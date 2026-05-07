@@ -34,12 +34,23 @@ $csprojContent = Get-Content $csproj -Raw -Encoding UTF8
 $csprojContent = $csprojContent -replace '<Version>[^<]+</Version>', "<Version>$newVersion</Version>"
 [System.IO.File]::WriteAllText($csproj, $csprojContent, [System.Text.Encoding]::UTF8)
 
-# -- 4. Build ------------------------------------------------------------------
+# -- 4. Atualizar FUNCIONALIDADES.md -------------------------------------------
+$funcDoc = "$PSScriptRoot\FUNCIONALIDADES.md"
+if (Test-Path $funcDoc) {
+    $today   = (Get-Date).ToString("yyyy-MM-dd")
+    $content = Get-Content $funcDoc -Raw -Encoding UTF8
+    $content = $content -replace '\*\*Versão:\*\* [^\r\n]+', "**Versão:** $newVersion"
+    $content = $content -replace '\*\*Atualizado em:\*\* [^\r\n]+', "**Atualizado em:** $today"
+    [System.IO.File]::WriteAllText($funcDoc, $content, [System.Text.Encoding]::UTF8)
+    Write-Host "FUNCIONALIDADES.md atualizado para $newVersion ($today)"
+}
+
+# -- 5. Build ------------------------------------------------------------------
 Write-Host "Compilando..."
 dotnet build $csproj -c Release --nologo -v quiet
 if ($LASTEXITCODE -ne 0) { Write-Error "Build falhou."; exit 1 }
 
-# -- 5. Deploy (requer Admin) --------------------------------------------------
+# -- 6. Deploy (requer Admin) --------------------------------------------------
 $pluginsDir = "C:\Program Files\GitExtensions\Plugins"
 if (-not (Test-Path $pluginsDir)) {
     $pluginsDir = "C:\Program Files (x86)\GitExtensions\Plugins"
@@ -63,7 +74,7 @@ $toolsTarget = "$PSScriptRoot\tools\net9.0-windows"
 if (-not (Test-Path $toolsTarget)) { New-Item -ItemType Directory $toolsTarget | Out-Null }
 Copy-Item $dll $toolsTarget -Force
 
-# -- 6. Pack -------------------------------------------------------------------
+# -- 7. Pack -------------------------------------------------------------------
 Write-Host "Gerando pacote $newVersion..."
 nuget pack $nuspec -OutputDirectory $outDir
 if ($LASTEXITCODE -ne 0) { Write-Error "nuget pack falhou."; exit 1 }
