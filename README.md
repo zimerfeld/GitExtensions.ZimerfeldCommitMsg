@@ -46,14 +46,30 @@ cd C:\NUGET\ZimerfeldCommitMsg\tools
 
 ## Build / atualização
 
-Para incrementar a versão e gerar um novo `.nupkg`:
+A cada mudança, execute `build.ps1` — ele **incrementa automaticamente** o número de build (`major.minor.build`), compila, faz deploy e gera o `.nupkg`.
+
+### Opção A — PowerShell (recomendado, requer Admin para deploy)
 
 ```powershell
 cd C:\NUGET\ZimerfeldCommitMsg
 .\build.ps1
 ```
 
-O script incrementa o número de build (`major.minor.build`), compila, faz deploy em `C:\Program Files\GitExtensions\Plugins\` (requer Admin) e gera o pacote `.nupkg`.
+### Opção B — Git Bash / Bash tool (sem elevação de Admin)
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:/NUGET/ZimerfeldCommitMsg/build.ps1"
+```
+
+> **O que o script faz, a cada execução:**
+> 1. Lê a versão atual do `.nuspec`
+> 2. Incrementa o `build` em +1 → `major.minor.build`
+> 3. Atualiza `.nuspec` e `.csproj` com a nova versão
+> 4. Compila em Release
+> 5. Copia o DLL para `C:\Program Files\GitExtensions\Plugins\` *(requer Admin)*
+> 6. Atualiza `tools\net9.0-windows\` com o DLL novo
+> 7. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
+> 8. Remove `.nupkg` de versões anteriores
 
 ## Licença
 
