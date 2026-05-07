@@ -215,10 +215,15 @@ internal sealed class CommitMessageGenerator
 
         if (comments.Count > 0)
         {
-            // Descrição = primeiro comentário; corpo = demais (máx. 3)
-            desc = NormalizeDesc(comments[0]);
-            body = comments.Count > 1
-                ? string.Join("\n", comments.Skip(1).Take(3).Select(c => $"- {NormalizeDesc(c)}"))
+            // Sujeito: cláusula principal do primeiro comentário (antes de conectores de propósito)
+            var mainClause = ExtractMainClause(comments[0]);
+            desc = NormalizeDesc(mainClause);
+
+            // Corpo: todos os comentários completos como marcadores
+            // Se o sujeito foi abreviado, o primeiro também aparece completo no corpo
+            bool wasShortened = mainClause.Length < comments[0].Length;
+            body = (comments.Count > 1 || wasShortened)
+                ? string.Join("\n", comments.Select(c => $"- {NormalizeDesc(c)}"))
                 : BuildBody(changes);
         }
         else
@@ -240,7 +245,7 @@ internal sealed class CommitMessageGenerator
     /// </summary>
     private List<string> ExtractDiffComments()
     {
-        var diff   = RunGit("diff", "--cached");
+        var diff   = RunGit("diff", "--cached", "--no-color");
         var seen   = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var result = new List<string>();
 
@@ -304,12 +309,30 @@ internal sealed class CommitMessageGenerator
         return text;
     }
 
-    /// <summary>Normaliza um comentário para uso como descrição: 1ª letra minúscula, máx. 72 chars.</summary>
-    private static string NormalizeDesc(string text)
+    /// <summary>
+    /// Extrai a cláusula principal de um comentário, descartando justificativas introduzidas
+    /// por conectores como " para ", " pois ", " porque ", " — ", etc.
+    /// Exemplo: "filtrar stems com ponto para evitar nomes de assembly"
+    ///       →  "filtrar stems com ponto"
+    /// </summary>
+    private static string ExtractMainClause(string comment)
     {
-        text = char.ToLowerInvariant(text[0]) + text[1..];
-        return text.Length > 72 ? text[..69] + "..." : text;
+        ReadOnlySpan<string> connectors =
+        [
+            " para ", " pois ", " porque ", " já que ", " a fim de ",
+            " quando ", " caso ", " evitando ", " — ", " - "
+        ];
+        foreach (var conn in connectors)
+        {
+            var idx = comment.IndexOf(conn, StringComparison.OrdinalIgnoreCase);
+            if (idx > 8) return comment[..idx].Trim();   // mínimo de 8 chars antes do conector
+        }
+        return comment;
     }
+
+    /// <summary>Normaliza um comentário para uso como descrição: 1ª letra minúscula.</summary>
+    private static string NormalizeDesc(string text) =>
+        char.ToLowerInvariant(text[0]) + text[1..];
 
     // ── Step 1 — Parse git diff --name-status ─────────────────────────────────
 
