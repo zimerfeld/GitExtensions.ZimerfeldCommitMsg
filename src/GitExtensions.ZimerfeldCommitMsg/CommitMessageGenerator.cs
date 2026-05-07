@@ -186,11 +186,16 @@ internal sealed class CommitMessageGenerator
             _          => added >= deleted ? "add" : "update"
         };
 
+        // When the verb would repeat the type word, omit it.
+        // e.g. "refactor: refactor 7 files" → "refactor: 7 files"
+        //      "fix: fix user service"       → "fix: user service"
+        bool verbRepeatsType = verb == type;
+
         // ── Single file: derive human-readable name from filename ──────────────
         if (changes.Count == 1)
         {
             var name = HumanizeName(Path.GetFileNameWithoutExtension(changes[0].Path));
-            return $"{verb} {name}";
+            return verbRepeatsType ? name : $"{verb} {name}";
         }
 
         // ── Multiple files ─────────────────────────────────────────────────────
@@ -204,7 +209,7 @@ internal sealed class CommitMessageGenerator
             .FirstOrDefault() ?? "files";
 
         var fileNoun = FileNoun(topExt, changes.Count);
-        return $"{verb} {fileNoun}";
+        return verbRepeatsType ? fileNoun : $"{verb} {fileNoun}";
     }
 
     // ── Step 5 — Build the body (bullet list of changed files) ────────────────
