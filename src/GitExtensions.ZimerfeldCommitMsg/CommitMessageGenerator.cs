@@ -339,6 +339,9 @@ internal sealed class CommitMessageGenerator
 
     private static string? ExtractRawConcept(string filename)
     {
+        // Stems com ponto são nomes de assembly/projeto (ex: GitExtensions.ZimerfeldCommitMsg) — ignorar
+        if (filename.Contains('.')) return null;
+
         var name = filename;
 
         // Remove prefixo "I" de interface: IUserService → UserService
@@ -356,7 +359,17 @@ internal sealed class CommitMessageGenerator
             }
         }
 
-        return name.Length >= 2 ? name : null;
+        if (name.Length < 2) return null;
+
+        // Se não está no dicionário e tem mais de 2 palavras PascalCase,
+        // é provavelmente um nome de projeto/namespace — ignorar
+        if (!ConceptPhrases.ContainsKey(name))
+        {
+            var wordCount = Regex.Matches(name, @"[A-Z][a-z]+").Count;
+            if (wordCount > 2) return null;
+        }
+
+        return name;
     }
 
     private static string BuildFunctionalPhrase(List<FileChange> changes)
