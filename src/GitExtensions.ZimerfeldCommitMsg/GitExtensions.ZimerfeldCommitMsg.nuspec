@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>GitExtensions.ZimerfeldCommitMsg</id>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <authors>Zimerfeld</authors>
     <description>Plugin para GitExtensions que gera automaticamente uma mensagem de commit resumindo em uma frase as mudanças nos arquivos staged, usando o formato Conventional Commits (feat/fix/docs/test/chore).</description>
     <tags>gitextensions plugin commit-message conventional-commits</tags>
@@ -14,10 +14,10 @@
     <!-- Plugin DLL -->
     <file src="bin\Release\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll" target="tools\net9.0-windows\" />
     <!-- Install / Uninstall scripts -->
-    <file src="..\..\tools\install.ps1"   target="tools\" />
+    <file src="..\..\tools\install.ps1" target="tools\" />
     <file src="..\..\tools\uninstall.ps1" target="tools\" />
     <!-- README e LICENSE -->
-    <file src="..\..\README.md"     target="\" />
-    <file src="..\..\LICENSE.txt"   target="\" />
+    <file src="..\..\README.md" target="\" />
+    <file src="..\..\LICENSE.txt" target="\" />
   </files>
 </package>
