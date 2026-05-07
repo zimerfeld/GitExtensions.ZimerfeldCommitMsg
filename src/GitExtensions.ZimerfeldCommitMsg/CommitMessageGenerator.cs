@@ -202,18 +202,113 @@ internal sealed class CommitMessageGenerator
 
     public string Generate()
     {
-        var raw = RunGit("diff", "--cached", "--name-status");
-        if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
+        var nameStatus = RunGit("diff", "--cached", "--name-status");
+        if (string.IsNullOrWhiteSpace(nameStatus)) return string.Empty;
 
-        var changes = ParseChanges(raw);
+        var changes = ParseChanges(nameStatus);
         if (changes.Count == 0) return string.Empty;
 
-        var type = DetermineType(changes);
-        var desc = BuildSubject(type, changes);
-        var body = BuildBody(changes);
+        var type     = DetermineType(changes);
+        var comments = ExtractDiffComments();
+
+        string desc, body;
+
+        if (comments.Count > 0)
+        {
+            // Descrição = primeiro comentário; corpo = demais (máx. 3)
+            desc = NormalizeDesc(comments[0]);
+            body = comments.Count > 1
+                ? string.Join("\n", comments.Skip(1).Take(3).Select(c => $"- {NormalizeDesc(c)}"))
+                : BuildBody(changes);
+        }
+        else
+        {
+            // Fallback: derivar da análise de nomes de arquivo
+            desc = BuildSubject(type, changes);
+            body = BuildBody(changes);
+        }
 
         var header = $"{type}: {desc}";
         return body.Length > 0 ? $"{header}\n\n{body}" : header;
+    }
+
+    // ── Extração de comentários do diff ───────────────────────────────────────
+
+    /// <summary>
+    /// Lê git diff --cached e coleta linhas adicionadas que são comentários
+    /// explicativos (não código comentado, não separadores visuais, não tags XML).
+    /// </summary>
+    private List<string> ExtractDiffComments()
+    {
+        var diff   = RunGit("diff", "--cached");
+        var seen   = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var result = new List<string>();
+
+        foreach (var line in diff.Split('\n'))
+        {
+            // Apenas linhas adicionadas; ignora cabeçalhos +++ do diff
+            if (line.Length < 3 || !line.StartsWith('+') || line.StartsWith("+++"))
+                continue;
+
+            var text = ExtractCommentText(line[1..].TrimStart());
+            if (text is not null && seen.Add(text))
+                result.Add(text);
+
+            if (result.Count >= 5) break;   // máx. 5 comentários
+        }
+
+        return result;
+    }
+
+    /// <summary>Tenta extrair texto de comentário de uma linha de código.</summary>
+    private static string? ExtractCommentText(string content)
+    {
+        string? raw = null;
+
+        // C# linha única: // ou ///
+        var m = Regex.Match(content, @"^\/\/\/?\s+(.+)");
+        if (m.Success) raw = m.Groups[1].Value;
+
+        // Python / shell / YAML: # texto
+        if (raw is null)
+        {
+            m = Regex.Match(content, @"^#+\s+([A-Za-zÀ-ú].+)");
+            if (m.Success) raw = m.Groups[1].Value;
+        }
+
+        return raw is null ? null : CleanCommentText(raw);
+    }
+
+    /// <summary>
+    /// Valida e limpa o texto extraído de um comentário.
+    /// Retorna null para separadores visuais, código comentado e tags XML.
+    /// </summary>
+    private static string? CleanCommentText(string raw)
+    {
+        var text = raw.Trim().TrimEnd('.', ':', ';');
+
+        if (text.Length < 10)  return null;   // muito curto
+        if (!text.Contains(' ')) return null;  // sem espaço = provavelmente não é frase
+
+        // Separadores visuais (── , ===, ---)
+        if (Regex.IsMatch(text, @"^[\-─═=\s]+$")) return null;
+        if (text.Count(c => c is '─' or '-' or '=') > text.Length / 3) return null;
+
+        // Tags de documentação XML
+        if (text.TrimStart().StartsWith('<')) return null;
+
+        // Código comentado: tem chaves ou chamada de método (palavra seguida de parênteses)
+        if (text.Contains('{') || text.Contains('}')) return null;
+        if (Regex.IsMatch(text, @"\w+\([^)]*\)")) return null;
+
+        return text;
+    }
+
+    /// <summary>Normaliza um comentário para uso como descrição: 1ª letra minúscula, máx. 72 chars.</summary>
+    private static string NormalizeDesc(string text)
+    {
+        text = char.ToLowerInvariant(text[0]) + text[1..];
+        return text.Length > 72 ? text[..69] + "..." : text;
     }
 
     // ── Step 1 — Parse git diff --name-status ─────────────────────────────────
