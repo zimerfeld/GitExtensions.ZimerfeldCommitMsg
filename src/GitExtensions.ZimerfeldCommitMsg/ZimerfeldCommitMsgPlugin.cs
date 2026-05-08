@@ -9,33 +9,40 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
 {
     private const string TemplateKey = "Zimerfeld: Auto-resumo";
 
+    // Capturado no Register() (roda na UI thread) para marshalling seguro
+    private SynchronizationContext? _syncContext;
+    private string _lastGeneratedMessage = string.Empty;
+
     public ZimerfeldCommitMsgPlugin()
     {
         Name        = "ZimerfeldCommitMsg";
         Description = "Gera automaticamente uma mensagem de commit resumindo as mudanças nos arquivos";
     }
 
-    // Called once per repository when the plugin is loaded / enabled
     public override void Register(IGitUICommands gitUiCommands)
     {
         base.Register(gitUiCommands);
+        _syncContext = SynchronizationContext.Current;
 
-        // Adds a template entry to the commit dialog's template dropdown.
-        // The lambda runs at selection time, so it always uses the current repository.
+        // Template no dropdown — só preenche quando o usuário selecionar explicitamente
         gitUiCommands.AddCommitTemplate(
             TemplateKey,
             () => new CommitMessageGenerator(gitUiCommands.Module.WorkingDir).Generate(),
             icon: null);
+
+        // Atualiza a mensagem automaticamente sempre que arquivos entram/saem do stage
+        gitUiCommands.PostRepositoryChanged += OnPostRepositoryChanged;
     }
 
-    // Called when the plugin is disabled or GitExtensions shuts down — no DLL left behind
     public override void Unregister(IGitUICommands gitUiCommands)
     {
+        gitUiCommands.PostRepositoryChanged -= OnPostRepositoryChanged;
         gitUiCommands.RemoveCommitTemplate(TemplateKey);
+        _lastGeneratedMessage = string.Empty;
         base.Unregister(gitUiCommands);
     }
 
-    // Called from Plugins menu → opens the commit dialog with the generated message pre-filled
+    // Plugins menu → abre o diálogo de commit com a mensagem já preenchida
     public override bool Execute(GitUIEventArgs args)
     {
         if (!args.GitModule.IsValidGitWorkingDir())
@@ -56,7 +63,99 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             return false;
         }
 
-        // Open the commit dialog with the generated message already filled in
         return args.GitUICommands.StartCommitDialog(args.OwnerForm, commitMessage: message);
+    }
+
+    // ── Stage/unstage handler ──────────────────────────────────────────────────
+
+    private void OnPostRepositoryChanged(object? sender, GitUIEventArgs e)
+    {
+        try
+        {
+            var workingDir = e.GitModule?.WorkingDir;
+            if (string.IsNullOrEmpty(workingDir)) return;
+
+            // Sempre executa na UI thread para acesso seguro a Application.OpenForms
+            if (_syncContext is not null)
+                _syncContext.Post(_ => RefreshOpenCommitDialog(workingDir), null);
+            else
+                RefreshOpenCommitDialog(workingDir);
+        }
+        catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
+    }
+
+    private void RefreshOpenCommitDialog(string workingDir)
+    {
+        try
+        {
+            // Localiza o diálogo de commit aberto, se houver
+            Form? commitForm = null;
+            foreach (Form f in Application.OpenForms)
+            {
+                if (f.GetType().Name == "FormCommit") { commitForm = f; break; }
+            }
+            if (commitForm == null) return;
+
+            var tb = FindCommitTextBox(commitForm);
+            if (tb == null) return;
+
+            // Não sobrescreve texto digitado manualmente pelo usuário:
+            // só atualiza se a caixa estiver vazia ou contiver a última mensagem gerada por nós
+            var current = tb.Text.Trim();
+            if (current.Length > 0 && current != _lastGeneratedMessage.Trim()) return;
+
+            var msg = new CommitMessageGenerator(workingDir).Generate();
+            if (string.IsNullOrEmpty(msg)) return;
+
+            _lastGeneratedMessage = msg;
+            tb.Text = msg;
+            tb.SelectionStart = 0;
+            tb.SelectionLength = 0;
+        }
+        catch { }
+    }
+
+    // ── UI helpers ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Localiza a caixa de texto da mensagem de commit no FormCommit.
+    /// Tenta nomes conhecidos de versões do GitExtensions; fallback: maior área editável.
+    /// </summary>
+    private static TextBoxBase? FindCommitTextBox(Form form)
+    {
+        // Nomes usados em versões diferentes do GitExtensions
+        foreach (var name in new[] { "Message", "commitMessageEditor", "_commitMessage", "commitMessage" })
+        {
+            if (FindDescendantByName(form, name) is TextBoxBase tb) return tb;
+        }
+
+        // Fallback: maior TextBox multiline editável (a caixa de mensagem é a maior)
+        return EnumerateDescendants(form)
+            .OfType<TextBoxBase>()
+            .Where(t => t.Multiline && !t.ReadOnly && t.Visible)
+            .OrderByDescending(t => t.Width * t.Height)
+            .FirstOrDefault();
+    }
+
+    private static Control? FindDescendantByName(Control parent, string name)
+    {
+        foreach (Control child in parent.Controls)
+        {
+            if (string.Equals(child.Name, name, StringComparison.OrdinalIgnoreCase))
+                return child;
+            var found = FindDescendantByName(child, name);
+            if (found is not null) return found;
+        }
+        return null;
+    }
+
+    private static IEnumerable<Control> EnumerateDescendants(Control parent)
+    {
+        foreach (Control child in parent.Controls)
+        {
+            yield return child;
+            foreach (var desc in EnumerateDescendants(child))
+                yield return desc;
+        }
     }
 }
