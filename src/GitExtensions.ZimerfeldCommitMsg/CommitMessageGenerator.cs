@@ -240,29 +240,76 @@ internal sealed class CommitMessageGenerator
     // ── Extração de comentários do diff ───────────────────────────────────────
 
     /// <summary>
-    /// Lê git diff --cached e coleta linhas adicionadas que são comentários
-    /// explicativos (não código comentado, não separadores visuais, não tags XML).
+    /// Lê git diff --cached e coleta comentários alterados (linhas + e -).
+    /// Linhas adicionadas (+): prioridade = tipo do arquivo (source=4, web=3, …).
+    /// Linhas removidas  (-): prioridade = tipo do arquivo − 1 (contexto do que mudou).
+    /// Retorna ordenado por prioridade → comentário mais impactante primeiro.
     /// </summary>
     private List<string> ExtractDiffComments()
     {
-        var diff   = RunGit("diff", "--cached", "--no-color");
-        var seen   = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var result = new List<string>();
+        var diff    = RunGit("diff", "--cached", "--no-color");
+        var buckets = new SortedDictionary<int, List<string>>(Comparer<int>.Create((a, b) => b.CompareTo(a)));
+        var seen    = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        int total   = 0;
+        int filePriority = 2;
 
         foreach (var line in diff.Split('\n'))
         {
-            // Apenas linhas adicionadas; ignora cabeçalhos +++ do diff
-            if (line.Length < 3 || !line.StartsWith('+') || line.StartsWith("+++"))
+            // Detecta o arquivo atual: "+++ b/caminho"
+            if (line.StartsWith("+++ b/"))
+            {
+                filePriority = CommentFilePriority(line[6..].Trim());
                 continue;
+            }
+
+            // Processa linhas adicionadas (+) e removidas (-); ignora cabeçalhos +++/---
+            bool isAdded   = line.Length >= 2 && line[0] == '+' && !line.StartsWith("+++");
+            bool isRemoved = line.Length >= 2 && line[0] == '-' && !line.StartsWith("---");
+            if (!isAdded && !isRemoved) continue;
 
             var text = ExtractCommentText(line[1..].TrimStart());
-            if (text is not null && seen.Add(text))
-                result.Add(text);
+            if (text is null || !seen.Add(text)) continue;
 
-            if (result.Count >= 5) break;   // máx. 5 comentários
+            // Linhas removidas têm prioridade um grau menor que as adicionadas —
+            // assim só dominam quando não há comentários adicionados do mesmo nível
+            int priority = isAdded ? filePriority : Math.Max(0, filePriority - 1);
+
+            if (!buckets.TryGetValue(priority, out var list))
+                buckets[priority] = list = [];
+
+            list.Add(text);
+            if (++total >= 15) break;
         }
 
-        return result;
+        return buckets.Values
+            .SelectMany(l => l)
+            .Take(5)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Prioridade do arquivo para ranquear os comentários:
+    /// maior = mais impactante → aparece na primeira linha do commit.
+    /// </summary>
+    private static int CommentFilePriority(string path)
+    {
+        // Arquivos de teste têm a menor prioridade
+        var lower = path.ToLowerInvariant();
+        if (lower.Contains("/test/") || lower.Contains("/tests/") ||
+            lower.Contains("/spec/") || lower.EndsWith("test.cs") ||
+            lower.EndsWith("tests.cs") || lower.Contains(".test.") ||
+            lower.Contains(".spec."))
+            return 0;
+
+        return GetCategory(path) switch
+        {
+            "source" => 4,
+            "web"    => 3,
+            "build"  => 2,
+            "config" => 1,
+            "docs"   => 1,
+            _        => 2
+        };
     }
 
     /// <summary>Tenta extrair texto de comentário de uma linha de código.</summary>
