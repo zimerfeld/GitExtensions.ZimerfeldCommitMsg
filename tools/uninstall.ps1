@@ -1,30 +1,88 @@
-param($installPath, $toolsPath, $package, $project)
+#Requires -Version 5.1
+<#
+.SYNOPSIS
+    Remove o plugin ZimerfeldCommitMsg do GitExtensions sem causar danos ao programa.
 
-# Auto-elevate quando nao estiver rodando como Administrador
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
-        [Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    $args = "-ExecutionPolicy Bypass -File `"$PSCommandPath`""
-    Start-Process powershell -Verb RunAs -ArgumentList $args
-    exit
-}
+.DESCRIPTION
+    Pode ser executado de duas formas:
 
-$dllName   = "GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
-$locations = @(
-    "C:\Program Files\GitExtensions\Plugins\$dllName",
-    "C:\Program Files (x86)\GitExtensions\Plugins\$dllName"
+      Opcao A - standalone:
+          cd C:\NUGET\ZimerfeldCommitMsg\tools
+          .\uninstall.ps1
+
+      Opcao B - via NuGet Package Manager Console (Visual Studio):
+          Uninstall-Package GitExtensions.ZimerfeldCommitMsg
+          (O NuGet invoca este script automaticamente.)
+
+.NOTES
+    Apenas o DLL do plugin e removido.
+    O GitExtensions e seus dados nao sao afetados.
+    Requer permissao de Administrador.
+#>
+
+param(
+    # Provided automatically by NuGet PMC; ignored when run standalone
+    $installPath,
+    $toolsPath,
+    $package,
+    $project
 )
 
-$removed = $false
-foreach ($path in $locations) {
-    if (Test-Path $path) {
-        Remove-Item -Path $path -Force
-        Write-Host "Plugin removido de: $path"
-        $removed = $true
-    }
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+$dllName = "GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
+
+# -- Locate GitExtensions Plugins folder --------------------------------------
+
+$candidates = @(
+    "C:\Program Files\GitExtensions\Plugins",
+    "C:\Program Files (x86)\GitExtensions\Plugins"
+)
+
+$pluginsDir = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if (-not $pluginsDir) {
+    Write-Warning "Pasta de plugins do GitExtensions nao encontrada. Nada a remover."
+    exit 0
 }
 
-if (-not $removed) {
-    Write-Host "Plugin nao encontrado nos locais padrao. Nenhum arquivo removido."
+$target = Join-Path $pluginsDir $dllName
+
+if (-not (Test-Path $target)) {
+    Write-Host "Plugin nao esta instalado em '$pluginsDir'. Nada a remover." -ForegroundColor Yellow
+    exit 0
 }
 
-Read-Host "Pressione Enter para sair"
+# -- Check administrator rights -----------------------------------------------
+
+$isAdmin = ([Security.Principal.WindowsPrincipal]
+            [Security.Principal.WindowsIdentity]::GetCurrent()
+           ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if (-not $isAdmin) {
+    Write-Warning @"
+Este script precisa de permissao de Administrador para remover:
+  $target
+
+Re-execute o PowerShell como Administrador e repita:
+  cd $PSScriptRoot
+  .\uninstall.ps1
+"@
+    exit 1
+}
+
+# -- Remove DLL ---------------------------------------------------------------
+
+try {
+    Remove-Item -Path $target -Force
+    Write-Host ""
+    Write-Host "✔  Plugin removido com sucesso:" -ForegroundColor Green
+    Write-Host "   $target" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "O GitExtensions nao foi afetado. Reinicie-o se ainda estiver aberto."
+}
+catch {
+    Write-Error "Falha ao remover o arquivo: $_"
+    exit 1
+}

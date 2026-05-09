@@ -20,5 +20,8 @@ if (-not (Test-Path $dest)) {
 }
 
 Copy-Item $dll $dest -Force
-Write-Host "DLL atualizada em: $dest"
+Write-Host ""
+Write-Host "DLL atualizada com sucesso em:" -ForegroundColor Green
+Write-Host "  $dest" -ForegroundColor Cyan
+Write-Host ""
 Write-Host "Reinicie o GitExtensions para aplicar."
