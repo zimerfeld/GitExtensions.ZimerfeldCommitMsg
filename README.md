@@ -18,9 +18,16 @@ Plugin para **GitExtensions** que gera automaticamente uma mensagem de commit re
 | Arquivo `README.md` | `docs: update README.md` |
 | Mix de adições e modificações em `.cs` | `feat: add (2 added, 1 modified) .cs files in src/Auth` |
 
+## Requisitos
+
+- PowerShell 5.1 ou superior
+- Permissão de **Administrador** para instalar/desinstalar
+
 ## Instalação
 
 ### Opção A — Via PowerShell (recomendado)
+
+Execute o PowerShell **como Administrador** e rode:
 
 ```powershell
 cd C:\NUGET\ZimerfeldCommitMsg\tools
@@ -38,6 +45,8 @@ C:\Program Files\GitExtensions\Plugins\
 Reinicie o GitExtensions.
 
 ## Desinstalação
+
+Execute o PowerShell **como Administrador** e rode:
 
 ```powershell
 cd C:\NUGET\ZimerfeldCommitMsg\tools
@@ -65,11 +74,21 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:/NUGET/ZimerfeldCommi
 > 1. Lê a versão atual do `.nuspec`
 > 2. Incrementa o `build` em +1 → `major.minor.build`
 > 3. Atualiza `.nuspec` e `.csproj` com a nova versão
-> 4. Compila em Release
-> 5. Copia o DLL para `C:\Program Files\GitExtensions\Plugins\` *(requer Admin)*
-> 6. Atualiza `tools\net9.0-windows\` com o DLL novo
-> 7. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
-> 8. Remove `.nupkg` de versões anteriores
+> 4. Atualiza `FUNCIONALIDADES.md` com versão e data
+> 5. Compila em Release
+> 6. Copia o DLL para `C:\Program Files\GitExtensions\Plugins\` *(requer Admin)*
+> 7. Atualiza `tools\net9.0-windows\` com o DLL novo
+> 8. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
+> 9. Remove `.nupkg` de versões anteriores
+
+## Deploy rápido (sem incrementar versão)
+
+Para atualizar apenas o DLL durante desenvolvimento:
+
+```powershell
+cd C:\NUGET\ZimerfeldCommitMsg\tools
+.\update-dll.ps1
+```
 
 ## Licença
 

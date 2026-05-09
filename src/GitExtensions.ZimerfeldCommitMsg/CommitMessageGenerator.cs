@@ -190,6 +190,167 @@ internal sealed class CommitMessageGenerator
         ["Generator"]   = "gerador",      ["Generators"]   = "gerador",
     };
 
+    // ── Tradução inglês → pt-BR: frases compostas (mais longas primeiro) ─────────
+    private static readonly (string En, string Pt)[] PhraseTranslations =
+    [
+        // Negações compostas (mais específicas antes das genéricas)
+        ("the node and all its descendants don't match the filter",
+            "o nó e todos os descendentes não correspondem ao filtro"),
+        ("the node and all its descendants", "o nó e todos os descendentes"),
+        ("all its descendants",              "todos os descendentes"),
+        ("don't match the filter",           "não correspondem ao filtro"),
+        ("doesn't match the filter",         "não corresponde ao filtro"),
+        ("don't match",                      "não correspondem"),
+        ("doesn't match",                    "não corresponde"),
+        ("do not match",                     "não correspondem"),
+        ("does not match",                   "não corresponde"),
+        ("returns null when",                "retorna null quando"),
+        // Contexto git
+        ("git-history hierarchy",            "hierarquia do histórico git"),
+        ("this was created from",            "de onde foi criado"),
+        ("then git-history hierarchy within each group",
+            "depois hierarquia do histórico git dentro de cada grupo"),
+        ("within each group",                "dentro de cada grupo"),
+        ("grouped by remote",                "agrupados por remoto"),
+        // Padrões relacionais
+        ("split by",                         "separado por"),
+        ("grouped by",                       "agrupado por"),
+        ("sorted by",                        "ordenado por"),
+        ("filtered by",                      "filtrado por"),
+        ("ordered by",                       "ordenado por"),
+        ("based on",                         "baseado em"),
+        ("mapped to",                        "mapeado para"),
+        ("converted to",                     "convertido para"),
+        ("converted into",                   "convertido em"),
+        ("created from",                     "criado a partir de"),
+        ("derived from",                     "derivado de"),
+    ];
+
+    // ── Tradução inglês → pt-BR: palavras individuais ─────────────────────────
+    private static readonly Dictionary<string, string> WordTranslations =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Verbos (3ª pessoa / infinitivo)
+        ["returns"]       = "retorna",      ["return"]        = "retornar",
+        ["converts"]      = "converte",     ["convert"]       = "converter",
+        ["creates"]       = "cria",         ["create"]        = "criar",
+        ["removes"]       = "remove",       ["remove"]        = "remover",
+        ["adds"]          = "adiciona",     ["add"]           = "adicionar",
+        ["updates"]       = "atualiza",     ["update"]        = "atualizar",
+        ["builds"]        = "constrói",     ["build"]         = "construir",
+        ["gets"]          = "obtém",        ["get"]           = "obter",
+        ["sets"]          = "define",       ["set"]           = "definir",
+        ["takes"]         = "recebe",       ["take"]          = "receber",
+        ["makes"]         = "cria",         ["make"]          = "criar",
+        ["uses"]          = "usa",          ["use"]           = "usar",
+        ["reads"]         = "lê",           ["read"]          = "ler",
+        ["writes"]        = "escreve",      ["write"]         = "escrever",
+        ["parses"]        = "processa",     ["parse"]         = "processar",
+        ["filters"]       = "filtra",       ["handles"]       = "trata",
+        ["handle"]        = "tratar",       ["validates"]     = "valida",
+        ["validate"]      = "validar",      ["loads"]         = "carrega",
+        ["load"]          = "carregar",     ["saves"]         = "salva",
+        ["save"]          = "salvar",       ["checks"]        = "verifica",
+        ["check"]         = "verificar",    ["matches"]       = "corresponde",
+        ["match"]         = "corresponder", ["wraps"]         = "encapsula",
+        ["wrap"]          = "encapsular",   ["extends"]       = "estende",
+        ["extend"]        = "estender",     ["represents"]    = "representa",
+        ["contains"]      = "contém",       ["contain"]       = "conter",
+        ["provides"]      = "fornece",      ["provide"]       = "fornecer",
+        ["processes"]     = "processa",     ["initializes"]   = "inicializa",
+        ["initialize"]    = "inicializar",  ["initialises"]   = "inicializa",
+        ["generates"]     = "gera",         ["generate"]      = "gerar",
+        ["calculates"]    = "calcula",      ["calculate"]     = "calcular",
+        ["extracts"]      = "extrai",       ["extract"]       = "extrair",
+        ["transforms"]    = "transforma",   ["transform"]     = "transformar",
+        ["resolves"]      = "resolve",      ["resolve"]       = "resolver",
+        ["throws"]        = "lança",        ["throw"]         = "lançar",
+        ["delegates"]     = "delega",       ["delegate"]      = "delegar",
+        ["exposes"]       = "expõe",        ["expose"]        = "expor",
+        ["renders"]       = "renderiza",    ["render"]        = "renderizar",
+        ["sends"]         = "envia",        ["send"]          = "enviar",
+        ["receives"]      = "recebe",       ["receive"]       = "receber",
+        ["maps"]          = "mapeia",       ["map"]           = "mapear",
+        ["groups"]        = "agrupa",       ["sorts"]         = "ordena",
+        ["joins"]         = "une",          ["splits"]        = "divide",
+        ["searches"]      = "busca",        ["search"]        = "buscar",
+        // Advérbios
+        ["recursively"]   = "recursivamente",
+        ["automatically"] = "automaticamente",
+        ["manually"]      = "manualmente",
+        ["directly"]      = "diretamente",
+        ["lazily"]        = "preguiçosamente",
+        ["asynchronously"]= "assincronamente",
+        ["synchronously"] = "sincronamente",
+        // Preposições / conjunções / artigos
+        ["the"]           = "",          // artigo omitido (gênero variável)
+        ["from"]          = "de",        ["into"]    = "em",
+        ["within"]        = "dentro de", ["without"] = "sem",
+        ["between"]       = "entre",     ["through"] = "através de",
+        ["onto"]          = "sobre",     ["when"]    = "quando",
+        ["where"]         = "onde",      ["and"]     = "e",
+        ["or"]            = "ou",        ["not"]     = "não",
+        ["all"]           = "todos",     ["each"]    = "cada",
+        ["its"]           = "seus",      ["their"]   = "seus",
+        ["that"]          = "que",       ["which"]   = "que",
+        ["this"]          = "este",      ["then"]    = "depois",
+        ["with"]          = "com",       ["for"]     = "para",
+        ["by"]            = "por",       ["of"]      = "de",
+        ["in"]            = "em",        ["at"]      = "em",
+        ["on"]            = "em",        ["as"]      = "como",
+        ["an"]            = "",          ["a"]       = "",
+        // Substantivos técnicos
+        ["node"]          = "nó",        ["nodes"]        = "nós",
+        ["tree"]          = "árvore",    ["hierarchy"]    = "hierarquia",
+        ["history"]       = "histórico", ["ancestor"]     = "ancestral",
+        ["descendant"]    = "descendente",["descendants"] = "descendentes",
+        ["parent"]        = "pai",       ["child"]        = "filho",
+        ["children"]      = "filhos",    ["prefix"]       = "prefixo",
+        ["suffix"]        = "sufixo",    ["remote"]       = "remoto",
+        ["remotes"]       = "remotos",   ["list"]         = "lista",
+        ["grouping"]      = "agrupamento",["filter"]      = "filtro",
+        ["entry"]         = "entrada",   ["entries"]      = "entradas",
+        ["key"]           = "chave",     ["value"]        = "valor",
+        ["values"]        = "valores",   ["index"]        = "índice",
+        ["path"]          = "caminho",   ["root"]         = "raiz",
+        ["leaf"]          = "folha",     ["depth"]        = "profundidade",
+        ["level"]         = "nível",     ["order"]        = "ordem",
+        ["result"]        = "resultado", ["output"]       = "saída",
+        ["input"]         = "entrada",   ["type"]         = "tipo",
+        ["name"]          = "nome",      ["label"]        = "rótulo",
+        ["message"]       = "mensagem",  ["error"]        = "erro",
+        ["event"]         = "evento",    ["item"]         = "item",
+        ["items"]         = "itens",     ["element"]      = "elemento",
+        ["elements"]      = "elementos", ["property"]     = "propriedade",
+        ["properties"]    = "propriedades",["collection"] = "coleção",
+        ["separator"]     = "separador", ["scope"]        = "escopo",
+        ["context"]       = "contexto",  ["source"]       = "origem",
+        ["target"]        = "destino",   ["state"]        = "estado",
+        ["status"]        = "status",    ["mode"]         = "modo",
+        ["format"]        = "formato",   ["pattern"]      = "padrão",
+        ["rule"]          = "regra",     ["rules"]        = "regras",
+        ["option"]        = "opção",     ["options"]      = "opções",
+        ["flag"]          = "sinalizador",["flags"]       = "sinalizadores",
+        ["limit"]         = "limite",    ["size"]         = "tamanho",
+        ["count"]         = "contagem",  ["total"]        = "total",
+        ["range"]         = "intervalo", ["step"]         = "passo",
+        ["folder"]        = "pasta",     ["file"]         = "arquivo",
+        ["task"]          = "tarefa",    ["tasks"]        = "tarefas",
+        // Adjetivos
+        ["based"]         = "baseado",   ["grouped"]      = "agrupado",
+        ["sorted"]        = "ordenado",  ["filtered"]     = "filtrado",
+        ["mapped"]        = "mapeado",   ["enabled"]      = "habilitado",
+        ["disabled"]      = "desabilitado",["visible"]    = "visível",
+        ["hidden"]        = "oculto",    ["selected"]     = "selecionado",
+        ["required"]      = "obrigatório",["optional"]    = "opcional",
+        ["created"]       = "criado",    ["nested"]       = "aninhado",
+        ["merged"]        = "mesclado",  ["loaded"]       = "carregado",
+    };
+
+    // Palavras inglesas conhecidas — usadas para detectar idioma do comentário
+    private static readonly HashSet<string> EnglishWords =
+        new(WordTranslations.Keys, StringComparer.OrdinalIgnoreCase);
+
     private static readonly string[] TestPathSegments =
         ["test", "tests", "spec", "specs", "__tests__", "unittest", "unittests"];
 
@@ -209,21 +370,37 @@ internal sealed class CommitMessageGenerator
         if (changes.Count == 0) return string.Empty;
 
         var type     = DetermineType(changes);
-        var comments = ExtractDiffComments();
+        // Traduz comentários ingleses para pt-BR; descarta apenas quando a tradução é insuficiente
+        var comments = ExtractDiffComments()
+            .Select(TranslateToPortuguese)
+            .OfType<string>()
+            .ToList();
 
         string desc, body;
 
-        if (comments.Count > 0)
+        var readmeTitle = ReadStagedReadmeTitle(changes);
+
+        if (readmeTitle is not null)
+        {
+            desc = readmeTitle;
+            var bodyComments = comments.Count > 0
+                ? string.Join("\n", comments.Select(c => $"- {NormalizeDesc(c)}"))
+                : BuildBody(changes);
+            body = bodyComments;
+        }
+        else if (comments.Count > 0)
         {
             // Sujeito: cláusula principal do primeiro comentário (antes de conectores de propósito)
             var mainClause = ExtractMainClause(comments[0]);
             desc = NormalizeDesc(mainClause);
 
-            // Corpo: todos os comentários completos como marcadores
-            // Se o sujeito foi abreviado, o primeiro também aparece completo no corpo
+            // Corpo: demais comentários como marcadores
+            // Quando o sujeito foi abreviado, o primeiro comentário aparece completo no corpo (para contexto);
+            // caso contrário não é repetido, pois já é a própria descrição.
             bool wasShortened = mainClause.Length < comments[0].Length;
-            body = (comments.Count > 1 || wasShortened)
-                ? string.Join("\n", comments.Select(c => $"- {NormalizeDesc(c)}"))
+            var bodyComments = wasShortened ? comments : comments.Skip(1).ToList();
+            body = bodyComments.Count > 0
+                ? string.Join("\n", bodyComments.Select(c => $"- {NormalizeDesc(c)}"))
                 : BuildBody(changes);
         }
         else
@@ -235,6 +412,32 @@ internal sealed class CommitMessageGenerator
 
         var header = $"{type}: {desc}";
         return body.Length > 0 ? $"{header}\n\n{body}" : header;
+    }
+
+    /// <summary>
+    /// Lê o título (primeira linha com #) do README.md staged, se houver.
+    /// </summary>
+    private string? ReadStagedReadmeTitle(List<FileChange> changes)
+    {
+        var readme = changes.FirstOrDefault(c =>
+            c.Status != 'D' &&
+            Path.GetFileName(c.Path).Equals("README.md", StringComparison.OrdinalIgnoreCase));
+
+        if (readme is null) return null;
+
+        var fullPath = Path.Combine(_workingDir, readme.Path.Replace('/', Path.DirectorySeparatorChar));
+        if (!File.Exists(fullPath)) return null;
+
+        foreach (var line in File.ReadLines(fullPath))
+        {
+            if (line.StartsWith('#'))
+            {
+                var title = line.TrimStart('#').Trim();
+                return string.IsNullOrEmpty(title) ? null : title;
+            }
+        }
+
+        return null;
     }
 
     // ── Extração de comentários do diff ───────────────────────────────────────
@@ -281,8 +484,10 @@ internal sealed class CommitMessageGenerator
             if (++total >= 15) break;
         }
 
+        // Dentro do mesmo nível de prioridade, comentários mais longos primeiro
+        // (comprimento como proxy do impacto/valor descritivo da alteração)
         return buckets.Values
-            .SelectMany(l => l)
+            .SelectMany(l => l.OrderByDescending(c => c.Length))
             .Take(5)
             .ToList();
     }
@@ -377,9 +582,77 @@ internal sealed class CommitMessageGenerator
         return comment;
     }
 
-    /// <summary>Normaliza um comentário para uso como descrição: 1ª letra minúscula.</summary>
-    private static string NormalizeDesc(string text) =>
-        char.ToLowerInvariant(text[0]) + text[1..];
+    /// <summary>
+    /// Normaliza um comentário para uso como descrição: 1ª letra minúscula,
+    /// exceto quando a palavra inicial é um acrônimo em MAIÚSCULAS (ex: "HTML", "API").
+    /// </summary>
+    private static string NormalizeDesc(string text)
+    {
+        // Preserva maiúsculas quando a palavra inicial é acrônimo (≥2 letras maiúsculas seguidas)
+        if (text.Length >= 2 && char.IsUpper(text[0]) && char.IsUpper(text[1]))
+            return text;
+        return char.ToLowerInvariant(text[0]) + text[1..];
+    }
+
+    /// <summary>
+    /// Detecta se um texto está predominantemente em inglês.
+    /// Critério: ≥25 % das palavras (minúsculas, ≥3 letras) estão no dicionário de tradução.
+    /// </summary>
+    private static bool IsEnglishText(string text)
+    {
+        var words = Regex.Matches(text.ToLowerInvariant(), @"\b[a-z]{3,}\b")
+                         .Select(m => m.Value)
+                         .ToList();
+        if (words.Count < 3) return false;
+        var englishCount = words.Count(w => EnglishWords.Contains(w));
+        return (double)englishCount / words.Count >= 0.25;
+    }
+
+    /// <summary>
+    /// Traduz um comentário do inglês para pt-BR usando frases e palavras mapeadas.
+    /// Preserva identificadores PascalCase/MAIÚSCULAS (código).
+    /// Retorna null quando a tradução é insuficiente (fallback pt-BR será usado).
+    /// </summary>
+    private static string? TranslateToPortuguese(string text)
+    {
+        if (!IsEnglishText(text)) return text;  // já em pt-BR
+
+        var result = text;
+
+        // Fase 1 — frases compostas (mais longas primeiro para evitar fragmentação)
+        foreach (var (en, pt) in PhraseTranslations)
+            result = Regex.Replace(result, $@"(?i){Regex.Escape(en)}", pt);
+
+        // Fase 2 — padrões estruturais
+        // "X-based" → "baseado em X"
+        result = Regex.Replace(result, @"\b(\w+)-based\b",
+            m => $"baseado em {m.Groups[1].Value.ToLowerInvariant()}", RegexOptions.IgnoreCase);
+        // "recursively VERBO" → "VERBO recursivamente"
+        result = Regex.Replace(result, @"\brecursively\s+(\w+)",
+            m =>
+            {
+                var verb = m.Groups[1].Value;
+                var pt   = WordTranslations.TryGetValue(verb, out var v) ? v : verb;
+                return $"{pt} recursivamente";
+            }, RegexOptions.IgnoreCase);
+
+        // Fase 3 — palavras individuais (preserva PascalCase = identificadores de código)
+        result = Regex.Replace(result, @"\b[A-Za-z][a-z]*\b",
+            m =>
+            {
+                var word = m.Value;
+                // Preserva PascalCase: primeira maiúscula + tem minúsculas = identificador
+                if (char.IsUpper(word[0]) && word.Length > 1 && word.Any(char.IsLower))
+                    return word;
+                return WordTranslations.TryGetValue(word, out var pt) ? pt : word;
+            });
+
+        // Limpeza: remove espaços duplos gerados pela remoção de artigos ("the" → "")
+        result = Regex.Replace(result, @"\s{2,}", " ").Trim().TrimStart(',', ';');
+
+        // Se ainda predominantemente inglês após tradução, descarta (qualidade insuficiente)
+        return IsEnglishText(result) ? null : result;
+    }
 
     // ── Step 1 — Parse git diff --name-status ─────────────────────────────────
 
@@ -639,13 +912,19 @@ internal sealed class CommitMessageGenerator
                fn.EndsWith("tests.cs") || fn.EndsWith("test.cs");
     }
 
-    /// <summary>PascalCase → palavras em minúsculas. "UserAuthService" → "user auth service".</summary>
+    /// <summary>
+    /// PascalCase → palavras humanizadas. Acrônimos em MAIÚSCULAS são preservados.
+    /// Ex: "UserAuthService" → "user auth service"; "HTMLParser" → "HTML parser".
+    /// </summary>
     private static string HumanizeName(string name)
     {
         var spaced = Regex.Replace(name, @"([a-z])([A-Z])", "$1 $2")
                           .Replace('-', ' ')
                           .Replace('_', ' ');
-        return Regex.Replace(spaced, @"\s+", " ").Trim().ToLowerInvariant();
+        var normalized = Regex.Replace(spaced, @"\s+", " ").Trim();
+        // Preserva segmentos em MAIÚSCULAS (acrônimos: ≥2 chars, todos maiúsculos)
+        return string.Join(" ", normalized.Split(' ')
+            .Select(w => w.Length >= 2 && w.All(char.IsUpper) ? w : w.ToLowerInvariant()));
     }
 
     private static string JoinPhrases(List<string> items) => items.Count switch
