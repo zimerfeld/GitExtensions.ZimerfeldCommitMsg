@@ -410,7 +410,7 @@ internal sealed class CommitMessageGenerator
             body = BuildBody(changes);
         }
 
-        var header = $"{type}: {desc}";
+        var header = TruncateTitle($"{type}: {desc}");
         return body.Length > 0 ? $"{header}\n\n{body}" : header;
     }
 
@@ -821,18 +821,11 @@ internal sealed class CommitMessageGenerator
         var concepts = ExtractUniqueConcepts(changes);
         if (concepts.Count == 0) return FallbackPhrase(changes);
 
-        var phrases = concepts
+        // Título: conceito mais dominante (frequente) — síntese global das mudanças
+        return concepts
             .Select(MapConcept)
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Take(3)
-            .ToList();
-
-        return phrases.Count switch
-        {
-            1 => phrases[0],
-            2 => $"{phrases[0]} e {phrases[1]}",
-            _ => $"{phrases[0]}, {phrases[1]} e {phrases[2]}"
-        };
+            .First();
     }
 
     private static string MapConcept(string raw) =>
@@ -925,6 +918,14 @@ internal sealed class CommitMessageGenerator
         // Preserva segmentos em MAIÚSCULAS (acrônimos: ≥2 chars, todos maiúsculos)
         return string.Join(" ", normalized.Split(' ')
             .Select(w => w.Length >= 2 && w.All(char.IsUpper) ? w : w.ToLowerInvariant()));
+    }
+
+    // Garante que o título do commit respeita o limite recomendado de 72 chars
+    private static string TruncateTitle(string title, int maxLen = 72)
+    {
+        if (title.Length <= maxLen) return title;
+        var cut = title.LastIndexOf(' ', maxLen - 2);
+        return cut > 8 ? title[..cut] + "…" : title[..(maxLen - 1)] + "…";
     }
 
     private static string JoinPhrases(List<string> items) => items.Count switch
