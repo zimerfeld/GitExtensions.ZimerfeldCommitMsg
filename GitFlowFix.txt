@@ -1,3 +1,10 @@
+O GitExtensions gravou configurações no seu formato interno (gitflow.branch.develop.type=base, etc.), mas o plugin Plugins → Gitflow usa o git flow CLI, que espera chaves diferentes:
+
+gitflow.branch.master = main
+gitflow.branch.develop = develop
+gitflow.prefix.feature = feature/
+etc.
+
 Como essas chaves não existem, o plugin acha que o gitflow nunca foi inicializado e continua mostrando "Init Gitflow".
 
 A correção é adicionar as chaves no formato padrão manualmente:
