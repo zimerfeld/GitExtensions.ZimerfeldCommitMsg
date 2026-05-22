@@ -369,7 +369,8 @@ internal sealed class CommitMessageGenerator
         var changes = ParseChanges(nameStatus);
         if (changes.Count == 0) return string.Empty;
 
-        var type     = DetermineType(changes);
+        var types    = DetermineAllTypes(changes);
+        var type     = types[0];
         // Traduz comentários ingleses para pt-BR; descarta apenas quando a tradução é insuficiente
         var comments = ExtractDiffComments()
             .Select(TranslateToPortuguese)
@@ -405,13 +406,19 @@ internal sealed class CommitMessageGenerator
         }
         else
         {
-            // Fallback: derivar da análise de nomes de arquivo
-            desc = BuildSubject(type, changes);
+            desc = string.Empty;
             body = BuildBody(changes);
         }
 
-        var header = TruncateTitle($"{type}: {desc}");
-        return body.Length > 0 ? $"{header}\n\n{body}" : header;
+        var header = TruncateTitle(string.Join(", ", types));
+        var fullBody = (desc.Length > 0, body.Length > 0) switch
+        {
+            (true,  true)  => $"{desc}\n\n{body}",
+            (true,  false) => desc,
+            (false, true)  => body,
+            _              => string.Empty
+        };
+        return fullBody.Length > 0 ? $"{header}\n\n{fullBody}" : header;
     }
 
     /// <summary>
@@ -690,6 +697,43 @@ internal sealed class CommitMessageGenerator
         if (deleted > 0 && deleted > added && modified == 0) return "chore";
         if (modified > 0 && added == 0 && deleted == 0)     return "fix";
         return added > modified ? "feat" : "refactor";
+    }
+
+    /// <summary>
+    /// Retorna todos os CC types envolvidos nas mudanças, ordenados por prioridade convencional.
+    /// </summary>
+    private static List<string> DetermineAllTypes(List<FileChange> changes)
+    {
+        var types = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var change in changes)
+        {
+            string t;
+            if (IsTestPath(change))
+            {
+                t = "test";
+            }
+            else
+            {
+                t = GetCategory(change.Path) switch
+                {
+                    "docs"   => "docs",
+                    "build"  => "build",
+                    "config" => "chore",
+                    _ => change.Status switch
+                    {
+                        'A' or 'C'        => "feat",
+                        'D'               => "chore",
+                        'M' or 'R' or 'T' => "fix",
+                        _                 => "refactor"
+                    }
+                };
+            }
+            types.Add(t);
+        }
+
+        var order = new[] { "feat", "fix", "refactor", "perf", "test", "build", "ci", "chore", "docs", "style" };
+        return [.. types.OrderBy(t => Array.IndexOf(order, t) is var i && i >= 0 ? i : 99)];
     }
 
     // ── Step 3 — Subject: descrição funcional em pt-BR ────────────────────────

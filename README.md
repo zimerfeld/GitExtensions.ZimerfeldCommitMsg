@@ -67,7 +67,7 @@ cd C:\NUGET\ZimerfeldCommitMsg
 ### Opção B — Git Bash / Bash tool (sem elevação de Admin)
 
 ```bash
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:/NUGET/ZimerfeldCommitMsg/build.ps1"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "C:/GitExtensions/ZimerfeldCommitMsg/build.ps1"
 ```
 
 > **O que o script faz, a cada execução:**

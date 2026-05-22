@@ -1,7 +1,7 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg — Funcionalidades
 
-**Versão:** 1.0.8  
-**Atualizado em:** 2026-05-21
+**Versão:** 1.0.15
+**Atualizado em:** 2026-05-22
 
 ---
 

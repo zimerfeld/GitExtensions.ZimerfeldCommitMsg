@@ -1,0 +1,9 @@
+{
+  "useMarkdownLinks": false,
+  "newLinkFormat": "shortest",
+  "defaultViewMode": "preview",
+  "showLineNumber": true,
+  "foldIndent": true,
+  "strictLineBreaks": false,
+  "showFrontmatter": false
+}
