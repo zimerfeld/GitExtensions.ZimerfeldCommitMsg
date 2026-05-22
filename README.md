@@ -1,6 +1,10 @@
 # GitExtensions.ZimerfeldCommitMsg
 
-Plugin para **GitExtensions** que gera automaticamente uma mensagem de commit resumindo em uma frase as mudanças nos arquivos staged, usando o formato **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`refactor`).
+Plugin para **GitExtensions** [GitExtensions](https://gitextensions.github.io/) que gera automaticamente uma mensagem de commit resumindo em uma frase as mudanças nos arquivos staged, usando o formato **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`refactor`).
+
+**Versão atual: 1.0.26**
+
+---
 
 ## Funcionalidades
 
@@ -10,13 +14,13 @@ Plugin para **GitExtensions** que gera automaticamente uma mensagem de commit re
 
 ## Exemplos de mensagens geradas
 
-| Mudanças staged | Mensagem gerada |
-|---|---|
-| Novo arquivo `UserService.cs` | `feat: add UserService.cs` |
-| 3 arquivos `.cs` adicionados em `src/Services` | `feat: add 3 .cs files in src/Services` |
-| Modificações em `appsettings.json` | `chore: update appsettings.json` |
-| Arquivo `README.md` | `docs: update README.md` |
-| Mix de adições e modificações em `.cs` | `feat: add (2 added, 1 modified) .cs files in src/Auth` |
+| Mudanças staged                                | Mensagem gerada                                         |
+| ---------------------------------------------- | ------------------------------------------------------- |
+| Novo arquivo `UserService.cs`                  | `feat: add UserService.cs`                              |
+| 3 arquivos `.cs` adicionados em `src/Services` | `feat: add 3 .cs files in src/Services`                 |
+| Modificações em `appsettings.json`             | `chore: update appsettings.json`                        |
+| Arquivo `README.md`                            | `docs: update README.md`                                |
+| Mix de adições e modificações em `.cs`         | `feat: add (2 added, 1 modified) .cs files in src/Auth` |
 
 ## Requisitos
 
@@ -30,7 +34,7 @@ Plugin para **GitExtensions** que gera automaticamente uma mensagem de commit re
 Execute o PowerShell **como Administrador** e rode:
 
 ```powershell
-cd C:\NUGET\ZimerfeldCommitMsg\tools
+cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
@@ -49,7 +53,7 @@ Reinicie o GitExtensions.
 Execute o PowerShell **como Administrador** e rode:
 
 ```powershell
-cd C:\NUGET\ZimerfeldCommitMsg\tools
+cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\uninstall.ps1
 ```
 
@@ -67,16 +71,17 @@ cd C:\NUGET\ZimerfeldCommitMsg
 ### Opção B — Git Bash / Bash tool (sem elevação de Admin)
 
 ```bash
-pwsh -NoProfile -ExecutionPolicy Bypass -File "C:/GitExtensions/ZimerfeldCommitMsg/build.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:/NUGET/ZimerfeldCommitMsg/build.ps1"
 ```
 
 > **O que o script faz, a cada execução:**
+>
 > 1. Lê a versão atual do `.nuspec`
 > 2. Incrementa o `build` em +1 → `major.minor.build`
 > 3. Atualiza `.nuspec` e `.csproj` com a nova versão
 > 4. Atualiza `FUNCIONALIDADES.md` com versão e data
 > 5. Compila em Release
-> 6. Copia o DLL para `C:\Program Files\GitExtensions\Plugins\` *(requer Admin)*
+> 6. Copia o DLL para `C:\Program Files\GitExtensions\Plugins\` _(requer Admin)_
 > 7. Atualiza `tools\net9.0-windows\` com o DLL novo
 > 8. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
 > 9. Remove `.nupkg` de versões anteriores
