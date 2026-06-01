@@ -369,7 +369,8 @@ internal sealed class CommitMessageGenerator
         var changes = ParseChanges(nameStatus);
         if (changes.Count == 0) return string.Empty;
 
-        var type     = DetermineType(changes);
+        var types    = DetermineAllTypes(changes);
+        var type     = types[0];
         // Traduz comentários ingleses para pt-BR; descarta apenas quando a tradução é insuficiente
         var comments = ExtractDiffComments()
             .Select(TranslateToPortuguese)
@@ -405,13 +406,19 @@ internal sealed class CommitMessageGenerator
         }
         else
         {
-            // Fallback: derivar da análise de nomes de arquivo
-            desc = BuildSubject(type, changes);
+            desc = string.Empty;
             body = BuildBody(changes);
         }
 
-        var header = $"{type}: {desc}";
-        return body.Length > 0 ? $"{header}\n\n{body}" : header;
+        var header = TruncateTitle(string.Join(", ", types));
+        var fullBody = (desc.Length > 0, body.Length > 0) switch
+        {
+            (true,  true)  => $"{desc}\n\n{body}",
+            (true,  false) => desc,
+            (false, true)  => body,
+            _              => string.Empty
+        };
+        return fullBody.Length > 0 ? $"{header}\n\n{fullBody}" : header;
     }
 
     /// <summary>
@@ -692,6 +699,43 @@ internal sealed class CommitMessageGenerator
         return added > modified ? "feat" : "refactor";
     }
 
+    /// <summary>
+    /// Retorna todos os CC types envolvidos nas mudanças, ordenados por prioridade convencional.
+    /// </summary>
+    private static List<string> DetermineAllTypes(List<FileChange> changes)
+    {
+        var types = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var change in changes)
+        {
+            string t;
+            if (IsTestPath(change))
+            {
+                t = "test";
+            }
+            else
+            {
+                t = GetCategory(change.Path) switch
+                {
+                    "docs"   => "docs",
+                    "build"  => "build",
+                    "config" => "chore",
+                    _ => change.Status switch
+                    {
+                        'A' or 'C'        => "feat",
+                        'D'               => "chore",
+                        'M' or 'R' or 'T' => "fix",
+                        _                 => "refactor"
+                    }
+                };
+            }
+            types.Add(t);
+        }
+
+        var order = new[] { "feat", "fix", "refactor", "perf", "test", "build", "ci", "chore", "docs", "style" };
+        return [.. types.OrderBy(t => Array.IndexOf(order, t) is var i && i >= 0 ? i : 99)];
+    }
+
     // ── Step 3 — Subject: descrição funcional em pt-BR ────────────────────────
 
     private static string BuildSubject(string type, List<FileChange> changes)
@@ -821,18 +865,11 @@ internal sealed class CommitMessageGenerator
         var concepts = ExtractUniqueConcepts(changes);
         if (concepts.Count == 0) return FallbackPhrase(changes);
 
-        var phrases = concepts
+        // Título: conceito mais dominante (frequente) — síntese global das mudanças
+        return concepts
             .Select(MapConcept)
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Take(3)
-            .ToList();
-
-        return phrases.Count switch
-        {
-            1 => phrases[0],
-            2 => $"{phrases[0]} e {phrases[1]}",
-            _ => $"{phrases[0]}, {phrases[1]} e {phrases[2]}"
-        };
+            .First();
     }
 
     private static string MapConcept(string raw) =>
@@ -925,6 +962,14 @@ internal sealed class CommitMessageGenerator
         // Preserva segmentos em MAIÚSCULAS (acrônimos: ≥2 chars, todos maiúsculos)
         return string.Join(" ", normalized.Split(' ')
             .Select(w => w.Length >= 2 && w.All(char.IsUpper) ? w : w.ToLowerInvariant()));
+    }
+
+    // Garante que o título do commit respeita o limite recomendado de 72 chars
+    private static string TruncateTitle(string title, int maxLen = 72)
+    {
+        if (title.Length <= maxLen) return title;
+        var cut = title.LastIndexOf(' ', maxLen - 2);
+        return cut > 8 ? title[..cut] + "…" : title[..(maxLen - 1)] + "…";
     }
 
     private static string JoinPhrases(List<string> items) => items.Count switch

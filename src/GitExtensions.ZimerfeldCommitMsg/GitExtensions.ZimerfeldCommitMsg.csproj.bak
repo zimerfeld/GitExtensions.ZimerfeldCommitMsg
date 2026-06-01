@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>GitExtensions.Plugins.ZimerfeldCommitMsg</AssemblyName>
+    <RootNamespace>GitExtensions.ZimerfeldCommitMsg</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <NeutralLanguage>pt-BR</NeutralLanguage>
+<<<<<<< HEAD
+    <Version>1.0.15</Version>
+=======
+    <Version>1.0.16</Version>
+>>>>>>> release/202606011057
+    <Authors>Zimerfeld</Authors>
+    <Description>GitExtensions plugin that summarizes staged changes into a single commit message sentence</Description>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <!-- GitExtensions hosts the plugin and supplies WindowsBase at runtime; nothing is
+         copied to output (Private=false), so the build-time version conflict between the
+         net9 ref pack (4.0.0.0) and GitExtensions' VS.Threading (8.0.0.0) is harmless. -->
+    <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference GitExtensions DLLs as private=false so they are NOT copied to output -->
+    <Reference Include="GitExtensions.Extensibility">
+      <HintPath>C:\Program Files\GitExtensions\GitExtensions.Extensibility.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="GitUIPluginInterfaces">
+      <HintPath>C:\Program Files\GitExtensions\GitUIPluginInterfaces.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition">
+      <HintPath>C:\Program Files\GitExtensions\System.ComponentModel.Composition.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
