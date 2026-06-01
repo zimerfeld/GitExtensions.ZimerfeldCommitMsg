@@ -9,6 +9,9 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
 {
     private const string TemplateKey = "Zimerfeld: Auto-resumo";
 
+    // Icone exibido no menu Plugins e no dropdown do dialogo de commit
+    private static readonly Image? PluginIcon = LoadIcon();
+
     // Capturado no Register() (roda na UI thread) para marshalling seguro
     private SynchronizationContext? _syncContext;
     private string _lastGeneratedMessage = string.Empty;
@@ -17,6 +20,20 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     {
         Name        = "ZimerfeldCommitMsg";
         Description = "Gera automaticamente uma mensagem de commit resumindo as mudanças nos arquivos";
+        if (PluginIcon is not null) Icon = PluginIcon;
+    }
+
+    private static Image? LoadIcon()
+    {
+        try
+        {
+            using var stream = typeof(ZimerfeldCommitMsgPlugin).Assembly
+                .GetManifestResourceStream("GitExtensions.ZimerfeldCommitMsg.Resources.icon.png");
+            if (stream is null) return null;
+            using var img = Image.FromStream(stream);
+            return new Bitmap(img);   // copia independente do stream (que sera descartado)
+        }
+        catch { return null; }
     }
 
     public override void Register(IGitUICommands gitUiCommands)
@@ -28,7 +45,7 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         gitUiCommands.AddCommitTemplate(
             TemplateKey,
             () => new CommitMessageGenerator(gitUiCommands.Module.WorkingDir).Generate(),
-            icon: null);
+            icon: PluginIcon);
 
         // Atualiza a mensagem automaticamente sempre que arquivos entram/saem do stage
         gitUiCommands.PostRepositoryChanged += OnPostRepositoryChanged;

@@ -2,7 +2,11 @@
 <package>
   <metadata>
     <id>GitExtensions.ZimerfeldCommitMsg</id>
+<<<<<<< HEAD
+    <version>1.0.15</version>
+=======
     <version>1.0.16</version>
+>>>>>>> release/202606011057
     <authors>Zimerfeld</authors>
     <description>Plugin para GitExtensions que gera automaticamente uma mensagem de commit resumindo em uma frase as mudanças nos arquivos staged, usando o formato Conventional Commits (feat/fix/docs/test/chore).</description>
     <tags>gitextensions plugin commit-message conventional-commits</tags>

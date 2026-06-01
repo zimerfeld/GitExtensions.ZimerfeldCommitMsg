@@ -9,7 +9,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <NeutralLanguage>pt-BR</NeutralLanguage>
+<<<<<<< HEAD
+    <Version>1.0.15</Version>
+=======
     <Version>1.0.16</Version>
+>>>>>>> release/202606011057
     <Authors>Zimerfeld</Authors>
     <Description>GitExtensions plugin that summarizes staged changes into a single commit message sentence</Description>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
