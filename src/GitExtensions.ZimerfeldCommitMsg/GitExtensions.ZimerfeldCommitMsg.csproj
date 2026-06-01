@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <NeutralLanguage>pt-BR</NeutralLanguage>
-    <Version>1.0.15</Version>
+    <Version>1.0.16</Version>
     <Authors>Zimerfeld</Authors>
     <Description>GitExtensions plugin that summarizes staged changes into a single commit message sentence</Description>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
@@ -18,6 +18,10 @@
          net9 ref pack (4.0.0.0) and GitExtensions' VS.Threading (8.0.0.0) is harmless. -->
     <MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\icon.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Reference GitExtensions DLLs as private=false so they are NOT copied to output -->
