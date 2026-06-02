@@ -5,7 +5,7 @@ atualizado: 2026-06-02
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits]
 status: ativo
 linguagem: C#
-versao: 1.0.18
+versao: 1.0.19
 repo: C:\GitExtensions\ZimerfeldCommitMsg
 ---
 
@@ -29,7 +29,7 @@ C:\GitExtensions\ZimerfeldCommitMsg\
 ├─ build.ps1                              # incrementa versão + build + deploy + nupkg
 ├─ README.md                              # instalação e uso
 ├─ FUNCIONALIDADES.md                     # spec detalhada da geração (atualizada pelo build.ps1)
-└─ GitExtensions.ZimerfeldCommitMsg.1.0.18.nupkg
+└─ GitExtensions.ZimerfeldCommitMsg.1.0.19.nupkg
 ```
 
 ## ⚙️ Stack técnica
@@ -83,13 +83,13 @@ Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` 
 > `FindCommitTextBox` tenta nomes conhecidos (`Message`, `commitMessageEditor`, `_commitMessage`, `commitMessage`) e cai num fallback heurístico (maior `TextBoxBase` multiline editável). Versões diferentes do GitExtensions mudam esses nomes.
 
 ## 🔢 Versionamento
-- Versão atual: **1.0.18** (csproj + nuspec sincronizados pelo `build.ps1`)
+- Versão atual: **1.0.19** (csproj + nuspec sincronizados pelo `build.ps1`)
 - Esquema: `major.minor.BUILD`, BUILD auto-incrementado a cada build
-- `FUNCIONALIDADES.md` carimba versão + data a cada build
+- `README.md` carimba versão + data a cada build (FUNCIONALIDADES.md foi removido e unificado no README.md)
 
 ## 📜 Histórico de sessões
 - [[2026-06-01 - Criação do cofre de neurônios CommitMsg]] — mapeamento inicial do projeto
-- [[2026-06-02 - Aprimoramento mensagens pt-BR]] — formato `tipo: descrição` corrigido; `BuildSubject` como fallback; deploy 1.0.18
+- [[2026-06-02 - Aprimoramento mensagens pt-BR]] — formato `tipo: descrição` corrigido; `BuildSubject` como fallback; FUNCIONALIDADES.md unificado em README.md; deploy 1.0.19
 
 ## 🔗 Relacionado
 - [[Plugin MEF para GitExtensions]]

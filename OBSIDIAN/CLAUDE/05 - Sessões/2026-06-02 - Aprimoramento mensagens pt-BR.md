@@ -3,10 +3,10 @@ tipo: sessao
 data: 2026-06-02
 hora: 06:39
 tags: [sessao, refactor, conventional-commits, formato, pt-BR]
-resumo: Corrigido formato tipo:descrição e fallback BuildSubject; build e deploy 1.0.18
+resumo: Corrigido formato tipo:descrição e fallback BuildSubject; FUNCIONALIDADES.md unificado em README.md; deploy 1.0.19
 projetos: [GitExtensions.ZimerfeldCommitMsg]
 versao-anterior: 1.0.17
-versao-nova: 1.0.18
+versao-nova: 1.0.19
 ---
 
 # Sessão 2026-06-02 — Aprimoramento de mensagens em pt-BR
@@ -63,11 +63,16 @@ Abrange autenticação nas camadas de serviço e repositório.
 - Removida variável intermediária `bodyComments` desnecessária no bloco `readmeTitle`
 - Removido o `switch` de `fullBody` substituído por expressão direta
 
-### 4. Build e deploy
-- Versão incrementada: **1.0.17 → 1.0.18**
-- Build Release compilado sem warnings
-- DLL copiada para `C:\Program Files\GitExtensions\Plugins\` via elevação UAC
-- `nupkg` gerado: `GitExtensions.ZimerfeldCommitMsg.1.0.18.nupkg`
+### 4. Unificação FUNCIONALIDADES.md → README.md
+- Conteúdo de `FUNCIONALIDADES.md` migrado para `README.md` (formato, estratégias, exemplos, build)
+- Exemplos de mensagens corrigidos para o comportamento real (pt-BR, `tipo: descrição`)
+- `build.ps1` atualizado: carimba versão/data em `README.md` em vez de `FUNCIONALIDADES.md`
+- `FUNCIONALIDADES.md` removido
+
+### 5. Build e deploy
+- Versão 1.0.18 → 1.0.19 (build extra pelo teste do build.ps1 com README.md)
+- DLL instalada em `C:\Program Files\GitExtensions\Plugins\` (10:09:50)
+- `nupkg` gerado: `GitExtensions.ZimerfeldCommitMsg.1.0.19.nupkg`
 
 ## 🧠 Decisões / aprendizados
 
