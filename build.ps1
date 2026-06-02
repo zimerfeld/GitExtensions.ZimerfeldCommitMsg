@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Compila o plugin, incrementa a versao (major.minor.build) e gera o .nupkg.
