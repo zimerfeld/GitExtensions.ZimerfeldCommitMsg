@@ -1,12 +1,14 @@
 ---
 tipo: fluxo
 tags: [fluxo, generate, pipeline, conventional-commits]
-atualizado: 2026-05-22
+atualizado: 2026-06-01
 ---
 
 # Fluxo: Geração da Mensagem de Commit
 
 Pipeline executado por `CommitMessageGenerator.Generate()`.
+
+> Este pipeline é o mesmo nas três portas de entrada do plugin: dropdown ([[Template Dropdown (Auto-resumo)]]), menu Plugins (`Execute`) e evento de stage ([[Stage Trigger]]). Muda apenas **quem dispara** e **quem preenche** a caixa de mensagem.
 
 ## Visão macro
 
@@ -89,10 +91,12 @@ Linhas removidas têm prioridade -1 em relação às adicionadas do mesmo arquiv
 Máximo: 5 comentários, 15 linhas processadas.
 
 **Tradução en→pt-BR:**
+0. **Mascara** nomes de branch gitflow e tipos CC (`PreservePattern`) → não traduzir
 1. Frases compostas (longest-match first): `"doesn't match"` → `"não corresponde"`
 2. Padrões estruturais: `X-based` → `baseado em X`
 3. Palavras individuais: `returns` → `retorna`
-4. Se ainda >25% inglês após tradução → descarta (qualidade insuficiente)
+4. Se ainda >25% inglês (texto mascarado) → descarta (qualidade insuficiente)
+5. **Restaura** os tokens preservados intactos. Ver [[../Decisoes/Preservação de Branches e Tipos CC]]
 
 O primeiro comentário (mais impactante) vira `desc`. Os demais vão para o body como marcadores `- item`.
 
@@ -138,5 +142,7 @@ resultado = header + "\n\n" + fullBody
 
 - [[../Sistema/Arquitetura]]
 - [[../Arquivos-Chave/CommitMessageGenerator]]
+- [[Template Dropdown (Auto-resumo)]]
 - [[../Decisoes/Título como Lista de Types]]
 - [[../Decisoes/Prioridade de Comentários]]
+- [[../Decisoes/Preservação de Branches e Tipos CC]]

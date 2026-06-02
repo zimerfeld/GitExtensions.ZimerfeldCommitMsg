@@ -2,8 +2,8 @@
 tipo: arquivo
 tags: [arquivo, gerador, núcleo, c#]
 arquivo: src/GitExtensions.ZimerfeldCommitMsg/CommitMessageGenerator.cs
-linhas: 987
-atualizado: 2026-05-22
+linhas: 1052
+atualizado: 2026-06-01
 ---
 
 # CommitMessageGenerator.cs
@@ -50,8 +50,10 @@ Núcleo do plugin. `internal sealed class` com um único campo de instância: `_
 ### Tradução
 | Método | Linha | Descrição |
 |---|---|---|
-| `IsEnglishText(string)` | ~601 | ≥25% das palavras no dicionário → inglês |
-| `TranslateToPortuguese(string)` | ~616 | Frases → padrões estruturais → palavras individuais |
+| `IsEnglishText(string)` | ~608 | ≥25% das palavras no dicionário → inglês |
+| `TranslateToPortuguese(string)` | ~632 | Mascara branches/tipos CC → frases → padrões → palavras → restaura |
+
+> **Preservação (branch `feature/modelo`):** antes de traduzir, `TranslateToPortuguese` mascara nomes de branch gitflow e tipos Conventional Commits (via `PreservePattern`) e os restaura intactos no fim — evita corromper slugs como `feature/search`. Ver [[../Decisoes/Preservação de Branches e Tipos CC]].
 
 ### Construção da mensagem
 | Método | Linha | Descrição |
@@ -114,6 +116,9 @@ Agrupados por domínio: identidade/acesso, usuário, comércio, comunicação, i
 ### WordTranslations (~L231)
 ~120 entradas: verbos, advérbios, preposições, substantivos técnicos, adjetivos.
 
+### PreservePattern (~L358)
+Regex `const` que casa **nomes de branch gitflow** (`feature/…`, `release/…`, `hotfix/…`, `bugfix/…`, `support/…`, etc.) e **tipos Conventional Commits** (`feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`). Usado por `TranslateToPortuguese` para mascarar/restaurar esses tokens sem traduzi-los.
+
 ---
 
 ## Record auxiliar
@@ -130,3 +135,4 @@ internal sealed record FileChange(char Status, string Path);
 - [[../Sistema/Arquitetura]]
 - [[../Decisoes/Título como Lista de Types]]
 - [[../Decisoes/Prioridade de Comentários]]
+- [[../Decisoes/Preservação de Branches e Tipos CC]]

@@ -1,7 +1,7 @@
 ---
 tipo: sistema
 tags: [sistema, overview, plugin, gitextensions]
-atualizado: 2026-05-22
+atualizado: 2026-06-01
 ---
 
 # Visão Geral
@@ -19,19 +19,21 @@ Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de
 | UI Framework | Windows Forms (herdado do GitExtensions) |
 | Assembly de saída | `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` |
 | Namespace | `GitExtensions.ZimerfeldCommitMsg` |
-| Versão atual | `1.0.13` |
+| Versão atual | `1.0.16` |
 | Autor | Zimerfeld |
 
-## Modos de uso
+> O plugin exibe um **ícone** (PNG embutido em `Resources/icon.png`) tanto no menu Plugins quanto na entrada do dropdown de templates. Carregado por `LoadIcon()` em [[../Arquivos-Chave/ZimerfeldCommitMsgPlugin]].
+
+## Modos de uso (três portas de entrada)
 
 ### 1. Template no diálogo de commit
-Selecione **"Zimerfeld: Auto-resumo"** no dropdown de templates → mensagem preenchida automaticamente.
+Selecione **"Zimerfeld: Auto-resumo"** no dropdown de templates → mensagem preenchida automaticamente. Passos detalhados em [[../Fluxos/Template Dropdown (Auto-resumo)]].
 
 ### 2. Menu Plugins
-`Plugins → ZimerfeldCommitMsg` → abre o `FormCommit` com a mensagem já inserida.
+`Plugins → ZimerfeldCommitMsg` → valida o repositório e abre o `FormCommit` com a mensagem já inserida (`Execute` → `StartCommitDialog`). Exibe `MessageBox` se não houver repo válido ou mudanças staged.
 
 ### 3. Auto-refresh por evento
-Sempre que arquivos entram ou saem do stage, o plugin detecta e atualiza o campo de mensagem no `FormCommit` aberto (via `PostRepositoryChanged`).
+Sempre que arquivos entram ou saem do stage, o plugin detecta e atualiza o campo de mensagem no `FormCommit` aberto (via `PostRepositoryChanged`) — **sem sobrescrever texto digitado à mão**. Ver [[../Fluxos/Stage Trigger]].
 
 ## Tipos Conventional Commits detectados
 
@@ -51,4 +53,6 @@ Sempre que arquivos entram ou saem do stage, o plugin detecta e atualiza o campo
 
 - [[Arquitetura]]
 - [[../Fluxos/Geração da Mensagem]]
+- [[../Fluxos/Template Dropdown (Auto-resumo)]]
 - [[../Arquivos-Chave/CommitMessageGenerator]]
+- [[../Decisoes/Preservação de Branches e Tipos CC]]
