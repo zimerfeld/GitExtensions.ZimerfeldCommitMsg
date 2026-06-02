@@ -1,9 +1,9 @@
 ---
 tipo: arquivo
-tags: [arquivo, plugin, entry-point, mef, winforms]
+tags: [arquivo, plugin, entry-point, mef, winforms, icone]
 arquivo: src/GitExtensions.ZimerfeldCommitMsg/ZimerfeldCommitMsgPlugin.cs
-linhas: 162
-atualizado: 2026-05-22
+linhas: 178
+atualizado: 2026-06-01
 ---
 
 # ZimerfeldCommitMsgPlugin.cs
@@ -30,8 +30,12 @@ O atributo `[Export]` é o ponto de descoberta pelo MEF do GitExtensions.
 | Campo | Tipo | Propósito |
 |---|---|---|
 | `TemplateKey` | `const string` | `"Zimerfeld: Auto-resumo"` — chave no dropdown |
+| `PluginIcon` | `static Image?` | Ícone do plugin (menu Plugins + dropdown), via `LoadIcon()` |
 | `_syncContext` | `SynchronizationContext?` | Capturado no `Register()` para marshalling UI |
 | `_lastGeneratedMessage` | `string` | Última mensagem gerada — protege texto manual do usuário |
+
+### `LoadIcon()` → `Image?`
+Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via `Assembly.GetManifestResourceStream`, retorna uma `Bitmap` independente do stream. Falha silenciosa (`null`) se o recurso não existir. Atribuído a `Icon` no construtor quando não-nulo.
 
 ---
 
@@ -40,7 +44,7 @@ O atributo `[Export]` é o ponto de descoberta pelo MEF do GitExtensions.
 ### `Register(IGitUICommands)`
 - Chama `base.Register()`
 - Captura `SynchronizationContext.Current` (UI thread)
-- `AddCommitTemplate(TemplateKey, factory, null)` — factory instancia `CommitMessageGenerator` sob demanda
+- `AddCommitTemplate(TemplateKey, factory, icon: PluginIcon)` — factory **lazy** instancia `CommitMessageGenerator` sob demanda; ver [[../Fluxos/Template Dropdown (Auto-resumo)]]
 - Assina `PostRepositoryChanged += OnPostRepositoryChanged`
 
 ### `Unregister(IGitUICommands)`
@@ -96,5 +100,6 @@ Todos os handlers têm `try/catch {}` vazio — exceções no plugin nunca derru
 ## Relacionado
 
 - [[CommitMessageGenerator]]
+- [[../Fluxos/Template Dropdown (Auto-resumo)]]
 - [[../Fluxos/Stage Trigger]]
 - [[../Sistema/Dependências]]

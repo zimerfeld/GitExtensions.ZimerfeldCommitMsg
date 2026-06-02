@@ -1,7 +1,7 @@
 ---
 tipo: moc
 tags: [home, moc, zimerfeld]
-atualizado: 2026-05-22
+atualizado: 2026-06-01
 ---
 
 # ZimerfeldCommitMsg — Mapa do Cofre
@@ -20,11 +20,12 @@ Plugin para **GitExtensions** que gera mensagens de commit automáticas no forma
 
 ### Fluxos
 - [[Fluxos/Geração da Mensagem]] — pipeline completo do `Generate()`
+- [[Fluxos/Template Dropdown (Auto-resumo)]] — passos ao selecionar o template no dropdown
 - [[Fluxos/Stage Trigger]] — auto-atualização ao dar stage/unstage
 - [[Fluxos/Instalação e Deploy]] — install / uninstall / update-dll
 
 ### Arquivos-Chave
-- [[Arquivos-Chave/CommitMessageGenerator]] — núcleo gerador (987 linhas)
+- [[Arquivos-Chave/CommitMessageGenerator]] — núcleo gerador (1052 linhas)
 - [[Arquivos-Chave/ZimerfeldCommitMsgPlugin]] — ponto de entrada do plugin
 - [[Arquivos-Chave/build.ps1]] — script de build e versionamento
 - [[Arquivos-Chave/inspector]] — ferramenta de introspecção de assemblies
@@ -33,6 +34,7 @@ Plugin para **GitExtensions** que gera mensagens de commit automáticas no forma
 - [[Decisoes/Título como Lista de Types]] — branch `feature/titulo` (2026-05-22)
 - [[Decisoes/Prioridade de Comentários]] — ranqueamento por tipo de arquivo
 - [[Decisoes/Estratégia de Detecção de Idioma]] — critério 25% de palavras inglesas
+- [[Decisoes/Preservação de Branches e Tipos CC]] — branch `feature/modelo` (2026-06-01)
 
 ---
 
@@ -60,4 +62,4 @@ ZimerfeldCommitMsg/
 
 ## Versão Atual
 
-`1.0.15` — compilada em `net9.0-windows`, target `AnyCPU`
+`1.0.16` — compilada em `net9.0-windows`, target `AnyCPU`

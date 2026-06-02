@@ -55,6 +55,8 @@ private static bool IsEnglishText(string text)
    Qualidade insuficiente — será ignorado pelo pipeline
 ```
 
+> **Preservação de branches/tipos CC (branch `feature/modelo`):** antes da Fase 1, nomes de branch gitflow e tipos Conventional Commits são **mascarados** (`PreservePattern`) e restaurados só no fim. A checagem de qualidade do passo 6 roda sobre o texto **mascarado**, para que slugs como `feature/search` não inflem o percentual de inglês e descartem uma boa tradução. Detalhes em [[Preservação de Branches e Tipos CC]].
+
 ## Preservação de identificadores
 
 ```csharp
@@ -81,3 +83,4 @@ Comentário inglês: `"filters stems with dot to avoid assembly names"`
 - [[../Fluxos/Geração da Mensagem]]
 - [[../Arquivos-Chave/CommitMessageGenerator]]
 - [[Prioridade de Comentários]]
+- [[Preservação de Branches e Tipos CC]]

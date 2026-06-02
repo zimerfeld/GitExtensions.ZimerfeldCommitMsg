@@ -6,7 +6,7 @@ tags: [conhecimento, conventional-commits, git, algoritmo, pt-br]
 
 # Geração de mensagem — Conventional Commits
 
-> Lógica implementada em `CommitMessageGenerator.cs` (~985 linhas) do projeto [[GitExtensions.ZimerfeldCommitMsg]]. Spec completa em `FUNCIONALIDADES.md`.
+> Lógica implementada em `CommitMessageGenerator.cs` (~1052 linhas) do projeto [[GitExtensions.ZimerfeldCommitMsg]]. Spec completa em `FUNCIONALIDADES.md`.
 
 ## Formato gerado
 ```
@@ -54,6 +54,9 @@ Gerado quando há 2+ arquivos com camadas arquiteturais distintas, ex.:
 ```
 Abrange autenticação e gerenciamento de token nas camadas de serviço, repositório e controlador.
 ```
+
+### Preservação na tradução
+Ao traduzir comentários ingleses, **nomes de branch** (gitflow) e **tipos Conventional Commits** são preservados intactos — não traduzidos. Ver [[Geração da Mensagem]] e a decisão em `Decisoes/Preservação de Branches e Tipos CC`.
 
 ## 🔗 Relacionado
 - [[GitExtensions.ZimerfeldCommitMsg]]

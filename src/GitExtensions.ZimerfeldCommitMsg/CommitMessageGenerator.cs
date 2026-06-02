@@ -351,6 +351,14 @@ internal sealed class CommitMessageGenerator
     private static readonly HashSet<string> EnglishWords =
         new(WordTranslations.Keys, StringComparer.OrdinalIgnoreCase);
 
+    // ── Tokens preservados na tradução (não traduzir) ─────────────────────────
+    // Nomes de branch no padrão gitflow (feature/…, release/…, etc.) e os tipos
+    // Conventional Commits. Sem esta proteção, a tradução palavra-a-palavra
+    // corromperia slugs de branch (ex: "feature/search" → "feature/buscar").
+    private const string PreservePattern =
+        @"\b(?:feature|release|hotfix|bugfix|support|feat|fix|chore|docs|refactor)/[A-Za-z0-9._\-/]+" + // branches gitflow
+        @"|\b(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\b";                       // tipos CC
+
     private static readonly string[] TestPathSegments =
         ["test", "tests", "spec", "specs", "__tests__", "unittest", "unittests"];
 
@@ -608,14 +616,20 @@ internal sealed class CommitMessageGenerator
 
     /// <summary>
     /// Traduz um comentário do inglês para pt-BR usando frases e palavras mapeadas.
-    /// Preserva identificadores PascalCase/MAIÚSCULAS (código).
+    /// Preserva identificadores PascalCase/MAIÚSCULAS (código), nomes de branch
+    /// (feature/…, release/…, etc.) e os tipos Conventional Commits.
     /// Retorna null quando a tradução é insuficiente (fallback pt-BR será usado).
     /// </summary>
     private static string? TranslateToPortuguese(string text)
     {
         if (!IsEnglishText(text)) return text;  // já em pt-BR
 
-        var result = text;
+        // Mascara nomes de branch e tipos CC com placeholders N
+        // (sem letras → as fases de tradução os ignoram). Restaurados no fim.
+        var preserved = new List<string>();
+        var result = Regex.Replace(text, PreservePattern,
+            m => { preserved.Add(m.Value); return $"{preserved.Count - 1}"; },
+            RegexOptions.IgnoreCase);
 
         // Fase 1 — frases compostas (mais longas primeiro para evitar fragmentação)
         foreach (var (en, pt) in PhraseTranslations)
@@ -648,8 +662,16 @@ internal sealed class CommitMessageGenerator
         // Limpeza: remove espaços duplos gerados pela remoção de artigos ("the" → "")
         result = Regex.Replace(result, @"\s{2,}", " ").Trim().TrimStart(',', ';');
 
-        // Se ainda predominantemente inglês após tradução, descarta (qualidade insuficiente)
-        return IsEnglishText(result) ? null : result;
+        // Avalia qualidade ANTES de restaurar: tokens preservados (branches/tipos CC)
+        // não devem contar como "inglês não traduzido".
+        if (IsEnglishText(result)) return null;  // descarta — fallback pt-BR será usado
+
+        // Restaura nomes de branch e tipos CC, intactos
+        if (preserved.Count > 0)
+            result = Regex.Replace(result, "(\\d+)",
+                m => preserved[int.Parse(m.Groups[1].Value)]);
+
+        return result;
     }
 
     // ── Step 1 — Parse git diff --name-status ─────────────────────────────────
