@@ -14,15 +14,13 @@ tags: [preferencia, contexto, pessoa]
 
 ## Preferências de trabalho
 - Usa **RTK** para economizar tokens — ver [[RTK]]
-- Trabalha com **DB2** (4 instâncias) — ver [[06 - Bancos de Dados]]
 - Valoriza engenharia de software bem-feita e organização
 
 ## Regras a respeitar
 > [!important]
 > - Não commitar/pushar sem pedido explícito
-> - DB2 tem 2FA: nunca reutilizar senha, sempre pedir fresca
 > - Manter este cofre de memória atualizado a cada sessão
 
 ## Projetos
-- [[GitExtensions.ZimerfeldCommitMsg]] — plugin C#/WinForms para GitExtensions que gera mensagens de commit (Conventional Commits, pt-BR) — `C:\NUGET\ZimerfeldCommitMsg`
-- [[GitExtensions.ZimerfeldTree]] — plugin C#/WinForms para GitExtensions (árvore hierárquica de branches) — `C:\NUGET\ZimerfeldTree` (cofre próprio)
+- [[GitExtensions.ZimerfeldCommitMsg]] — plugin C#/WinForms para GitExtensions que gera mensagens de commit (Conventional Commits, pt-BR) — `C:\GitExtensions\ZimerfeldCommitMsg`
+- [[GitExtensions.ZimerfeldTree]] — plugin C#/WinForms para GitExtensions (árvore hierárquica de branches) — `C:\GitExtensions\ZimerfeldTree` (cofre próprio)

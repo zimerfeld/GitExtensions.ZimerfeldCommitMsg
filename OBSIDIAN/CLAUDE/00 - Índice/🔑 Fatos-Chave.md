@@ -29,12 +29,6 @@ tags: [fatos-chave, referencia]
 - **Obsidian** — este cofre de memória
 - **Claude Code** no Windows (shell: PowerShell / git bash)
 
-## 🗄️ Bancos de Dados DB2
-- Homologação: **HSGUCA**, **HSGUWEB**
-- Produção: **DB2CA**, **DBWEB**
-- ⚠️ 2FA ativo — senha pedida **sempre** fresca, nunca reutilizada
-- Ver [[06 - Bancos de Dados]]
-
 ## 📐 Convenções
 - Datas: `AAAA-MM-DD`
 - Commits no formato **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`), descrição em **pt-BR** — é literalmente o que este projeto gera
