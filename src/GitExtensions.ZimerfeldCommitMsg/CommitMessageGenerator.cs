@@ -392,20 +392,17 @@ internal sealed class CommitMessageGenerator
         if (readmeTitle is not null)
         {
             desc = readmeTitle;
-            var bodyComments = comments.Count > 0
+            body = comments.Count > 0
                 ? string.Join("\n", comments.Select(c => $"- {NormalizeDesc(c)}"))
                 : BuildBody(changes);
-            body = bodyComments;
         }
         else if (comments.Count > 0)
         {
-            // Sujeito: cláusula principal do primeiro comentário (antes de conectores de propósito)
             var mainClause = ExtractMainClause(comments[0]);
             desc = NormalizeDesc(mainClause);
 
-            // Corpo: demais comentários como marcadores
-            // Quando o sujeito foi abreviado, o primeiro comentário aparece completo no corpo (para contexto);
-            // caso contrário não é repetido, pois já é a própria descrição.
+            // Quando o sujeito foi abreviado, o primeiro comentário aparece completo no corpo
+            // para preservar o contexto; caso contrário não é repetido, pois já é a descrição.
             bool wasShortened = mainClause.Length < comments[0].Length;
             var bodyComments = wasShortened ? comments : comments.Skip(1).ToList();
             body = bodyComments.Count > 0
@@ -414,19 +411,13 @@ internal sealed class CommitMessageGenerator
         }
         else
         {
-            desc = string.Empty;
+            desc = BuildSubject(type, changes);
             body = BuildBody(changes);
         }
 
-        var header = TruncateTitle(string.Join(", ", types));
-        var fullBody = (desc.Length > 0, body.Length > 0) switch
-        {
-            (true,  true)  => $"{desc}\n\n{body}",
-            (true,  false) => desc,
-            (false, true)  => body,
-            _              => string.Empty
-        };
-        return fullBody.Length > 0 ? $"{header}\n\n{fullBody}" : header;
+        var typeStr = string.Join(", ", types);
+        var title = TruncateTitle(desc.Length > 0 ? $"{typeStr}: {desc}" : typeStr);
+        return body.Length > 0 ? $"{title}\n\n{body}" : title;
     }
 
     /// <summary>

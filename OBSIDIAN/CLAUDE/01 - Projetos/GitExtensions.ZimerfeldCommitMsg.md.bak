@@ -5,8 +5,13 @@ atualizado: 2026-06-02
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits]
 status: ativo
 linguagem: C#
+<<<<<<< HEAD
+versao: 1.0.16
+repo: C:\NUGET\ZimerfeldCommitMsg
+=======
 versao: 1.0.18
 repo: C:\GitExtensions\ZimerfeldCommitMsg
+>>>>>>> 12704c9f69e895c56a69ab215d76fea29d82de8b
 ---
 
 # ✍️ GitExtensions.ZimerfeldCommitMsg
@@ -18,8 +23,8 @@ Plugin para **[GitExtensions](https://gitextensions.github.io/)** que **gera aut
 ```
 C:\GitExtensions\ZimerfeldCommitMsg\
 ├─ src\GitExtensions.ZimerfeldCommitMsg\   # código do plugin (.csproj)
-│   ├─ ZimerfeldCommitMsgPlugin.cs        # entry point MEF (~161 linhas)
-│   ├─ CommitMessageGenerator.cs          # toda a lógica de geração (~985 linhas)
+│   ├─ ZimerfeldCommitMsgPlugin.cs        # entry point MEF (~178 linhas)
+│   ├─ CommitMessageGenerator.cs          # toda a lógica de geração (~1052 linhas)
 │   ├─ *.csproj / *.nuspec                # build + manifesto NuGet
 ├─ inspector\                             # utilitário p/ inspecionar a API do GitExtensions via reflection
 │   └─ Program.cs                         # lista tipos/membros de Extensibility e PluginInterfaces
@@ -29,7 +34,11 @@ C:\GitExtensions\ZimerfeldCommitMsg\
 ├─ build.ps1                              # incrementa versão + build + deploy + nupkg
 ├─ README.md                              # instalação e uso
 ├─ FUNCIONALIDADES.md                     # spec detalhada da geração (atualizada pelo build.ps1)
+<<<<<<< HEAD
+└─ GitExtensions.ZimerfeldCommitMsg.1.0.16.nupkg
+=======
 └─ GitExtensions.ZimerfeldCommitMsg.1.0.18.nupkg
+>>>>>>> 12704c9f69e895c56a69ab215d76fea29d82de8b
 ```
 
 ## ⚙️ Stack técnica
@@ -46,7 +55,7 @@ C:\GitExtensions\ZimerfeldCommitMsg\
   - `System.ComponentModel.Composition.dll`
 
 ## ✨ Funcionalidades principais
-- **Template no diálogo de commit:** opção **"Zimerfeld: Auto-resumo"** no dropdown de templates preenche a mensagem (`AddCommitTemplate`)
+- **Template no diálogo de commit:** opção **"Zimerfeld: Auto-resumo"** (com ícone) no dropdown de templates preenche a mensagem (`AddCommitTemplate`) — passos em [[Template Dropdown (Auto-resumo)]]
 - **Menu Plugins → ZimerfeldCommitMsg:** abre o `StartCommitDialog` com a mensagem já preenchida (`Execute`)
 - **Auto-refresh ao (un)stage:** assina `PostRepositoryChanged`; se o `FormCommit` estiver aberto e a caixa estiver vazia (ou contiver a última mensagem que nós geramos), atualiza a mensagem. **Nunca sobrescreve texto digitado pelo usuário**
 - Marshalling seguro pra UI thread via `SynchronizationContext` capturado no `Register()`
@@ -57,6 +66,7 @@ Formato: `<tipo>: <descrição pt-BR>` + corpo opcional. Sem scope. Ver detalhes
 - **Estratégia 1 (principal):** extrai comentários adicionados (`+`) do `git diff --cached --no-color`, filtra ruído (separadores, tags XML, código comentado, < 10 chars). O primeiro comentário vira a descrição; os demais vão no corpo como marcadores `- item`
 - **Estratégia 2 (fallback):** `BuildSubject(type, changes)` → verbo pt-BR + conceito dominante extraído dos nomes de arquivo (ex: `"adicionar autenticação"`, `"corrigir gerenciamento de usuários"`)
 - **Tipo** detectado por: arquivos novos → `feat`; só modificações → `fix`; só docs → `docs`; testes → `test`; config → `chore`; build → `build`; mix → `refactor`
+- **Tradução pt-BR preservando branches e tipos CC:** comentários ingleses são traduzidos, mas nomes de branch (gitflow) e tipos Conventional Commits ficam intactos (`PreservePattern`) — ver `Decisoes/Preservação de Branches e Tipos CC`
 
 ## 🛠️ Build / instalação
 ```powershell
@@ -83,7 +93,11 @@ Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` 
 > `FindCommitTextBox` tenta nomes conhecidos (`Message`, `commitMessageEditor`, `_commitMessage`, `commitMessage`) e cai num fallback heurístico (maior `TextBoxBase` multiline editável). Versões diferentes do GitExtensions mudam esses nomes.
 
 ## 🔢 Versionamento
+<<<<<<< HEAD
+- Versão atual: **1.0.16** (csproj + nuspec sincronizados pelo `build.ps1`)
+=======
 - Versão atual: **1.0.18** (csproj + nuspec sincronizados pelo `build.ps1`)
+>>>>>>> 12704c9f69e895c56a69ab215d76fea29d82de8b
 - Esquema: `major.minor.BUILD`, BUILD auto-incrementado a cada build
 - `FUNCIONALIDADES.md` carimba versão + data a cada build
 
