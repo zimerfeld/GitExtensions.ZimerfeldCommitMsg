@@ -439,7 +439,10 @@ internal sealed class CommitMessageGenerator
             if (line.StartsWith('#'))
             {
                 var title = line.TrimStart('#').Trim();
-                return string.IsNullOrEmpty(title) ? null : title;
+                if (string.IsNullOrEmpty(title)) return null;
+                // Ignora títulos que são apenas nomes de projeto/repositório (sem espaço ou com ponto)
+                if (!title.Contains(' ') || title.Contains('.')) return null;
+                return title;
             }
         }
 
@@ -461,13 +464,17 @@ internal sealed class CommitMessageGenerator
         var seen    = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         int total   = 0;
         int filePriority = 2;
+        bool isMdFile    = false;
 
         foreach (var line in diff.Split('\n'))
         {
             // Detecta o arquivo atual: "+++ b/caminho"
             if (line.StartsWith("+++ b/"))
             {
-                filePriority = CommentFilePriority(line[6..].Trim());
+                var filePath = line[6..].Trim();
+                filePriority = CommentFilePriority(filePath);
+                // Em .md, headings "# Texto" são estrutura Markdown, não comentários de código
+                isMdFile = filePath.EndsWith(".md", StringComparison.OrdinalIgnoreCase);
                 continue;
             }
 
@@ -476,7 +483,7 @@ internal sealed class CommitMessageGenerator
             bool isRemoved = line.Length >= 2 && line[0] == '-' && !line.StartsWith("---");
             if (!isAdded && !isRemoved) continue;
 
-            var text = ExtractCommentText(line[1..].TrimStart());
+            var text = ExtractCommentText(line[1..].TrimStart(), isMdFile);
             if (text is null || !seen.Add(text)) continue;
 
             // Linhas removidas têm prioridade um grau menor que as adicionadas —
@@ -524,7 +531,7 @@ internal sealed class CommitMessageGenerator
     }
 
     /// <summary>Tenta extrair texto de comentário de uma linha de código.</summary>
-    private static string? ExtractCommentText(string content)
+    private static string? ExtractCommentText(string content, bool isMdFile = false)
     {
         string? raw = null;
 
@@ -533,7 +540,8 @@ internal sealed class CommitMessageGenerator
         if (m.Success) raw = m.Groups[1].Value;
 
         // Python / shell / YAML: # texto
-        if (raw is null)
+        // Em arquivos .md o padrão "# Texto" é heading Markdown, não comentário — ignorar
+        if (raw is null && !isMdFile)
         {
             m = Regex.Match(content, @"^#+\s+([A-Za-zÀ-ú].+)");
             if (m.Success) raw = m.Groups[1].Value;
@@ -836,6 +844,9 @@ internal sealed class CommitMessageGenerator
     {
         // Stems com ponto são nomes de assembly/projeto (ex: GitExtensions.ZimerfeldCommitMsg) — ignorar
         if (filename.Contains('.')) return null;
+
+        // Filenames com caracteres não-ASCII (emoji, acentos fora do padrão PascalCase) — ignorar
+        if (filename.Any(c => c > 127)) return null;
 
         var name = filename;
 
