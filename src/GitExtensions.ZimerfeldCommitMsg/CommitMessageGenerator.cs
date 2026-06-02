@@ -761,25 +761,9 @@ internal sealed class CommitMessageGenerator
 
     private static string BuildSubject(string type, List<FileChange> changes)
     {
-        int added   = changes.Count(c => c.Status is 'A' or 'C');
-        int deleted = changes.Count(c => c.Status == 'D');
-        int modified= changes.Count(c => c.Status is 'M' or 'R' or 'T');
-
-        // Verbo em pt-BR; null = omitir (tipo já descreve a ação)
-        string? verb = type switch
-        {
-            "feat"     => "adicionar",
-            "fix"      => "corrigir",
-            "docs"     => "atualizar",
-            "test"     => added > modified ? "adicionar" : "atualizar",
-            "chore"    => deleted > 0 && added == 0 ? "remover" : "atualizar",
-            "build"    => added > modified ? "adicionar" : "atualizar",
-            "refactor" => null,   // "refactor: refatorar X" seria redundante
-            _          => added >= deleted ? "adicionar" : "atualizar"
-        };
-
-        var phrase = BuildFunctionalPhrase(changes);
-        return verb is not null ? $"{verb} {phrase}" : phrase;
+        // O tipo CC já é o verbo (feat = novo, fix = corrigir, docs = atualizar…)
+        // — adicionar verbo em pt-BR seria redundante
+        return BuildFunctionalPhrase(changes);
     }
 
     // ── Step 4 — Body: frase das camadas arquiteturais em pt-BR ───────────────
