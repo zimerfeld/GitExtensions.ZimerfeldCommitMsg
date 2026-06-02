@@ -3,7 +3,8 @@ tipo: decisão
 tags: [decisão, título, conventional-commits, types, branch]
 branch: feature/titulo
 data: 2026-05-22
-status: implementada
+revisado: 2026-06-02
+status: revisada
 ---
 
 # Decisão: Título como Lista de CC Types
@@ -39,9 +40,7 @@ Novo formato:
 
 Exemplos após a mudança:
 ```
-feat, docs, chore
-
-filtrar stems com ponto
+feat, docs, chore: filtrar stems com ponto
 
 Abrange autenticação nas camadas de serviço e repositório.
 ```
@@ -69,34 +68,40 @@ Deduplicar + ordenar por prioridade convencional:
 feat → fix → refactor → perf → test → build → ci → chore → docs → style
 ```
 
-### Mudança em `Generate()`
+### Mudança em `Generate()` (implementação original)
 
 ```csharp
-// ANTES:
+// ANTES (type único):
 var type   = DetermineType(changes);
 var header = TruncateTitle($"{type}: {desc}");
 
-// DEPOIS:
+// DEPOIS (lista de types, desc no corpo):
 var types  = DetermineAllTypes(changes);
 var header = TruncateTitle(string.Join(", ", types));
 ```
 
-A `desc` (quando vinda de comentários do diff ou README) migra para o corpo, não para o título.
+### ⚠️ Revisão 2026-06-02 — Descrição de volta à primeira linha
 
-No fallback (sem comentários, sem README): `desc = string.Empty`, apenas o `BuildBody()` vai para o corpo.
+A `desc` voltou para a primeira linha junto com os types, separada por `: `, seguindo o padrão Conventional Commits:
 
-### Preservação do tipo primário
+```csharp
+var typeStr = string.Join(", ", types);
+var title   = TruncateTitle(desc.Length > 0 ? $"{typeStr}: {desc}" : typeStr);
+return body.Length > 0 ? $"{title}\n\n{body}" : title;
+```
 
-`var type = types[0]` — mantido para `BuildSubject()` (verbo em pt-BR), mas não mais usado no header.
+**Motivação da revisão:** a spec em `FUNCIONALIDADES.md` sempre definiu `<tipo>: <descrição>` na primeira linha. A versão anterior criava uma linha só com os types e a descrição num parágrafo separado, quebrando o formato Conventional Commits.
+
+**Fallback corrigido:** quando não há comentários nem README, `desc = BuildSubject(type, changes)` — antes ficava vazio, gerando commits sem descrição.
 
 ## Trade-offs
 
-| Aspecto | Antes | Depois |
-|---|---|---|
-| Informação no título | Único type + descrição | Todos os types |
-| Descrição | No título | No corpo |
-| Commits simples (1 type) | `feat: adicionar X` | `feat` |
-| Commits mistos | `feat: adicionar X` (info perdida) | `feat, docs, chore` |
+| Aspecto | Antes (type único) | Implementação original | Estado atual (2026-06-02) |
+|---|---|---|---|
+| Tipos no título | Único | Todos, separados por `, ` | Todos, separados por `, ` |
+| Descrição | No título | Parágrafo separado | Na primeira linha (após `: `) |
+| Commits simples | `feat: adicionar X` | `feat\n\nadicionarX` | `feat: adicionar X` |
+| Commits mistos | `feat: adicionar X` (info perdida) | `feat, docs, chore\n\ndescrição` | `feat, docs, chore: descrição` |
 
 ## Arquivos modificados
 

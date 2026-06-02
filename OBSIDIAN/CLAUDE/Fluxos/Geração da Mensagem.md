@@ -1,7 +1,7 @@
 ---
 tipo: fluxo
 tags: [fluxo, generate, pipeline, conventional-commits]
-atualizado: 2026-05-22
+atualizado: 2026-06-02
 ---
 
 # Fluxo: Geração da Mensagem de Commit
@@ -24,8 +24,9 @@ ParseChanges() → List<FileChange>
         │       └──► TranslateToPortuguese()
         │
         └──► Montagem
-                header = Join(types, ", ")   ← título é a lista de types
-                body   = desc + corpo arquitetural
+                typeStr = Join(types, ", ")
+                title   = TruncateTitle(typeStr + ": " + desc)
+                output  = title + "\n\n" + body
 ```
 
 ## Passo 1 — ParseChanges
@@ -99,7 +100,8 @@ O primeiro comentário (mais impactante) vira `desc`. Os demais vão para o body
 **ExtractMainClause:** separa `desc` no primeiro conector de propósito (` para `, ` pois `, ` porque `, ` — `) para manter só a cláusula principal.
 
 ### 3c. Fallback (sem comentários, sem README)
-`desc = ""` — o body é gerado só com a análise arquitetural.
+`desc = BuildSubject(type, changes)` — gera verbo pt-BR + frase funcional do conceito dominante.
+Exemplos: `"adicionar autenticação"`, `"corrigir gerenciamento de usuários"`.
 
 ## Passo 4 — Corpo arquitetural (BuildBody)
 
@@ -117,22 +119,30 @@ Abrange autenticação e gerenciamento de usuários nas camadas de serviço e re
 ## Passo 5 — Montagem final
 
 ```
-header  = TruncateTitle( Join(types, ", ") )   → ex: "feat, docs, chore"
-fullBody = desc + "\n\n" + body                → ex: "filtrar stems com ponto\n\nAbrange..."
-resultado = header + "\n\n" + fullBody
+typeStr = Join(types, ", ")                         → ex: "feat, docs, chore"
+title   = TruncateTitle(typeStr + ": " + desc)      → ex: "feat: adicionar autenticação"
+output  = body.Length > 0 ? title + "\n\n" + body : title
 ```
 
 `TruncateTitle` limita a 72 chars, cortando no último espaço e adicionando `…`.
+
+Formato final (Conventional Commits):
+```
+feat: adicionar autenticação
+
+Abrange autenticação e gerenciamento de token nas camadas de serviço e repositório.
+```
 
 ## Exemplos de saída
 
 | Staged | Saída |
 |---|---|
-| `UserService.cs` adicionado | `feat` |
-| `README.md` modificado | `docs` |
-| `.cs` modificado + `.yml` alterado | `fix, chore` |
-| `.cs` novo + `.md` + `appsettings.json` | `feat, docs, chore` |
-| `.cs` com comentário `// filtrar stems` staged | `feat\n\nfiltrar stems` |
+| `AuthService.cs` adicionado | `feat: adicionar autenticação` |
+| `README.md` modificado | `docs: atualizar documentação` |
+| `.cs` modificado + `.yml` alterado | `fix, chore: corrigir código-fonte` |
+| `.cs` novo + `.md` + `appsettings.json` | `feat, docs, chore: adicionar código-fonte` |
+| `.cs` com comentário `// filtrar stems` staged | `feat: filtrar stems` |
+| `.cs` novo sem comentário, `UserService` + `UserRepository` | `feat: adicionar gerenciamento de usuários\n\nInclui as camadas de serviço e repositório.` |
 
 ## Relacionado
 

@@ -1,7 +1,7 @@
 ---
 tipo: referencia
 criado: 2026-06-01
-atualizado: 2026-06-01
+atualizado: 2026-06-02
 tags: [fatos-chave, referencia]
 ---
 
@@ -17,9 +17,9 @@ tags: [fatos-chave, referencia]
 - Ver [[Renato]] para preferências detalhadas
 
 ## 📁 Caminhos importantes
-- Cofre de memória (este): `C:\NUGET\ZimerfeldCommitMsg\OBSIDIAN\CLAUDE`
-- Raiz de projetos: `C:\NUGET\ZimerfeldCommitMsg`
-- `C:\NUGET\ZimerfeldCommitMsg` **é** o repositório do projeto [[GitExtensions.ZimerfeldCommitMsg]] (C#, plugin GitExtensions)
+- Cofre de memória (este): `C:\GitExtensions\ZimerfeldCommitMsg\OBSIDIAN\CLAUDE`
+- Raiz de projetos: `C:\GitExtensions\ZimerfeldCommitMsg`
+- `C:\GitExtensions\ZimerfeldCommitMsg` **é** o repositório do projeto [[GitExtensions.ZimerfeldCommitMsg]] (C#, plugin GitExtensions)
 - GitExtensions instalado em: `C:\Program Files\GitExtensions\`
 - Plugins do GitExtensions: `C:\Program Files\GitExtensions\Plugins\`
 - Projeto irmão: `C:\NUGET\ZimerfeldTree` — plugin [[GitExtensions.ZimerfeldTree]] (árvore de branches), tem seu próprio cofre de memória
