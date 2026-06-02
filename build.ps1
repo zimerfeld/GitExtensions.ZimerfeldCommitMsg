@@ -34,15 +34,15 @@ $csprojContent = Get-Content $csproj -Raw -Encoding UTF8
 $csprojContent = $csprojContent -replace '<Version>[^<]+</Version>', "<Version>$newVersion</Version>"
 [System.IO.File]::WriteAllText($csproj, $csprojContent, [System.Text.Encoding]::UTF8)
 
-# -- 4. Atualizar FUNCIONALIDADES.md -------------------------------------------
-$funcDoc = "$PSScriptRoot\FUNCIONALIDADES.md"
-if (Test-Path $funcDoc) {
+# -- 4. Atualizar README.md ----------------------------------------------------
+$readmeDoc = "$PSScriptRoot\README.md"
+if (Test-Path $readmeDoc) {
     $today   = (Get-Date).ToString("yyyy-MM-dd")
-    $content = Get-Content $funcDoc -Raw -Encoding UTF8
+    $content = Get-Content $readmeDoc -Raw -Encoding UTF8
     $content = $content -replace '\*\*Versão:\*\* [^\r\n]+', "**Versão:** $newVersion"
     $content = $content -replace '\*\*Atualizado em:\*\* [^\r\n]+', "**Atualizado em:** $today"
-    [System.IO.File]::WriteAllText($funcDoc, $content, [System.Text.Encoding]::UTF8)
-    Write-Host "FUNCIONALIDADES.md atualizado para $newVersion ($today)"
+    [System.IO.File]::WriteAllText($readmeDoc, $content, [System.Text.Encoding]::UTF8)
+    Write-Host "README.md atualizado para $newVersion ($today)"
 }
 
 # -- 5. Build ------------------------------------------------------------------
