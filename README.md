@@ -233,6 +233,14 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 
 ---
 
+## Plugins relacionados
+
+### [GitExtensions.ZimerfeldTree](https://www.nuget.org/packages/GitExtensions.ZimerfeldTree/)
+
+Plugin para GitExtensions que exibe branches hierarquicamente em uma janela de árvore persistente e não-modal. Branches separados por `/` são mostrados como nós de pasta aninhados sob três seções fixas — LOCAL, REMOTES e tags. Por **zimerfeld**.
+
+---
+
 ## Licença
 
 [MIT](LICENSE.txt)
