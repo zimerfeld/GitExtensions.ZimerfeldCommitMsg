@@ -7,7 +7,7 @@ namespace GitExtensions.ZimerfeldCommitMsg;
 [Export(typeof(IGitPlugin))]
 public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
 {
-    private const string TemplateKey = "Zimerfeld: Auto-resumo";
+    private const string TemplateKey = "Zimerfeld Commit Msg";
 
     // Icone exibido no menu Plugins e no dropdown do dialogo de commit
     private static readonly Image? PluginIcon = LoadIcon();
