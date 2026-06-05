@@ -2,9 +2,9 @@
 <package>
   <metadata>
     <id>GitExtensions.ZimerfeldCommitMsg</id>
-    <version>1.0.31</version>
+    <version>1.0.34</version>
     <authors>Zimerfeld</authors>
-    <description>Plugin para GitExtensions que gera automaticamente uma mensagem de commit resumindo em uma frase as mudanças nos arquivos staged, usando o formato Conventional Commits (feat/fix/docs/test/chore).</description>
+    <description>Plugin for GitExtensions that automatically generates commit messages in Conventional Commits v1.0.0 format (feat/fix/docs/test/chore/build/refactor), in Brazilian Portuguese, by analyzing the actual content of staged changes. Supports two strategies: comment-based (extracts meaningful comments added to the diff) and filename-based (derives semantic concepts from file names). The message is refreshed automatically whenever files are staged or unstaged while the commit dialog is open.</description>
     <tags>gitextensions plugin commit-message conventional-commits</tags>
     <readme>README.md</readme>
     <license type="expression">MIT</license>
