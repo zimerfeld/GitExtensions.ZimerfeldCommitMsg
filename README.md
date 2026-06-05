@@ -1,6 +1,6 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.28
+**Versão:** 1.0.29
 **Atualizado em:** 2026-06-05
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit no formato **Conventional Commits v1.0.0**, em **português-BR**, analisando o conteúdo real das alterações staged.
@@ -10,7 +10,7 @@ Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera autom
 ## Modos de integração
 
 ### Template no diálogo de commit
-Selecione **"Zimerfeld: Auto-resumo"** no dropdown de templates da janela de commit. A mensagem é gerada e preenchida automaticamente no campo de texto.
+Selecione **"Zimerfeld Commit Msg"** no dropdown de templates da janela de commit. A mensagem é gerada e preenchida automaticamente no campo de texto.
 
 ### Menu Plugins
 Acesse **Plugins → ZimerfeldCommitMsg**. O diálogo de commit abre com a mensagem já preenchida.
