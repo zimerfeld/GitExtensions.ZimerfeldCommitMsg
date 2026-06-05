@@ -351,6 +351,45 @@ internal sealed class CommitMessageGenerator
     private static readonly HashSet<string> EnglishWords =
         new(WordTranslations.Keys, StringComparer.OrdinalIgnoreCase);
 
+    // ── Verbos em pt-BR: presente do indicativo, 3ª pessoa singular ──────────
+    // Utilizados para detectar quando a descrição já começa com um verbo.
+    private static readonly HashSet<string> PtVerbs3rd = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "adiciona", "remove",   "corrige",   "ajusta",     "refatora",   "implementa",
+        "atualiza", "melhora",  "padroniza", "reorganiza", "simplifica", "documenta",
+        "valida",   "otimiza",  "configura", "filtra",     "gera",       "calcula",
+        "extrai",   "transforma","resolve",  "expõe",      "renderiza",  "envia",
+        "recebe",   "mapeia",   "agrupa",    "ordena",     "une",        "divide",
+        "busca",    "retorna",  "converte",  "cria",       "obtém",      "define",
+        "lê",       "escreve",  "processa",  "trata",      "carrega",    "salva",
+        "verifica", "corresponde","encapsula","estende",   "representa", "contém",
+        "fornece",  "inicializa","delega",   "lança",      "constrói",
+    };
+
+    // ── Verbos pt-BR: infinitivo → 3ª pessoa singular presente ───────────────
+    private static readonly Dictionary<string, string> InfinitiveTo3rd =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["adicionar"]  = "Adiciona",  ["remover"]      = "Remove",    ["corrigir"]   = "Corrige",
+        ["ajustar"]    = "Ajusta",    ["refatorar"]    = "Refatora",  ["implementar"]= "Implementa",
+        ["atualizar"]  = "Atualiza",  ["melhorar"]     = "Melhora",   ["padronizar"] = "Padroniza",
+        ["reorganizar"]= "Reorganiza",["simplificar"]  = "Simplifica",["documentar"] = "Documenta",
+        ["validar"]    = "Valida",    ["otimizar"]     = "Otimiza",   ["configurar"] = "Configura",
+        ["filtrar"]    = "Filtra",    ["gerar"]        = "Gera",      ["calcular"]   = "Calcula",
+        ["extrair"]    = "Extrai",    ["transformar"]  = "Transforma",["resolver"]   = "Resolve",
+        ["expor"]      = "Expõe",     ["renderizar"]   = "Renderiza", ["enviar"]     = "Envia",
+        ["receber"]    = "Recebe",    ["mapear"]       = "Mapeia",    ["agrupar"]    = "Agrupa",
+        ["ordenar"]    = "Ordena",    ["unir"]         = "Une",       ["dividir"]    = "Divide",
+        ["buscar"]     = "Busca",     ["retornar"]     = "Retorna",   ["converter"]  = "Converte",
+        ["criar"]      = "Cria",      ["construir"]    = "Constrói",  ["obter"]      = "Obtém",
+        ["definir"]    = "Define",    ["ler"]          = "Lê",        ["escrever"]   = "Escreve",
+        ["processar"]  = "Processa",  ["tratar"]       = "Trata",     ["carregar"]   = "Carrega",
+        ["salvar"]     = "Salva",     ["verificar"]    = "Verifica",  ["encapsular"] = "Encapsula",
+        ["estender"]   = "Estende",   ["representar"]  = "Representa",["conter"]     = "Contém",
+        ["fornecer"]   = "Fornece",   ["inicializar"]  = "Inicializa",["delegar"]    = "Delega",
+        ["lançar"]     = "Lança",     ["mover"]        = "Move",      ["renomear"]   = "Renomeia",
+    };
+
     // ── Tokens preservados na tradução (não traduzir) ─────────────────────────
     // Nomes de branch no padrão gitflow (feature/…, release/…, etc.) e os tipos
     // Conventional Commits. Sem esta proteção, a tradução palavra-a-palavra
@@ -391,23 +430,31 @@ internal sealed class CommitMessageGenerator
 
         if (readmeTitle is not null)
         {
-            desc = readmeTitle;
+            desc = NormalizeDesc(readmeTitle);
             body = comments.Count > 0
-                ? string.Join("\n", comments.Select(c => $"- {NormalizeDesc(c)}"))
+                ? string.Join("\n", comments.Select(c => $"- {FormatTitle(type, changes, NormalizeDesc(c))}"))
                 : BuildBody(changes);
         }
         else if (comments.Count > 0)
         {
             var mainClause = ExtractMainClause(comments[0]);
-            desc = NormalizeDesc(mainClause);
-
-            // Quando o sujeito foi abreviado, o primeiro comentário aparece completo no corpo
-            // para preservar o contexto; caso contrário não é repetido, pois já é a descrição.
             bool wasShortened = mainClause.Length < comments[0].Length;
-            var bodyComments = wasShortened ? comments : comments.Skip(1).ToList();
-            body = bodyComments.Count > 0
-                ? string.Join("\n", bodyComments.Select(c => $"- {NormalizeDesc(c)}"))
-                : BuildBody(changes);
+
+            if (wasShortened)
+            {
+                // Primeiro comentário é muito específico para o subject; usa frase funcional
+                // geral para evitar repetição entre título e primeiro bullet do body.
+                desc = BuildSubject(type, changes);
+                body = string.Join("\n", comments.Select(c => $"- {FormatTitle(type, changes, NormalizeDesc(c))}"));
+            }
+            else
+            {
+                desc = NormalizeDesc(mainClause);
+                var bodyComments = comments.Skip(1).ToList();
+                body = bodyComments.Count > 0
+                    ? string.Join("\n", bodyComments.Select(c => $"- {FormatTitle(type, changes, NormalizeDesc(c))}"))
+                    : BuildBody(changes);
+            }
         }
         else
         {
@@ -415,8 +462,7 @@ internal sealed class CommitMessageGenerator
             body = BuildBody(changes);
         }
 
-        var typeStr = string.Join(", ", types);
-        var title = TruncateTitle(desc.Length > 0 ? $"{typeStr}: {desc}" : typeStr);
+        var title = TruncateTitle(FormatTitle(type, changes, desc));
         return body.Length > 0 ? $"{title}\n\n{body}" : title;
     }
 
@@ -759,11 +805,74 @@ internal sealed class CommitMessageGenerator
 
     // ── Step 3 — Subject: descrição funcional em pt-BR ────────────────────────
 
-    private static string BuildSubject(string type, List<FileChange> changes)
+    private static string BuildSubject(string type, List<FileChange> changes) =>
+        BuildFunctionalPhrase(changes);
+
+    // ── Verbo imperativo em pt-BR ──────────────────────────────────────────────
+
+    /// <summary>
+    /// Mapeia o tipo CC + contexto das mudanças para um verbo imperativo em pt-BR.
+    /// </summary>
+    private static string MapTypeToVerb(string type, List<FileChange> changes)
     {
-        // O tipo CC já é o verbo (feat = novo, fix = corrigir, docs = atualizar…)
-        // — adicionar verbo em pt-BR seria redundante
-        return BuildFunctionalPhrase(changes);
+        bool hasDeletions  = changes.Any(c => c.Status == 'D');
+        bool hasAdditions  = changes.Any(c => c.Status is 'A' or 'C');
+        bool onlyAdditions = changes.All(c => c.Status is 'A' or 'C');
+
+        return type switch
+        {
+            "feat"     => onlyAdditions ? "Implementa" : "Adiciona",
+            "fix"      => "Corrige",
+            "refactor" => "Refatora",
+            "docs"     => hasAdditions  ? "Documenta"  : "Atualiza",
+            "build"    => "Configura",
+            "chore"    => hasDeletions  ? "Remove"     : "Configura",
+            "test"     => "Adiciona",
+            "perf"     => "Otimiza",
+            "ci"       => "Configura",
+            "style"    => "Padroniza",
+            _          => "Atualiza"
+        };
+    }
+
+    /// <summary>
+    /// Formata o título completo: detecta verbo inicial em <paramref name="desc"/>
+    /// (3ª pessoa ou infinitivo) e capitaliza; caso contrário, prefixa o verbo
+    /// mapeado do tipo CC.
+    /// Exemplos: "filtrar stems" → "Filtra stems", "autenticação" → "Adiciona autenticação"
+    /// </summary>
+    private static string FormatTitle(string type, List<FileChange> changes, string desc)
+    {
+        if (desc.Length == 0)
+            return MapTypeToVerb(type, changes);
+
+        var (verb, remainder) = ExtractLeadingVerb(desc);
+        if (verb is not null)
+            return remainder.Length > 0 ? $"{verb} {remainder}" : verb;
+
+        return $"{MapTypeToVerb(type, changes)} {desc}";
+    }
+
+    /// <summary>
+    /// Tenta extrair o verbo inicial de uma descrição em pt-BR.
+    /// Reconhece formas na 3ª pessoa do singular e infinitivos mapeados.
+    /// Retorna (verbo capitalizado, restante) ou (null, desc original).
+    /// </summary>
+    private static (string? Verb, string Remainder) ExtractLeadingVerb(string desc)
+    {
+        var firstSpace = desc.IndexOf(' ');
+        if (firstSpace <= 0) return (null, desc);
+
+        var firstWord = desc[..firstSpace].ToLowerInvariant();
+        var rest      = desc[(firstSpace + 1)..];
+
+        if (PtVerbs3rd.Contains(firstWord))
+            return (char.ToUpperInvariant(firstWord[0]) + firstWord[1..], rest);
+
+        if (InfinitiveTo3rd.TryGetValue(firstWord, out var imperative))
+            return (imperative, rest);
+
+        return (null, desc);
     }
 
     // ── Step 4 — Body: frase das camadas arquiteturais em pt-BR ───────────────

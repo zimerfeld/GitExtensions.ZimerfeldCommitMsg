@@ -1,7 +1,7 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.22
-**Atualizado em:** 2026-06-02
+**Versão:** 1.0.25
+**Atualizado em:** 2026-06-05
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit no formato **Conventional Commits v1.0.0**, em **português-BR**, analisando o conteúdo real das alterações staged.
 

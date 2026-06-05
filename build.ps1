@@ -11,6 +11,14 @@ $nuspec  = "$PSScriptRoot\src\GitExtensions.ZimerfeldCommitMsg\GitExtensions.Zim
 $csproj  = "$PSScriptRoot\src\GitExtensions.ZimerfeldCommitMsg\GitExtensions.ZimerfeldCommitMsg.csproj"
 $outDir  = $PSScriptRoot
 
+# -- 0. Fechar GitExtensions (libera DLL antes do build) ----------------------
+$geProc = Get-Process -Name GitExtensions -ErrorAction SilentlyContinue
+if ($geProc) {
+    Write-Host "Fechando GitExtensions..."
+    Stop-Process -Name GitExtensions -Force
+    Start-Sleep -Seconds 1
+}
+
 # -- 1. Ler versao atual do nuspec ---------------------------------------------
 [xml]$spec = Get-Content $nuspec -Encoding UTF8
 $current   = $spec.package.metadata.version
