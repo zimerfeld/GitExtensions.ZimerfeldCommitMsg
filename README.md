@@ -1,7 +1,9 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.29
+**Versão:** 1.0.31
 **Atualizado em:** 2026-06-05
+
+![Screenshot](Screenshot.png)
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit no formato **Conventional Commits v1.0.0**, em **português-BR**, analisando o conteúdo real das alterações staged.
 
@@ -230,6 +232,14 @@ Para atualizar apenas a DLL durante desenvolvimento:
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\update-dll.ps1
 ```
+
+---
+
+## Plugins relacionados
+
+### [GitExtensions.ZimerfeldTree](https://www.nuget.org/packages/GitExtensions.ZimerfeldTree/)
+
+Plugin para GitExtensions que exibe branches hierarquicamente em uma janela de árvore persistente e não-modal. Branches separados por `/` são mostrados como nós de pasta aninhados sob três seções fixas — LOCAL, REMOTES e tags. Por **zimerfeld**.
 
 ---
 

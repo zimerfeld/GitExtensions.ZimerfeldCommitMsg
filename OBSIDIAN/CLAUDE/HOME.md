@@ -6,6 +6,8 @@ atualizado: 2026-06-01
 
 # ZimerfeldCommitMsg — Mapa do Cofre
 
+![[Anexos/Screenshot.png]]
+
 Plugin para **GitExtensions** que gera mensagens de commit automáticas no formato **Conventional Commits v1.0.0**, em português-BR, analisando o conteúdo das alterações staged.
 
 ---
