@@ -1,7 +1,7 @@
 ---
 tipo: sistema
 tags: [build, versão, nupkg, deploy]
-atualizado: 2026-06-01
+atualizado: 2026-06-05
 ---
 
 # Versionamento e Build
@@ -10,7 +10,12 @@ atualizado: 2026-06-01
 
 `major.minor.build` — somente o `build` é incrementado automaticamente pelo `build.ps1`. Major e minor são alterados manualmente.
 
-**Versão atual:** `1.0.16` *(fonte da verdade: `.nuspec` / `.csproj`)*
+**Versão atual:** `1.0.35` *(fonte da verdade: `.nuspec` / `.csproj`)*
+
+> [!note] Recursos `.resx` embutidos (sem satellite assemblies)
+> As strings de UI vivem em `Resources/Strings.resx` (EN neutro) e `Resources/StringsPtBr.resx` (PT),
+> embutidas no **assembly principal** (PT sem sufixo de cultura → não vira satellite), preservando o
+> deploy de **DLL única**. Ver [[../Decisoes/Suporte Multilíngue PT-EN]].
 
 ## Ciclo build.ps1
 

@@ -1,18 +1,70 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.34
-**Atualizado em:** 2026-06-05
+**Versão:** 1.0.39
+**Atualizado em:** 2026-06-06
 
 ![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/Screenshot.png)
 
-Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit no formato **Conventional Commits v1.0.0**, em **português-BR**, analisando o conteúdo real das alterações staged.
+Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit no formato **Conventional Commits v1.0.0**, analisando o conteúdo real das alterações staged. **Multilíngue**: gera a mensagem em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
+
+---
+
+## Funcionalidades em alto nível
+
+- **Geração automática** da mensagem de commit a partir do conteúdo real do diff staged (não apenas dos nomes de arquivo).
+- **Conventional Commits v1.0.0** — detecta o(s) tipo(s) (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) e prefixa o verbo imperativo adequado.
+- **Multilíngue (Português/Inglês)** — idioma escolhido automaticamente pelo SO, com seletor manual de override.
+- **Duas estratégias de conteúdo**: baseada em comentários do diff (principal) e baseada em nomes de arquivo (fallback).
+- **Corpo em bullets** — até 5 frases de uma linha, cada uma resumindo a mudança mais significativa de um arquivo.
+- **Tradução inglês → português** dos comentários (apenas quando a saída é pt-BR); em inglês, os comentários passam intactos.
+- **Três modos de integração**: template no diálogo de commit, menu Plugins e auto-refresh ao stage/unstage.
+- **Não destrutivo** — nunca sobrescreve texto digitado manualmente pelo usuário.
+
+---
+
+## Multilíngue (Português / Inglês)
+
+O plugin gera toda a mensagem (descrição, corpo e verbos) **no idioma escolhido**, e localiza também as mensagens de UI (diálogos de aviso).
+
+### Seleção do idioma
+
+Há **duas formas** de escolher o idioma, com os mesmos rótulos bilíngues (claros independentemente do idioma do sistema):
+
+**1. No dropdown de templates da tela de commit** — três itens, um por idioma (escolha rápida por commit):
+
+```
+Zimerfeld Commit Msg — Automático/Automatic
+Zimerfeld Commit Msg — Português/Portuguese
+Zimerfeld Commit Msg — Inglês/English
+```
+
+**2. Em Configurações → Plugins → ZimerfeldCommitMsg** — o seletor **"Idioma da mensagem / Message language"** define o **padrão** usado pelo menu Plugins e pelo auto-refresh.
+
+| Opção | Comportamento |
+|---|---|
+| `Automático/Automatic` | **Padrão.** Detecta pelo idioma do sistema operacional/GitExtensions (`pt-*` → português; qualquer outro → inglês). |
+| `Português/Portuguese` | Força a saída em português-BR. |
+| `Inglês/English` | Força a saída em inglês. |
+
+> Escolher um item de idioma no dropdown **fixa** aquele idioma também para o auto-refresh enquanto o diálogo estiver aberto. O override prevalece sobre o idioma do SO; a detecção automática usa `CultureInfo.CurrentUICulture`.
+>
+> **Obs.:** o nó **ZimerfeldCommitMsg** só aparece na árvore de **Configurações → Plugins** depois que a DLL com o seletor (≥ 1.0.36) é instalada e o GitExtensions é reiniciado.
+
+### Exemplo lado a lado
+
+| Português-BR | English |
+|---|---|
+| `feat: Implementa autenticação` | `feat: Implement authentication` |
+| `- Adiciona autenticação` | `- Add authentication` |
+| `- Adiciona processamento de pagamento` | `- Add payment processing` |
+| `- Adiciona gerenciamento de token` | `- Add token management` |
 
 ---
 
 ## Modos de integração
 
 ### Template no diálogo de commit
-Selecione **"Zimerfeld Commit Msg"** no dropdown de templates da janela de commit. A mensagem é gerada e preenchida automaticamente no campo de texto.
+No dropdown de templates da janela de commit há um item por idioma — **"Zimerfeld Commit Msg — Automático/Automatic"**, **"— Português/Portuguese"** e **"— Inglês/English"**. Selecione um e a mensagem é gerada nesse idioma e preenchida automaticamente no campo de texto.
 
 ### Menu Plugins
 Acesse **Plugins → ZimerfeldCommitMsg**. O diálogo de commit abre com a mensagem já preenchida.
@@ -32,7 +84,7 @@ Enquanto o diálogo de commit estiver aberto, a mensagem é atualizada automatic
 
 - Sem scope — evita redundância com o nome do projeto
 - Sem realce de cores — usa `git diff --no-color` para evitar códigos ANSI
-- Descrição sempre em português-BR
+- Descrição no idioma ativo (português-BR ou inglês)
 
 Quando as mudanças envolvem mais de um tipo, todos aparecem na primeira linha separados por vírgula:
 
@@ -89,7 +141,7 @@ fix: filtrar stems com ponto para evitar nomes de assembly
 - adicionar sufixo Generator aos SemanticSuffixes
 ```
 
-Comentários em inglês são traduzidos automaticamente para português-BR antes de serem usados.
+Quando a saída é **português-BR**, comentários em inglês são traduzidos automaticamente antes de serem usados. Quando a saída é **inglês**, os comentários passam intactos (e comentários em português permanecem em português).
 
 ---
 
@@ -130,38 +182,40 @@ Para cada arquivo staged, o nome (sem extensão) passa por:
 | `Report` | relatórios |
 | `CommitMessage` | mensagem de commit |
 
-#### Verbos em pt-BR por tipo
+#### Verbos por tipo (exemplos em pt-BR)
 
-| Tipo | Verbo | Exemplo gerado |
-|---|---|---|
-| `feat` | adicionar | `feat: adicionar gerenciamento de usuários` |
-| `fix` | corrigir | `fix: corrigir processamento de pagamento` |
-| `docs` | atualizar | `docs: atualizar documentação` |
-| `test` | adicionar / atualizar | `test: adicionar testes de integração` |
-| `chore` | atualizar / remover | `chore: atualizar configuração` |
-| `build` | adicionar / atualizar | `build: atualizar configuração de build` |
-| `refactor` | *(omitido — redundante)* | `refactor: gerenciamento de usuários` |
+| Tipo | Verbo (pt-BR) | Verbo (en) | Exemplo gerado |
+|---|---|---|---|
+| `feat` | Adiciona / Implementa | Add / Implement | `feat: Implementa gerenciamento de usuários` |
+| `fix` | Corrige | Fix | `fix: Corrige processamento de pagamento` |
+| `docs` | Documenta / Atualiza | Document / Update | `docs: Atualiza documentação` |
+| `test` | Adiciona | Add | `test: Adiciona testes de integração` |
+| `chore` | Configura / Remove | Configure / Remove | `chore: Configura configuração` |
+| `build` | Configura | Configure | `build: Configura configuração de build` |
+| `refactor` | Refatora | Refactor | `refactor: Refatora gerenciamento de usuários` |
 
 #### Corpo da mensagem (body)
 
-Gerado quando há 2+ arquivos com camadas arquiteturais distintas:
+Quando há 2+ arquivos, o corpo lista até **5 bullets**, cada um com uma frase de uma linha resumindo a mudança mais significativa de um arquivo (ordenados por relevância do arquivo). O verbo de cada bullet acompanha o status no git (adicionado/removido/renomeado/modificado):
 
 ```
-Abrange autenticação e gerenciamento de token nas camadas de serviço, repositório e controlador.
+- Adiciona autenticação
+- Adiciona processamento de pagamento
+- Adiciona gerenciamento de token
 ```
 
 ---
 
 ## Exemplos de mensagens geradas
 
-| Arquivos staged | Mensagem gerada |
-|---|---|
-| `AuthService.cs` adicionado | `feat: adicionar autenticação` |
-| `UserService.cs` modificado | `fix: corrigir gerenciamento de usuários` |
-| `README.md` modificado | `docs: atualizar documentação` |
-| `appsettings.json` alterado | `chore: atualizar configuração` |
-| `UserService.cs` + `UserRepository.cs` adicionados | `feat: adicionar gerenciamento de usuários` + corpo com camadas |
-| `.cs` com comentário `// filtrar stems com ponto` staged | `fix: filtrar stems com ponto` |
+| Arquivos staged | Mensagem gerada (pt-BR) | Mensagem gerada (en) |
+|---|---|---|
+| `AuthService.cs` adicionado | `feat: Implementa autenticação` | `feat: Implement authentication` |
+| `UserService.cs` modificado | `fix: Corrige gerenciamento de usuários` | `fix: Fix user management` |
+| `README.md` modificado | `docs: Atualiza documentação` | `docs: Update documentation` |
+| `appsettings.json` alterado | `chore: Configura configuração` | `chore: Configure configuration` |
+| `UserService.cs` + `UserRepository.cs` adicionados | `feat: Implementa gerenciamento de usuários` + bullets | `feat: Implement user management` + bullets |
+| `.cs` com comentário `// filtrar stems com ponto` staged | `fix: Filtra stems com ponto` | `fix: Filter stems with dot` |
 
 ---
 

@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <NeutralLanguage>pt-BR</NeutralLanguage>
-    <Version>1.0.34</Version>
+    <Version>1.0.39</Version>
     <Authors>Zimerfeld</Authors>
     <Description>GitExtensions plugin that summarizes staged changes into a single commit message sentence</Description>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
@@ -21,6 +21,15 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\icon.png" />
+    <!-- Strings de UI embutidas no assembly principal (sem satellite assemblies, para
+         preservar o deploy de DLL única). LogicalName fixo → nome de recurso determinístico,
+         independente de RootNamespace/pasta, casando com os ResourceManager em Strings.cs. -->
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <LogicalName>GitExtensions.ZimerfeldCommitMsg.Resources.Strings.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\StringsPtBr.resx">
+      <LogicalName>GitExtensions.ZimerfeldCommitMsg.Resources.StringsPtBr.resources</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

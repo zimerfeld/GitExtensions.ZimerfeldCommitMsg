@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using GitExtensions.ZimerfeldCommitMsg.Localization;
 
 namespace GitExtensions.ZimerfeldCommitMsg;
 
@@ -15,6 +16,8 @@ namespace GitExtensions.ZimerfeldCommitMsg;
 internal sealed class CommitMessageGenerator
 {
     private readonly string _workingDir;
+    private readonly MessageLanguage _language;
+    private readonly LanguagePack _lang;
 
     // ── Extension → semantic category ─────────────────────────────────────────
 
@@ -59,136 +62,6 @@ internal sealed class CommitMessageGenerator
         "Facade","Proxy","Decorator","Adapter","Client","Endpoint","Endpoints",
         "Base","Abstract","Interface","Implementation","Impl",
     ];
-
-    // ── Domain concept → frase em pt-BR ───────────────────────────────────────
-    private static readonly Dictionary<string, string> ConceptPhrases = new(StringComparer.OrdinalIgnoreCase)
-    {
-        // Identidade / acesso
-        ["Auth"]           = "autenticação",
-        ["Authentication"] = "autenticação",
-        ["Login"]          = "login",
-        ["Logout"]         = "logout",
-        ["SignIn"]         = "login",
-        ["SignUp"]         = "cadastro",
-        ["Register"]       = "cadastro",
-        ["Registration"]   = "cadastro",
-        ["Password"]       = "gerenciamento de senha",
-        ["Token"]          = "gerenciamento de token",
-        ["Jwt"]            = "autenticação JWT",
-        ["Bearer"]         = "autenticação por token",
-        ["Session"]        = "gerenciamento de sessão",
-        ["Permission"]     = "permissões",
-        ["Permissions"]    = "permissões",
-        ["Role"]           = "controle de acesso por papel",
-        ["Roles"]          = "controle de acesso por papel",
-        ["Claim"]          = "claims",
-        ["OAuth"]          = "integração OAuth",
-        // Usuário / conta
-        ["User"]           = "gerenciamento de usuários",
-        ["Users"]          = "gerenciamento de usuários",
-        ["Account"]        = "gerenciamento de conta",
-        ["Profile"]        = "perfil do usuário",
-        ["Member"]         = "associação",
-        ["Customer"]       = "gerenciamento de clientes",
-        ["Tenant"]         = "multi-tenancy",
-        // Comércio
-        ["Order"]          = "processamento de pedidos",
-        ["Cart"]           = "carrinho de compras",
-        ["Checkout"]       = "fluxo de checkout",
-        ["Payment"]        = "processamento de pagamento",
-        ["Invoice"]        = "gerenciamento de faturas",
-        ["Product"]        = "gerenciamento de produtos",
-        ["Catalog"]        = "catálogo de produtos",
-        ["Inventory"]      = "estoque",
-        ["Shipping"]       = "frete",
-        ["Discount"]       = "gerenciamento de descontos",
-        ["Coupon"]         = "gerenciamento de cupons",
-        ["Subscription"]   = "assinaturas",
-        // Comunicação
-        ["Email"]          = "serviço de e-mail",
-        ["Mail"]           = "serviço de e-mail",
-        ["Sms"]            = "notificações SMS",
-        ["Notification"]   = "notificações",
-        ["Push"]           = "notificações push",
-        ["Webhook"]        = "webhooks",
-        ["Message"]        = "mensagens",
-        ["Chat"]           = "chat",
-        // Infraestrutura
-        ["Cache"]          = "cache",
-        ["Log"]            = "registro de log",
-        ["Logger"]         = "registro de log",
-        ["Logging"]        = "registro de log",
-        ["Audit"]          = "trilha de auditoria",
-        ["Health"]         = "verificação de saúde",
-        ["Metric"]         = "métricas",
-        ["Monitor"]        = "monitoramento",
-        ["Queue"]          = "fila de mensagens",
-        ["Job"]            = "tarefas em segundo plano",
-        ["Scheduler"]      = "agendamento de tarefas",
-        ["Worker"]         = "workers em segundo plano",
-        ["Event"]          = "tratamento de eventos",
-        // Dados
-        ["Migration"]      = "migração de banco de dados",
-        ["Seed"]           = "população de dados",
-        ["Database"]       = "acesso ao banco de dados",
-        ["Db"]             = "banco de dados",
-        ["Storage"]        = "armazenamento",
-        ["File"]           = "gerenciamento de arquivos",
-        ["Upload"]         = "upload de arquivos",
-        ["Download"]       = "download de arquivos",
-        ["Blob"]           = "armazenamento de blobs",
-        // Relatórios
-        ["Report"]         = "relatórios",
-        ["Dashboard"]      = "painel",
-        ["Analytics"]      = "análises",
-        ["Export"]         = "exportação de dados",
-        ["Import"]         = "importação de dados",
-        ["Pdf"]            = "geração de PDF",
-        ["Excel"]          = "exportação para Excel",
-        // Busca
-        ["Search"]         = "busca",
-        ["Filter"]         = "filtragem",
-        // Configuração
-        ["Settings"]       = "configurações",
-        ["Config"]         = "configuração",
-        ["AppSettings"]    = "configurações da aplicação",
-        // API
-        ["Api"]            = "API",
-        ["Rest"]           = "API REST",
-        ["Grpc"]           = "serviço gRPC",
-        ["GraphQL"]        = "GraphQL",
-        ["Swagger"]        = "documentação da API",
-        ["Cors"]           = "política CORS",
-        // Testes
-        ["Test"]           = "testes unitários",
-        ["Tests"]          = "testes unitários",
-        ["Integration"]    = "testes de integração",
-        ["E2E"]            = "testes end-to-end",
-        // Docs
-        ["Readme"]         = "documentação",
-        ["Changelog"]      = "changelog",
-        ["Docs"]           = "documentação",
-        // Plugin / commit
-        ["CommitMessage"]  = "mensagem de commit",
-        ["CommitMsg"]      = "mensagem de commit",
-        ["Plugin"]         = "plugin",
-        ["GitExtension"]   = "extensão do Git",
-    };
-
-    // ── Architectural layers detected from file suffixes ───────────────────────
-    private static readonly Dictionary<string, string> ArchLayers = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["Controller"]  = "controlador",  ["Controllers"]  = "controlador",
-        ["Service"]     = "serviço",      ["Services"]     = "serviço",
-        ["Repository"]  = "repositório",  ["Repositories"] = "repositório",
-        ["Manager"]     = "gerenciador",  ["Handler"]      = "handler",
-        ["Middleware"]  = "middleware",    ["Validator"]    = "validador",
-        ["Mapper"]      = "mapeador",     ["Factory"]      = "fábrica",
-        ["Tests"]       = "teste",        ["Test"]         = "teste",
-        ["Dto"]         = "DTO",          ["ViewModel"]    = "view model",
-        ["Entity"]      = "entidade",     ["Model"]        = "modelo",
-        ["Generator"]   = "gerador",      ["Generators"]   = "gerador",
-    };
 
     // ── Tradução inglês → pt-BR: frases compostas (mais longas primeiro) ─────────
     private static readonly (string En, string Pt)[] PhraseTranslations =
@@ -351,45 +224,6 @@ internal sealed class CommitMessageGenerator
     private static readonly HashSet<string> EnglishWords =
         new(WordTranslations.Keys, StringComparer.OrdinalIgnoreCase);
 
-    // ── Verbos em pt-BR: presente do indicativo, 3ª pessoa singular ──────────
-    // Utilizados para detectar quando a descrição já começa com um verbo.
-    private static readonly HashSet<string> PtVerbs3rd = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "adiciona", "remove",   "corrige",   "ajusta",     "refatora",   "implementa",
-        "atualiza", "melhora",  "padroniza", "reorganiza", "simplifica", "documenta",
-        "valida",   "otimiza",  "configura", "filtra",     "gera",       "calcula",
-        "extrai",   "transforma","resolve",  "expõe",      "renderiza",  "envia",
-        "recebe",   "mapeia",   "agrupa",    "ordena",     "une",        "divide",
-        "busca",    "retorna",  "converte",  "cria",       "obtém",      "define",
-        "lê",       "escreve",  "processa",  "trata",      "carrega",    "salva",
-        "verifica", "corresponde","encapsula","estende",   "representa", "contém",
-        "fornece",  "inicializa","delega",   "lança",      "constrói",
-    };
-
-    // ── Verbos pt-BR: infinitivo → 3ª pessoa singular presente ───────────────
-    private static readonly Dictionary<string, string> InfinitiveTo3rd =
-        new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["adicionar"]  = "Adiciona",  ["remover"]      = "Remove",    ["corrigir"]   = "Corrige",
-        ["ajustar"]    = "Ajusta",    ["refatorar"]    = "Refatora",  ["implementar"]= "Implementa",
-        ["atualizar"]  = "Atualiza",  ["melhorar"]     = "Melhora",   ["padronizar"] = "Padroniza",
-        ["reorganizar"]= "Reorganiza",["simplificar"]  = "Simplifica",["documentar"] = "Documenta",
-        ["validar"]    = "Valida",    ["otimizar"]     = "Otimiza",   ["configurar"] = "Configura",
-        ["filtrar"]    = "Filtra",    ["gerar"]        = "Gera",      ["calcular"]   = "Calcula",
-        ["extrair"]    = "Extrai",    ["transformar"]  = "Transforma",["resolver"]   = "Resolve",
-        ["expor"]      = "Expõe",     ["renderizar"]   = "Renderiza", ["enviar"]     = "Envia",
-        ["receber"]    = "Recebe",    ["mapear"]       = "Mapeia",    ["agrupar"]    = "Agrupa",
-        ["ordenar"]    = "Ordena",    ["unir"]         = "Une",       ["dividir"]    = "Divide",
-        ["buscar"]     = "Busca",     ["retornar"]     = "Retorna",   ["converter"]  = "Converte",
-        ["criar"]      = "Cria",      ["construir"]    = "Constrói",  ["obter"]      = "Obtém",
-        ["definir"]    = "Define",    ["ler"]          = "Lê",        ["escrever"]   = "Escreve",
-        ["processar"]  = "Processa",  ["tratar"]       = "Trata",     ["carregar"]   = "Carrega",
-        ["salvar"]     = "Salva",     ["verificar"]    = "Verifica",  ["encapsular"] = "Encapsula",
-        ["estender"]   = "Estende",   ["representar"]  = "Representa",["conter"]     = "Contém",
-        ["fornecer"]   = "Fornece",   ["inicializar"]  = "Inicializa",["delegar"]    = "Delega",
-        ["lançar"]     = "Lança",     ["mover"]        = "Move",      ["renomear"]   = "Renomeia",
-    };
-
     // ── Tokens preservados na tradução (não traduzir) ─────────────────────────
     // Nomes de branch no padrão gitflow (feature/…, release/…, etc.) e os tipos
     // Conventional Commits. Sem esta proteção, a tradução palavra-a-palavra
@@ -404,7 +238,12 @@ internal sealed class CommitMessageGenerator
     private static readonly HashSet<string> SkippableRoots =
         new(StringComparer.OrdinalIgnoreCase) { "src", "app", "lib", "source", "main", ".", "" };
 
-    public CommitMessageGenerator(string workingDir) => _workingDir = workingDir;
+    public CommitMessageGenerator(string workingDir, MessageLanguage language)
+    {
+        _workingDir = workingDir;
+        _language   = language;
+        _lang       = LanguagePack.For(language);
+    }
 
     // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -418,11 +257,11 @@ internal sealed class CommitMessageGenerator
 
         var types    = DetermineAllTypes(changes);
         var type     = types[0];
-        // Traduz comentários ingleses para pt-BR; descarta apenas quando a tradução é insuficiente
-        var comments = ExtractDiffComments()
-            .Select(TranslateToPortuguese)
-            .OfType<string>()
-            .ToList();
+        // pt-BR: traduz comentários ingleses, descartando traduções insuficientes.
+        // Inglês: comentários passam intactos (inglês permanece inglês; pt-BR permanece pt-BR).
+        var comments = _language == MessageLanguage.PtBr
+            ? ExtractDiffComments().Select(TranslateToPortuguese).OfType<string>().ToList()
+            : ExtractDiffComments();
 
         string desc, body;
 
@@ -623,18 +462,13 @@ internal sealed class CommitMessageGenerator
 
     /// <summary>
     /// Extrai a cláusula principal de um comentário, descartando justificativas introduzidas
-    /// por conectores como " para ", " pois ", " porque ", " — ", etc.
+    /// por conectores específicos do idioma (pt-BR " para ", " pois "…; inglês " to ", " because "…).
     /// Exemplo: "filtrar stems com ponto para evitar nomes de assembly"
     ///       →  "filtrar stems com ponto"
     /// </summary>
-    private static string ExtractMainClause(string comment)
+    private string ExtractMainClause(string comment)
     {
-        ReadOnlySpan<string> connectors =
-        [
-            " para ", " pois ", " porque ", " já que ", " a fim de ",
-            " quando ", " caso ", " evitando ", " — ", " - "
-        ];
-        foreach (var conn in connectors)
+        foreach (var conn in _lang.MainClauseConnectors)
         {
             var idx = comment.IndexOf(conn, StringComparison.OrdinalIgnoreCase);
             if (idx > 8) return comment[..idx].Trim();   // mínimo de 8 chars antes do conector
@@ -805,117 +639,65 @@ internal sealed class CommitMessageGenerator
 
     // ── Step 3 — Subject: descrição funcional em pt-BR ────────────────────────
 
-    private static string BuildSubject(string type, List<FileChange> changes) =>
+    private string BuildSubject(string type, List<FileChange> changes) =>
         BuildFunctionalPhrase(changes);
 
-    // ── Verbo imperativo em pt-BR ──────────────────────────────────────────────
+    // ── Verbo imperativo (idioma-específico) ───────────────────────────────────
 
     /// <summary>
-    /// Mapeia o tipo CC + contexto das mudanças para um verbo imperativo em pt-BR.
+    /// Mapeia o tipo CC + contexto das mudanças para o verbo imperativo no idioma ativo.
     /// </summary>
-    private static string MapTypeToVerb(string type, List<FileChange> changes)
+    private string TypeVerb(string type, List<FileChange> changes)
     {
         bool hasDeletions  = changes.Any(c => c.Status == 'D');
         bool hasAdditions  = changes.Any(c => c.Status is 'A' or 'C');
         bool onlyAdditions = changes.All(c => c.Status is 'A' or 'C');
-
-        return type switch
-        {
-            "feat"     => onlyAdditions ? "Implementa" : "Adiciona",
-            "fix"      => "Corrige",
-            "refactor" => "Refatora",
-            "docs"     => hasAdditions  ? "Documenta"  : "Atualiza",
-            "build"    => "Configura",
-            "chore"    => hasDeletions  ? "Remove"     : "Configura",
-            "test"     => "Adiciona",
-            "perf"     => "Otimiza",
-            "ci"       => "Configura",
-            "style"    => "Padroniza",
-            _          => "Atualiza"
-        };
+        return _lang.TypeVerb(type, onlyAdditions, hasAdditions, hasDeletions);
     }
 
     /// <summary>
     /// Formata o título completo: detecta verbo inicial em <paramref name="desc"/>
-    /// (3ª pessoa ou infinitivo) e capitaliza; caso contrário, prefixa o verbo
-    /// mapeado do tipo CC.
+    /// e o normaliza; caso contrário, prefixa o verbo mapeado do tipo CC.
     /// Exemplos: "filtrar stems" → "Filtra stems", "autenticação" → "Adiciona autenticação"
     /// </summary>
-    private static string FormatTitle(string type, List<FileChange> changes, string desc)
+    private string FormatTitle(string type, List<FileChange> changes, string desc)
     {
         if (desc.Length == 0)
-            return MapTypeToVerb(type, changes);
+            return TypeVerb(type, changes);
 
-        var (verb, remainder) = ExtractLeadingVerb(desc);
+        var (verb, remainder) = _lang.LeadingVerb(desc);
         if (verb is not null)
             return remainder.Length > 0 ? $"{verb} {remainder}" : verb;
 
-        return $"{MapTypeToVerb(type, changes)} {desc}";
+        return $"{TypeVerb(type, changes)} {desc}";
     }
 
-    /// <summary>
-    /// Tenta extrair o verbo inicial de uma descrição em pt-BR.
-    /// Reconhece formas na 3ª pessoa do singular e infinitivos mapeados.
-    /// Retorna (verbo capitalizado, restante) ou (null, desc original).
-    /// </summary>
-    private static (string? Verb, string Remainder) ExtractLeadingVerb(string desc)
-    {
-        var firstSpace = desc.IndexOf(' ');
-        if (firstSpace <= 0) return (null, desc);
+    // ── Step 4 — Body: bullets das mudanças mais significativas ──────────────
 
-        var firstWord = desc[..firstSpace].ToLowerInvariant();
-        var rest      = desc[(firstSpace + 1)..];
-
-        if (PtVerbs3rd.Contains(firstWord))
-            return (char.ToUpperInvariant(firstWord[0]) + firstWord[1..], rest);
-
-        if (InfinitiveTo3rd.TryGetValue(firstWord, out var imperative))
-            return (imperative, rest);
-
-        return (null, desc);
-    }
-
-    // ── Step 4 — Body: frase das camadas arquiteturais em pt-BR ───────────────
-
-    private static string BuildBody(List<FileChange> changes)
+    private string BuildBody(List<FileChange> changes)
     {
         if (changes.Count == 1) return string.Empty;
 
-        var concepts = ExtractUniqueConcepts(changes);
-        var layers   = ExtractArchLayerNames(changes);
+        var bullets = changes
+            .OrderByDescending(c => CommentFilePriority(c.Path))
+            .Select(c =>
+            {
+                var raw = ExtractRawConcept(Path.GetFileNameWithoutExtension(c.Path));
+                if (raw is null) return null;
+                var concept = MapConcept(raw);
+                return $"- {_lang.StatusVerb(c.Status)} {concept}";
+            })
+            .OfType<string>()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(5)
+            .ToList();
 
-        if (layers.Count < 2 && concepts.Count < 2) return string.Empty;
-
-        var sb = new StringBuilder();
-
-        if (concepts.Count >= 2)
-        {
-            var phrases = concepts
-                .Select(MapConcept)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Take(3)
-                .ToList();
-
-            sb.Append("Abrange ");
-            sb.Append(JoinPhrases(phrases));
-
-            if (layers.Count >= 2)
-                sb.Append($" nas camadas de {JoinPhrases(layers)}");
-        }
-        else if (layers.Count >= 2)
-        {
-            sb.Append($"Inclui as camadas de {JoinPhrases(layers)}");
-        }
-
-        if (sb.Length == 0) return string.Empty;
-
-        sb.Append('.');
-        return sb.ToString();
+        return string.Join("\n", bullets);
     }
 
     // ── Concept extraction ─────────────────────────────────────────────────────
 
-    private static List<string> ExtractUniqueConcepts(List<FileChange> changes)
+    private List<string> ExtractUniqueConcepts(List<FileChange> changes)
     {
         var freq = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
@@ -933,7 +715,7 @@ internal sealed class CommitMessageGenerator
             .ToList();
     }
 
-    private static string? ExtractRawConcept(string filename)
+    private string? ExtractRawConcept(string filename)
     {
         // Stems com ponto são nomes de assembly/projeto (ex: GitExtensions.ZimerfeldCommitMsg) — ignorar
         if (filename.Contains('.')) return null;
@@ -962,7 +744,7 @@ internal sealed class CommitMessageGenerator
 
         // Se não está no dicionário e tem mais de 2 palavras PascalCase,
         // é provavelmente um nome de projeto/namespace — ignorar
-        if (!ConceptPhrases.ContainsKey(name))
+        if (!_lang.HasConcept(name))
         {
             var wordCount = Regex.Matches(name, @"[A-Z][a-z]+").Count;
             if (wordCount > 2) return null;
@@ -971,7 +753,7 @@ internal sealed class CommitMessageGenerator
         return name;
     }
 
-    private static string BuildFunctionalPhrase(List<FileChange> changes)
+    private string BuildFunctionalPhrase(List<FileChange> changes)
     {
         if (changes.Count == 1)
         {
@@ -989,10 +771,9 @@ internal sealed class CommitMessageGenerator
             .First();
     }
 
-    private static string MapConcept(string raw) =>
-        ConceptPhrases.TryGetValue(raw, out var mapped) ? mapped : HumanizeName(raw);
+    private string MapConcept(string raw) => _lang.MapConcept(raw, HumanizeName);
 
-    private static string FallbackPhrase(List<FileChange> changes)
+    private string FallbackPhrase(List<FileChange> changes)
     {
         var category = changes
             .Select(c => GetCategory(c.Path))
@@ -1001,43 +782,7 @@ internal sealed class CommitMessageGenerator
             .Select(g => g.Key)
             .FirstOrDefault() ?? "source";
 
-        return category switch
-        {
-            "docs"   => "documentação",
-            "config" => "configuração",
-            "build"  => "configuração de build",
-            "test"   => "testes unitários",
-            "web"    => "componentes web",
-            _        => "código-fonte"
-        };
-    }
-
-    // ── Architectural layer detection ──────────────────────────────────────────
-
-    private static List<string> ExtractArchLayerNames(List<FileChange> changes)
-    {
-        var found = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var change in changes)
-        {
-            var name = Path.GetFileNameWithoutExtension(change.Path);
-            foreach (var (suffix, layer) in ArchLayers)
-            {
-                if (name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) &&
-                    name.Length > suffix.Length)
-                {
-                    found.Add(layer);
-                    break;
-                }
-            }
-        }
-
-        // Ordem canônica
-        var order = new[] { "serviço", "repositório", "controlador", "handler",
-                            "middleware", "validador", "mapeador", "fábrica",
-                            "gerenciador", "gerador", "DTO", "view model",
-                            "entidade", "modelo", "teste" };
-        return found.OrderBy(l => Array.IndexOf(order, l)).ThenBy(l => l).ToList();
+        return _lang.FallbackPhrase(category);
     }
 
     // ── Generic helpers ────────────────────────────────────────────────────────
@@ -1088,14 +833,6 @@ internal sealed class CommitMessageGenerator
         var cut = title.LastIndexOf(' ', maxLen - 2);
         return cut > 8 ? title[..cut] + "…" : title[..(maxLen - 1)] + "…";
     }
-
-    private static string JoinPhrases(List<string> items) => items.Count switch
-    {
-        0 => string.Empty,
-        1 => items[0],
-        2 => $"{items[0]} e {items[1]}",
-        _ => $"{string.Join(", ", items[..^1])} e {items[^1]}"
-    };
 
     private static string GetCommonDirectory(List<string> paths)
     {
