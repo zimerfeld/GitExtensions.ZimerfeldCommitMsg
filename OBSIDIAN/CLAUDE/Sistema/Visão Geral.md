@@ -1,14 +1,14 @@
 ---
 tipo: sistema
-tags: [sistema, overview, plugin, gitextensions]
-atualizado: 2026-06-01
+tags: [sistema, overview, plugin, gitextensions, i18n]
+atualizado: 2026-06-05
 ---
 
 # Visão Geral
 
 ## O que é
 
-Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de commit no formato **Conventional Commits v1.0.0**, em **português-BR**, analisando as alterações staged reais.
+Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de commit no formato **Conventional Commits v1.0.0**, analisando as alterações staged reais. **Multilíngue**: gera em **português-BR ou inglês**, detectado pelo idioma do SO, com **override manual** no seletor "Idioma da mensagem / Message language". Ver [[../Decisoes/Suporte Multilíngue PT-EN]].
 
 ## Stack
 
@@ -19,7 +19,8 @@ Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de
 | UI Framework | Windows Forms (herdado do GitExtensions) |
 | Assembly de saída | `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` |
 | Namespace | `GitExtensions.ZimerfeldCommitMsg` |
-| Versão atual | `1.0.16` |
+| Versão atual | `1.0.35` |
+| Idiomas | Português-BR / Inglês (auto pelo SO + override) |
 | Autor | Zimerfeld |
 
 > O plugin exibe um **ícone** (PNG embutido em `Resources/icon.png`) tanto no menu Plugins quanto na entrada do dropdown de templates. Carregado por `LoadIcon()` em [[../Arquivos-Chave/ZimerfeldCommitMsgPlugin]].
@@ -55,4 +56,5 @@ Sempre que arquivos entram ou saem do stage, o plugin detecta e atualiza o campo
 - [[../Fluxos/Geração da Mensagem]]
 - [[../Fluxos/Template Dropdown (Auto-resumo)]]
 - [[../Arquivos-Chave/CommitMessageGenerator]]
+- [[../Decisoes/Suporte Multilíngue PT-EN]]
 - [[../Decisoes/Preservação de Branches e Tipos CC]]

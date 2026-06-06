@@ -12,32 +12,36 @@ internal enum MessageLanguage
 }
 
 /// <summary>
-/// Rótulos do <c>ChoiceSetting</c> de idioma exibidos nas opções do plugin.
-/// Compartilhados entre o plugin (registro do setting) e o resolvedor (leitura).
+/// Rótulos bilíngues do <c>ChoiceSetting</c> de idioma exibidos nas opções do plugin.
+/// O rótulo mostra os dois idiomas (ex.: "Português/Portuguese") para ser claro
+/// independentemente do idioma do sistema. Compartilhados entre o plugin (registro do
+/// setting) e o resolvedor (leitura). A correspondência no resolvedor é por subtrecho,
+/// então o formato exato do rótulo pode mudar sem quebrar a leitura.
 /// </summary>
 internal static class LanguageOption
 {
-    public const string Auto       = "Automático";
-    public const string Portugues  = "Português";
-    public const string English    = "English";
+    public const string Auto       = "Automático/Automatic";
+    public const string Portugues  = "Português/Portuguese";
+    public const string English    = "Inglês/English";
 }
 
 /// <summary>
 /// Resolve o idioma efetivo a partir do valor configurado pelo usuário.
-/// "Automático" (ou ausente) detecta pelo idioma do sistema operacional/GitExtensions.
+/// "Automático" (ou ausente/desconhecido) detecta pelo idioma do sistema operacional/GitExtensions.
+/// A correspondência é por subtrecho (tolerante a rótulos bilíngues e a valores antigos).
 /// </summary>
 internal static class MessageLanguageResolver
 {
     public static MessageLanguage Resolve(string? settingValue)
     {
-        if (Equals(settingValue, LanguageOption.Portugues) ||
-            string.Equals(settingValue, "Portugues", StringComparison.OrdinalIgnoreCase))
-            return MessageLanguage.PtBr;
+        var v = (settingValue ?? string.Empty).ToLowerInvariant();
 
-        if (Equals(settingValue, LanguageOption.English))
-            return MessageLanguage.En;
+        // "Português" / "Portuguese"
+        if (v.Contains("portug")) return MessageLanguage.PtBr;
+        // "Inglês" / "English"
+        if (v.Contains("ingl") || v.Contains("english")) return MessageLanguage.En;
 
-        // "Automático" ou valor desconhecido → detecta pelo SO
+        // "Automático" / "Automatic" / valor desconhecido → detecta pelo SO
         return FromCulture(CultureInfo.CurrentUICulture);
     }
 
@@ -46,7 +50,4 @@ internal static class MessageLanguageResolver
         culture.TwoLetterISOLanguageName.Equals("pt", StringComparison.OrdinalIgnoreCase)
             ? MessageLanguage.PtBr
             : MessageLanguage.En;
-
-    private static bool Equals(string? value, string option) =>
-        string.Equals(value, option, StringComparison.OrdinalIgnoreCase);
 }

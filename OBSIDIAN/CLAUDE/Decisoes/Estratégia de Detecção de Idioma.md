@@ -6,10 +6,16 @@ status: estável
 
 # Decisão: Estratégia de Detecção de Idioma
 
+> [!info] Escopo: idioma do **comentário** (entrada), não da **saída**
+> Esta nota trata de detectar o idioma de um *comentário do código* para decidir se traduz para
+> pt-BR. A escolha do **idioma de saída** da mensagem (Português/Inglês, automático pelo SO +
+> override) é outra decisão: ver [[Suporte Multilíngue PT-EN]]. A tradução EN→PT descrita aqui
+> **só roda quando o idioma de saída é pt-BR**.
+
 ## Contexto
 
-Comentários no código podem estar em inglês ou português. O plugin precisa:
-1. Detectar o idioma
+Comentários no código podem estar em inglês ou português. Quando a saída é pt-BR, o plugin precisa:
+1. Detectar o idioma do comentário
 2. Traduzir inglês → pt-BR
 3. Descartar traduções de má qualidade
 
