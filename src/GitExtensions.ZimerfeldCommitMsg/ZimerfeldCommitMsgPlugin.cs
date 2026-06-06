@@ -10,10 +10,20 @@ namespace GitExtensions.ZimerfeldCommitMsg;
 [Export(typeof(IGitPlugin))]
 public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
 {
-    private const string TemplateKey = "Zimerfeld Commit Msg";
+    private const string TemplatePrefix = "Zimerfeld Commit Msg";
 
     // Icone exibido no menu Plugins e no dropdown do dialogo de commit
     private static readonly Image? PluginIcon = LoadIcon();
+
+    // Itens do dropdown de templates de commit: rótulo + idioma forçado.
+    // A API de templates do GitExtensions é PLANA (sem submenu aninhado), então expomos
+    // um item por idioma. Lang == null → "Automático": segue o setting/idioma do SO.
+    private static readonly (string Label, MessageLanguage? Lang)[] _templateItems =
+    [
+        ($"{TemplatePrefix} — {LanguageOption.Auto}",      null),
+        ($"{TemplatePrefix} — {LanguageOption.Portugues}", MessageLanguage.PtBr),
+        ($"{TemplatePrefix} — {LanguageOption.English}",   MessageLanguage.En),
+    ];
 
     // Idioma da mensagem: Automático (detecta pelo SO) ou forçado pelo usuário.
     private static readonly ChoiceSetting _languageSetting = new(
@@ -25,6 +35,10 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     // Capturado no Register() (roda na UI thread) para marshalling seguro
     private SynchronizationContext? _syncContext;
     private string _lastGeneratedMessage = string.Empty;
+
+    // Idioma escolhido explicitamente num item do dropdown (null = seguir o setting/SO).
+    // Faz o auto-refresh manter o idioma que o usuário acabou de escolher.
+    private MessageLanguage? _sessionLanguage;
 
     public ZimerfeldCommitMsgPlugin()
     {
@@ -42,12 +56,29 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     }
 
     /// <summary>
-    /// Idioma efetivo: lê o setting (quando disponível) e resolve "Automático" pelo SO.
+    /// Idioma do setting: lê o valor configurado (quando disponível) e resolve "Automático" pelo SO.
     /// </summary>
     private MessageLanguage CurrentLanguage()
     {
         var value = Settings is null ? null : _languageSetting.ValueOrDefault(Settings);
         return MessageLanguageResolver.Resolve(value);
+    }
+
+    /// <summary>
+    /// Idioma efetivo: a escolha explícita num item do dropdown tem prioridade sobre o setting/SO.
+    /// </summary>
+    private MessageLanguage EffectiveLanguage() => _sessionLanguage ?? CurrentLanguage();
+
+    /// <summary>
+    /// Gera a mensagem para um item do dropdown e fixa o idioma escolhido (<paramref name="forced"/>)
+    /// para que o auto-refresh subsequente mantenha o mesmo idioma.
+    /// </summary>
+    private string GenerateForTemplate(string workingDir, MessageLanguage? forced)
+    {
+        _sessionLanguage = forced;
+        var msg = new CommitMessageGenerator(workingDir, forced ?? CurrentLanguage()).Generate();
+        _lastGeneratedMessage = msg;
+        return msg;
     }
 
     private static Image? LoadIcon()
@@ -68,11 +99,16 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         base.Register(gitUiCommands);
         _syncContext = SynchronizationContext.Current;
 
-        // Template no dropdown — só preenche quando o usuário selecionar explicitamente
-        gitUiCommands.AddCommitTemplate(
-            TemplateKey,
-            () => new CommitMessageGenerator(gitUiCommands.Module.WorkingDir, CurrentLanguage()).Generate(),
-            icon: PluginIcon);
+        // Um item de template por idioma (Automático/Português/Inglês) — só preenche
+        // quando o usuário selecionar explicitamente no dropdown.
+        foreach (var (label, lang) in _templateItems)
+        {
+            var forced = lang;   // captura por iteração
+            gitUiCommands.AddCommitTemplate(
+                label,
+                () => GenerateForTemplate(gitUiCommands.Module.WorkingDir, forced),
+                icon: PluginIcon);
+        }
 
         // Atualiza a mensagem automaticamente sempre que arquivos entram/saem do stage
         gitUiCommands.PostRepositoryChanged += OnPostRepositoryChanged;
@@ -81,7 +117,8 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     public override void Unregister(IGitUICommands gitUiCommands)
     {
         gitUiCommands.PostRepositoryChanged -= OnPostRepositoryChanged;
-        gitUiCommands.RemoveCommitTemplate(TemplateKey);
+        foreach (var (label, _) in _templateItems)
+            gitUiCommands.RemoveCommitTemplate(label);
         _lastGeneratedMessage = string.Empty;
         base.Unregister(gitUiCommands);
     }
@@ -150,7 +187,7 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             var current = tb.Text.Trim();
             if (current.Length > 0 && current != _lastGeneratedMessage.Trim()) return;
 
-            var msg = new CommitMessageGenerator(workingDir, CurrentLanguage()).Generate();
+            var msg = new CommitMessageGenerator(workingDir, EffectiveLanguage()).Generate();
             if (string.IsNullOrEmpty(msg)) return;
 
             _lastGeneratedMessage = msg;
