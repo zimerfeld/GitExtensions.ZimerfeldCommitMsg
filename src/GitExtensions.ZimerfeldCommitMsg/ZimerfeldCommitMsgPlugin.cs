@@ -1,6 +1,9 @@
 using System.ComponentModel.Composition;
+using System.Globalization;
 using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
+using GitExtensions.Extensibility.Settings;
+using GitExtensions.ZimerfeldCommitMsg.Localization;
 
 namespace GitExtensions.ZimerfeldCommitMsg;
 
@@ -12,15 +15,39 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     // Icone exibido no menu Plugins e no dropdown do dialogo de commit
     private static readonly Image? PluginIcon = LoadIcon();
 
+    // Idioma da mensagem: Automático (detecta pelo SO) ou forçado pelo usuário.
+    private static readonly ChoiceSetting _languageSetting = new(
+        "ZimerfeldCommitMsg_Language",
+        "Idioma da mensagem / Message language",
+        new[] { LanguageOption.Auto, LanguageOption.Portugues, LanguageOption.English },
+        LanguageOption.Auto);
+
     // Capturado no Register() (roda na UI thread) para marshalling seguro
     private SynchronizationContext? _syncContext;
     private string _lastGeneratedMessage = string.Empty;
 
     public ZimerfeldCommitMsgPlugin()
     {
-        Name        = "ZimerfeldCommitMsg";
-        Description = "Gera automaticamente uma mensagem de commit resumindo as mudanças nos arquivos";
+        Name = "ZimerfeldCommitMsg";
+        // Na construção o container de settings ainda não está disponível; a descrição do
+        // menu segue o idioma do SO. O override manual afeta a mensagem gerada e os diálogos.
+        Description = Strings.PluginDescription(MessageLanguageResolver.FromCulture(CultureInfo.CurrentUICulture));
         if (PluginIcon is not null) Icon = PluginIcon;
+    }
+
+    /// <summary>Expõe o seletor de idioma nas configurações do plugin.</summary>
+    public override IEnumerable<ISetting> GetSettings()
+    {
+        yield return _languageSetting;
+    }
+
+    /// <summary>
+    /// Idioma efetivo: lê o setting (quando disponível) e resolve "Automático" pelo SO.
+    /// </summary>
+    private MessageLanguage CurrentLanguage()
+    {
+        var value = Settings is null ? null : _languageSetting.ValueOrDefault(Settings);
+        return MessageLanguageResolver.Resolve(value);
     }
 
     private static Image? LoadIcon()
@@ -44,7 +71,7 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         // Template no dropdown — só preenche quando o usuário selecionar explicitamente
         gitUiCommands.AddCommitTemplate(
             TemplateKey,
-            () => new CommitMessageGenerator(gitUiCommands.Module.WorkingDir).Generate(),
+            () => new CommitMessageGenerator(gitUiCommands.Module.WorkingDir, CurrentLanguage()).Generate(),
             icon: PluginIcon);
 
         // Atualiza a mensagem automaticamente sempre que arquivos entram/saem do stage
@@ -62,20 +89,22 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     // Plugins menu → abre o diálogo de commit com a mensagem já preenchida
     public override bool Execute(GitUIEventArgs args)
     {
+        var lang = CurrentLanguage();
+
         if (!args.GitModule.IsValidGitWorkingDir())
         {
             MessageBox.Show(
-                "Nenhum repositório Git válido encontrado.",
+                Strings.RepoInvalido(lang),
                 Name, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
 
-        var message = new CommitMessageGenerator(args.GitModule.WorkingDir).Generate();
+        var message = new CommitMessageGenerator(args.GitModule.WorkingDir, lang).Generate();
 
         if (string.IsNullOrWhiteSpace(message))
         {
             MessageBox.Show(
-                "Nenhuma mudança staged encontrada.\n\nFaça o stage dos arquivos antes de gerar a mensagem.",
+                Strings.SemMudancasStaged(lang),
                 Name, MessageBoxButtons.OK, MessageBoxIcon.Information);
             return false;
         }
@@ -121,7 +150,7 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             var current = tb.Text.Trim();
             if (current.Length > 0 && current != _lastGeneratedMessage.Trim()) return;
 
-            var msg = new CommitMessageGenerator(workingDir).Generate();
+            var msg = new CommitMessageGenerator(workingDir, CurrentLanguage()).Generate();
             if (string.IsNullOrEmpty(msg)) return;
 
             _lastGeneratedMessage = msg;
