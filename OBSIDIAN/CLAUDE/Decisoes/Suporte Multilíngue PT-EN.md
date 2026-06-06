@@ -61,6 +61,8 @@ Classe abstrata + `PtBrLanguagePack` + `EnLanguagePack`. Expõe:
 1. **Dropdown de templates da tela de commit** — três itens planos, um por idioma:
    `Zimerfeld Commit Msg — Automático/Automatic | — Português/Portuguese | — Inglês/English`.
    Escolher um **fixa** o idioma (`_sessionLanguage`) para o auto-refresh manter o mesmo.
+
+   ![[Anexos/Screenshot.png]]
 2. **`ChoiceSetting` em Configurações → Plugins → ZimerfeldCommitMsg** — define o **padrão**
    (menu Plugins + auto-refresh). O nó só aparece na árvore quando a DLL com `GetSettings()`
    (≥ 1.0.36) está instalada e o GitExtensions reiniciado.
