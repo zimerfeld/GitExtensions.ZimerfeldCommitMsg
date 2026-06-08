@@ -1,7 +1,7 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.39
-**Atualizado em:** 2026-06-06
+**Versão:** 1.0.41
+**Atualizado em:** 2026-06-08
 
 ![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/Screenshot.png)
 
