@@ -2,13 +2,18 @@
 <package>
   <metadata>
     <id>GitExtensions.ZimerfeldCommitMsg</id>
-    <version>1.0.39</version>
+    <version>1.0.41</version>
     <authors>Zimerfeld</authors>
     <description>Plugin for GitExtensions that automatically generates commit messages in Conventional Commits v1.0.0 format (feat/fix/docs/test/chore/build/refactor), in Brazilian Portuguese or English — selected automatically from the operating system language, with a manual override in the plugin settings — by analyzing the actual content of staged changes. Supports two strategies: comment-based (extracts meaningful comments added to the diff) and filename-based (derives semantic concepts from file names). The message is refreshed automatically whenever files are staged or unstaged while the commit dialog is open.</description>
     <tags>gitextensions plugin commit-message conventional-commits</tags>
     <readme>README.md</readme>
     <license type="expression">MIT</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+      <group targetFramework="net9.0">
+        <dependency id="GitExtensions.Extensibility" version="[7.0.0, 7.1.0)" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <!-- Plugin DLL -->

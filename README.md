@@ -1,7 +1,7 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.39
-**Atualizado em:** 2026-06-06
+**Versão:** 1.0.41
+**Atualizado em:** 2026-06-08
 
 ![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/Screenshot.png?v=1.0.39)
 
@@ -232,12 +232,24 @@ Quando há 2+ arquivos, o corpo lista até **5 bullets**, cada um com uma frase 
 
 Execute o PowerShell **como Administrador**:
 
+Caso o arquivo tenha sido baixado para a pasta C:\Downloads
+
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
 ### Opção B — Manual
+
+Para esse pacote, a instalação manual faça assim:
+
+Caso o arquivo tenha sido baixado para a pasta C:\Downloads
+
+Extraia o arquivo C:\Downloads\gitextensions.zimerfeldcommitmsg.1.0.0.nupkg.
+Você pode renomear para .zip e abrir, ou extrair direto com um descompactador.
+
+Dentro do pacote, pegue esta DLL:
+tools\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll
 
 Copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para:
 
@@ -246,6 +258,14 @@ C:\Program Files\GitExtensions\Plugins\
 ```
 
 Reinicie o GitExtensions.
+
+Feche e abra o GitExtensions novamente.
+Se precisar de permissão de administrador para copiar em Program Files, abra o Explorer ou PowerShell como admin.
+
+Observações importantes:
+
+Esse pacote foi empacotado para net9.0-windows. Se sua versão do GitExtensions não estiver compatível com essa runtime, o plugin pode não carregar.
+Depois de reiniciar, o plugin deve aparecer em Plugins e nas configurações em Settings -> Plugins -> ZimerfeldCommitMsg.
 
 ---
 
