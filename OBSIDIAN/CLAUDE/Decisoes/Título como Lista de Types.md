@@ -4,10 +4,20 @@ tags: [decisão, título, conventional-commits, types, branch]
 branch: feature/titulo
 data: 2026-05-22
 revisado: 2026-06-02
-status: revisada
+status: superada
+superada-em: 2026-06-05
+superada-por: "[[2026-06-05 - Formato imperativo pt-BR]]"
 ---
 
 # Decisão: Título como Lista de CC Types
+
+> [!warning] SUPERADA em 2026-06-05 — não reflete mais o código
+> O prefixo de tipos (`feat, docs, chore: …`) foi **removido**. O código atual gera
+> `<Verbo> <descrição>` **sem** o prefixo `tipo:`: a lista de tipos é calculada
+> (`DetermineAllTypes`), mas **só o tipo de maior prioridade** (`types[0]`) é usado, e
+> apenas para **escolher o verbo** (`FormatTitle`/`TypeVerb`) — os tipos não aparecem na
+> mensagem. Ver [[2026-06-05 - Formato imperativo pt-BR]] e [[Geração de mensagem - Conventional Commits]].
+> O conteúdo abaixo é mantido como registro histórico.
 
 ## Contexto
 

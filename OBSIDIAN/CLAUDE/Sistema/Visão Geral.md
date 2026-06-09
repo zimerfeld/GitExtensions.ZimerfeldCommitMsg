@@ -19,7 +19,7 @@ Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de
 | UI Framework | Windows Forms (herdado do GitExtensions) |
 | Assembly de saída | `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` |
 | Namespace | `GitExtensions.ZimerfeldCommitMsg` |
-| Versão atual | `1.0.35` |
+| Versão atual | `1.0.40` |
 | Idiomas | Português-BR / Inglês (auto pelo SO + override) |
 | Autor | Zimerfeld |
 
@@ -28,7 +28,7 @@ Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de
 ## Modos de uso (três portas de entrada)
 
 ### 1. Template no diálogo de commit
-Selecione **"Zimerfeld: Auto-resumo"** no dropdown de templates → mensagem preenchida automaticamente. Passos detalhados em [[../Fluxos/Template Dropdown (Auto-resumo)]].
+Selecione um dos **três itens por idioma** no dropdown de templates — **"Zimerfeld Commit Msg — Automático/Automatic"**, **"— Português/Portuguese"** ou **"— Inglês/English"** → mensagem gerada nesse idioma e preenchida automaticamente. Passos detalhados em [[../Fluxos/Template Dropdown (Auto-resumo)]].
 
 ### 2. Menu Plugins
 `Plugins → ZimerfeldCommitMsg` → valida o repositório e abre o `FormCommit` com a mensagem já inserida (`Execute` → `StartCommitDialog`). Exibe `MessageBox` se não houver repo válido ou mudanças staged.
@@ -48,7 +48,7 @@ Sempre que arquivos entram ou saem do stage, o plugin detecta e atualiza o campo
 | `build` | Somente build files (`.csproj`, `.sln`, `Dockerfile`) |
 | `refactor` | Mix sem padrão dominante |
 
-> **Novidade branch `feature/titulo` (2026-05-22):** o título passa a listar **todos** os types envolvidos separados por vírgula (ex: `feat, docs, chore`). Ver [[../Decisoes/Título como Lista de Types]].
+> **Atenção (2026-06-05):** o tipo CC **não** é impresso na mensagem. Cada arquivo é classificado, mas só o tipo de maior prioridade (`types[0]`) é usado, e apenas para **escolher o verbo** da primeira linha (`Implementa`, `Corrige`, …). A antiga listagem de tipos por vírgula ([[../Decisoes/Título como Lista de Types]]) foi **superada**. Ver [[../Fluxos/Geração da Mensagem]].
 
 ## Relacionado
 

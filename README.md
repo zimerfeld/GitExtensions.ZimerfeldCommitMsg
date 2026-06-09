@@ -1,18 +1,18 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.39
-**Atualizado em:** 2026-06-06
+**Versão:** 1.0.43
+**Atualizado em:** 2026-06-09
 
 ![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/Screenshot.png)
 
-Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit no formato **Conventional Commits v1.0.0**, analisando o conteúdo real das alterações staged. **Multilíngue**: gera a mensagem em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
+Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
 ---
 
 ## Funcionalidades em alto nível
 
 - **Geração automática** da mensagem de commit a partir do conteúdo real do diff staged (não apenas dos nomes de arquivo).
-- **Conventional Commits v1.0.0** — detecta o(s) tipo(s) (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) e prefixa o verbo imperativo adequado.
+- **Verbo guiado por Conventional Commits** — classifica as mudanças nos tipos (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) e prefixa o **verbo** correspondente (3ª pessoa do presente em pt-BR / imperativo em inglês). O tipo em si **não** aparece na mensagem.
 - **Multilíngue (Português/Inglês)** — idioma escolhido automaticamente pelo SO, com seletor manual de override.
 - **Duas estratégias de conteúdo**: baseada em comentários do diff (principal) e baseada em nomes de arquivo (fallback).
 - **Corpo em bullets** — até 5 frases de uma linha, cada uma resumindo a mudança mais significativa de um arquivo.
@@ -54,7 +54,7 @@ Zimerfeld Commit Msg — Inglês/English
 
 | Português-BR | English |
 |---|---|
-| `feat: Implementa autenticação` | `feat: Implement authentication` |
+| `Implementa autenticação` | `Implement authentication` |
 | `- Adiciona autenticação` | `- Add authentication` |
 | `- Adiciona processamento de pagamento` | `- Add payment processing` |
 | `- Adiciona gerenciamento de token` | `- Add token management` |
@@ -77,32 +77,32 @@ Enquanto o diálogo de commit estiver aberto, a mensagem é atualizada automatic
 ## Formato da mensagem gerada
 
 ```
-<tipo>: <descrição em pt-BR>
+<Verbo> <descrição no idioma ativo>
 
-<corpo opcional>
+- <bullet 1>
+- <bullet 2>
 ```
 
-- Sem scope — evita redundância com o nome do projeto
-- Sem realce de cores — usa `git diff --no-color` para evitar códigos ANSI
-- Descrição no idioma ativo (português-BR ou inglês)
+- **Sem prefixo `tipo:`** — a primeira linha começa direto pelo **verbo** escolhido a partir do tipo (ex.: `Implementa`, `Corrige`, `Atualiza`).
+- **Sem scope** — evita redundância com o nome do projeto.
+- **Sem realce de cores** — usa `git diff --no-color` para evitar códigos ANSI.
+- **Limite de 72 caracteres** na primeira linha (corta no último espaço e adiciona `…`).
+- **Descrição e verbos no idioma ativo** (português-BR ou inglês).
+- **Corpo opcional** — até 5 bullets de uma linha, gerado quando há 2+ arquivos ou comentários extras.
 
-Quando as mudanças envolvem mais de um tipo, todos aparecem na primeira linha separados por vírgula:
+### Tipos detectados (definem o verbo)
 
-```
-feat, chore: adicionar autenticação
-```
+Cada arquivo staged recebe um tipo. O **verbo** da primeira linha vem do tipo de **maior prioridade** entre todos os arquivos (ordem: `feat` → `fix` → `refactor` → `perf` → `test` → `build` → `ci` → `chore` → `docs` → `style`). **O tipo não é impresso** — só seleciona o verbo.
 
-### Tipos detectados (Conventional Commits)
-
-| Tipo | Quando é usado |
+| Tipo | Atribuído a um arquivo quando… |
 |---|---|
-| `feat` | Arquivos adicionados (novos) |
-| `fix` | Apenas modificações em arquivos existentes |
-| `docs` | Somente arquivos de documentação (`.md`, `.txt`, etc.) |
-| `test` | Arquivos em pastas de teste ou com sufixo `Test`/`Spec` |
-| `chore` | Somente arquivos de configuração (`.json`, `.yml`, etc.) |
-| `build` | Somente arquivos de build (`.csproj`, `.sln`, `Dockerfile`, etc.) |
-| `refactor` | Mix de adições e modificações sem padrão claro |
+| `feat` | arquivo de código **adicionado** (status `A`/`C`, categoria source/web) |
+| `fix` | arquivo de código **modificado/renomeado** (status `M`/`R`/`T`) |
+| `docs` | arquivo de documentação (`.md`, `.txt`, `.rst`, `.adoc`) |
+| `test` | caminho de teste (pasta `test`/`tests`/`spec` ou sufixo `Test`/`Spec`) |
+| `chore` | arquivo de configuração (`.json`, `.yml`, etc.) **ou** qualquer arquivo **deletado** (status `D`) |
+| `build` | arquivo de build (`.csproj`, `.sln`, `Dockerfile`, etc.) |
+| `refactor` | demais casos sem padrão claro |
 
 ---
 
@@ -110,7 +110,7 @@ feat, chore: adicionar autenticação
 
 ### Estratégia 1 — Baseada em comentários do diff (principal)
 
-Executa `git diff --cached --no-color` e extrai as linhas **adicionadas** (`+`) que são comentários explicativos.
+Executa `git diff --cached --no-color` e coleta as linhas de **comentário** que foram **adicionadas** (`+`) ou **removidas** (`-`). As adicionadas têm prioridade pela **categoria do arquivo** (source = 4 > web = 3 > build = 2 / config = 1 / docs = 1; arquivos de teste = 0); as removidas entram com prioridade um grau menor. São varridas até 15 linhas e usados até **5 comentários**; dentro de uma mesma prioridade, os mais longos vêm primeiro.
 
 #### Padrões reconhecidos
 
@@ -132,16 +132,17 @@ Executa `git diff --cached --no-color` e extrai as linhas **adicionadas** (`+`) 
 
 #### Como os comentários são usados
 
-O comentário mais impactante vira a **descrição** na primeira linha. Os demais aparecem no **corpo** como itens de lista:
+O comentário mais impactante vira a **descrição** na primeira linha (com o verbo inicial normalizado para 3ª pessoa/imperativo). Os demais aparecem no **corpo** como itens de lista:
 
 ```
-fix: filtrar stems com ponto para evitar nomes de assembly
+Valida o token antes de processar a requisição
 
-- ignorar conceitos com mais de 2 palavras PascalCase
-- adicionar sufixo Generator aos SemanticSuffixes
+- Filtra requisições sem cabeçalho de autenticação
 ```
 
-Quando a saída é **português-BR**, comentários em inglês são traduzidos automaticamente antes de serem usados. Quando a saída é **inglês**, os comentários passam intactos (e comentários em português permanecem em português).
+> Se o comentário escolhido contém um conector de justificativa (` para `, ` pois `, ` porque `, …), a parte após o conector é descartada da primeira linha, e a descrição passa a usar a frase funcional dos nomes de arquivo (Estratégia 2) para evitar repetição com os bullets.
+
+Quando a saída é **português-BR**, comentários em inglês são traduzidos automaticamente antes de serem usados (e descartados se a tradução ficar com mais de 25% de inglês). Quando a saída é **inglês**, os comentários passam intactos (e comentários em português permanecem em português). Nomes de branch (`feature/…`, `release/…`) e tipos Conventional Commits são preservados na tradução.
 
 ---
 
@@ -182,17 +183,24 @@ Para cada arquivo staged, o nome (sem extensão) passa por:
 | `Report` | relatórios |
 | `CommitMessage` | mensagem de commit |
 
-#### Verbos por tipo (exemplos em pt-BR)
+#### Verbos por tipo
 
-| Tipo | Verbo (pt-BR) | Verbo (en) | Exemplo gerado |
+O verbo é escolhido pelo tipo (e, em alguns casos, pelo contexto das mudanças):
+
+| Tipo | Verbo (pt-BR) | Verbo (en) | Condição |
 |---|---|---|---|
-| `feat` | Adiciona / Implementa | Add / Implement | `feat: Implementa gerenciamento de usuários` |
-| `fix` | Corrige | Fix | `fix: Corrige processamento de pagamento` |
-| `docs` | Documenta / Atualiza | Document / Update | `docs: Atualiza documentação` |
-| `test` | Adiciona | Add | `test: Adiciona testes de integração` |
-| `chore` | Configura / Remove | Configure / Remove | `chore: Configura configuração` |
-| `build` | Configura | Configure | `build: Configura configuração de build` |
-| `refactor` | Refatora | Refactor | `refactor: Refatora gerenciamento de usuários` |
+| `feat` | Implementa / Adiciona | Implement / Add | `Implementa` quando só há adições; `Adiciona` caso contrário |
+| `fix` | Corrige | Fix | — |
+| `refactor` | Refatora | Refactor | — |
+| `docs` | Documenta / Atualiza | Document / Update | `Documenta` quando há adições; `Atualiza` caso contrário |
+| `build` | Configura | Configure | — |
+| `chore` | Remove / Configura | Remove / Configure | `Remove` quando há deleções; `Configura` caso contrário |
+| `test` | Adiciona | Add | — |
+| `perf` | Otimiza | Optimize | — |
+| `ci` | Configura | Configure | — |
+| `style` | Padroniza | Standardize | — |
+
+> Se a descrição já começa com um verbo conhecido (ex.: o comentário `filtrar stems…`), ele é **normalizado** (pt-BR: 3ª pessoa do presente → `Filtra`; en: imperativo → `Filter`) em vez de prefixar um novo verbo do tipo.
 
 #### Corpo da mensagem (body)
 
@@ -210,12 +218,12 @@ Quando há 2+ arquivos, o corpo lista até **5 bullets**, cada um com uma frase 
 
 | Arquivos staged | Mensagem gerada (pt-BR) | Mensagem gerada (en) |
 |---|---|---|
-| `AuthService.cs` adicionado | `feat: Implementa autenticação` | `feat: Implement authentication` |
-| `UserService.cs` modificado | `fix: Corrige gerenciamento de usuários` | `fix: Fix user management` |
-| `README.md` modificado | `docs: Atualiza documentação` | `docs: Update documentation` |
-| `appsettings.json` alterado | `chore: Configura configuração` | `chore: Configure configuration` |
-| `UserService.cs` + `UserRepository.cs` adicionados | `feat: Implementa gerenciamento de usuários` + bullets | `feat: Implement user management` + bullets |
-| `.cs` com comentário `// filtrar stems com ponto` staged | `fix: Filtra stems com ponto` | `fix: Filter stems with dot` |
+| `AuthService.cs` adicionado | `Implementa autenticação` | `Implement authentication` |
+| `PaymentService.cs` adicionado | `Implementa processamento de pagamento` | `Implement payment processing` |
+| `UserService.cs` modificado | `Corrige gerenciamento de usuários` | `Fix user management` |
+| `README.md` modificado | `Atualiza documentação` | `Update documentation` |
+| `UserService.cs` + `TokenService.cs` adicionados | `Implementa gerenciamento de usuários`<br>`- Adiciona gerenciamento de usuários`<br>`- Adiciona gerenciamento de token` | `Implement user management`<br>`- Add user management`<br>`- Add token management` |
+| `.cs` modificado com comentário `// Valida o token antes de processar a requisição` | `Valida o token antes de processar a requisição` | _(comentário em pt passa intacto)_ |
 
 ---
 

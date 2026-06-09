@@ -9,6 +9,9 @@ obj/
 inspector/bin/
 inspector/obj/
 
+# GitExtensions binaries baixados pelo pacote GitExtensions.Extensibility (prebuild)
+gitextensions.shared/
+
 # Visual Studio / Rider
 .vs/
 .idea/

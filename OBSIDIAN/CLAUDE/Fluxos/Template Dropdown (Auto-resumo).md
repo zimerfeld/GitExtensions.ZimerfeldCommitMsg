@@ -4,25 +4,30 @@ tags: [fluxo, dropdown, template, commit, auto-resumo, ui]
 atualizado: 2026-06-01
 ---
 
-# Fluxo: Dropdown "Zimerfeld: Auto-resumo"
+# Fluxo: Dropdown "Zimerfeld Commit Msg — Auto/PT/EN"
 
-Passos executados quando o usuário seleciona a opção **"Zimerfeld: Auto-resumo"** no dropdown de templates do diálogo de commit (`FormCommit`) do GitExtensions.
+Passos executados quando o usuário seleciona um dos **três itens** (um por idioma) **"Zimerfeld Commit Msg — Automático/Português/Inglês"** no dropdown de templates do diálogo de commit (`FormCommit`) do GitExtensions.
 
 É **uma das três portas de entrada** do plugin — ver também [[Stage Trigger]] (evento automático) e o `Execute()` do menu Plugins ([[../Arquivos-Chave/ZimerfeldCommitMsgPlugin]]).
 
 ## Registro (acontece uma vez, no `Register()`)
 
 ```csharp
-private const string TemplateKey = "Zimerfeld: Auto-resumo";
+private const string TemplatePrefix = "Zimerfeld Commit Msg";
 
-gitUiCommands.AddCommitTemplate(
-    TemplateKey,                                                       // rótulo no dropdown
-    () => new CommitMessageGenerator(gitUiCommands.Module.WorkingDir)  // factory LAZY
-              .Generate(),
-    icon: PluginIcon);                                                 // ícone ao lado do rótulo
+// 3 itens: rótulo + idioma forçado (null = Automático)
+foreach (var (label, lang) in _templateItems)   // Auto/null, PT, EN
+{
+    var forced = lang;
+    gitUiCommands.AddCommitTemplate(
+        label,                                                    // "… — Automático/Português/Inglês"
+        () => GenerateForTemplate(gitUiCommands.Module.WorkingDir, forced),  // factory LAZY
+        icon: PluginIcon);                                        // ícone ao lado do rótulo
+}
 ```
 
-- `AddCommitTemplate(key, factory, icon)` registra uma entrada **nomeada** na lista de templates de mensagem do `FormCommit`.
+- `AddCommitTemplate(label, factory, icon)` registra uma entrada **nomeada** por item; a API é **plana** (sem submenu), por isso são 3 itens, não um submenu de idioma.
+- `GenerateForTemplate` fixa `_sessionLanguage = forced` e instancia `CommitMessageGenerator(workingDir, forced ?? CurrentLanguage())` — o auto-refresh subsequente mantém o idioma escolhido.
 - A `factory` é um **delegate preguiçoso**: não roda no registro, só quando o usuário **seleciona** a opção.
 - `PluginIcon` é o ícone (PNG embutido) exibido ao lado do rótulo no dropdown e também no menu Plugins. Ver [[../Arquivos-Chave/ZimerfeldCommitMsgPlugin]].
 
@@ -33,21 +38,21 @@ Usuário abre o diálogo de commit (FormCommit)
         │
         ▼
 Abre o dropdown de templates de mensagem
-        │   (entrada "Zimerfeld: Auto-resumo" com ícone)
+        │   (3 itens "Zimerfeld Commit Msg — Auto/PT/EN" com ícone)
         ▼
-Usuário seleciona "Zimerfeld: Auto-resumo"
+Usuário seleciona um item "Zimerfeld Commit Msg — …"
         │
         ▼
-GitExtensions invoca a factory registrada
+GitExtensions invoca a factory registrada do item
         │
         ▼
-new CommitMessageGenerator(gitUiCommands.Module.WorkingDir)
-        │   WorkingDir é lido AGORA → reflete o repositório atual
+GenerateForTemplate(WorkingDir, forced)
+        │   fixa _sessionLanguage = forced (idioma do item)
         ▼
-.Generate()                                  ← pipeline completo
+new CommitMessageGenerator(WorkingDir, idioma).Generate()   ← pipeline completo
         │   git diff --cached --name-status
         │   git diff --cached --no-color
-        │   → header (lista de types) + corpo (desc + arquitetura)
+        │   → "<Verbo> <descrição>" + corpo em bullets   (SEM prefixo "tipo:")
         ▼
 Retorna string da mensagem
         │
@@ -63,7 +68,7 @@ GitExtensions preenche a caixa de mensagem do FormCommit
    - `ParseChanges` → tipos via `DetermineAllTypes`
    - comentários do diff (ranqueados + traduzidos en→pt-BR, preservando branches e tipos CC — ver [[../Decisoes/Preservação de Branches e Tipos CC]])
    - título do README staged (se houver)
-   - montagem `header\n\nfullBody`
+   - montagem `title\n\nbody` → `<Verbo> <descrição>` + bullets (sem prefixo `tipo:`)
 4. **Preenchimento** — a string retornada é colocada na caixa de mensagem **pelo próprio GitExtensions** (o plugin não manipula o `TextBox` neste caminho).
 
 ## Diferenças entre as três portas de entrada
@@ -81,7 +86,7 @@ GitExtensions preenche a caixa de mensagem do FormCommit
 
 - Este caminho **não** exibe `MessageBox`: se não houver staged changes, a factory retorna `string.Empty` e o GitExtensions simplesmente não preenche nada.
 - Como a factory é avaliada a cada seleção, **reselecionar** o template regenera a mensagem com o estado atual do stage.
-- O template é removido no `Unregister()` via `RemoveCommitTemplate(TemplateKey)`.
+- Os 3 templates são removidos no `Unregister()` via `RemoveCommitTemplate(label)` para cada item.
 
 ## Relacionado
 

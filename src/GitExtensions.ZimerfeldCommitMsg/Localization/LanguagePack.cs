@@ -43,6 +43,9 @@ internal abstract class LanguagePack
 
     // ── Frase de fallback por categoria de arquivo ──────────────────────────
     public abstract string FallbackPhrase(string category);
+
+    // ── Substantivo "arquivo(s)" flexionado pela contagem (linha-log) ────────
+    public abstract string FilesWord(int count);
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -176,6 +179,8 @@ internal sealed class PtBrLanguagePack : LanguagePack
         "web"    => "componentes web",
         _        => "código-fonte",
     };
+
+    public override string FilesWord(int count) => count == 1 ? "arquivo" : "arquivos";
 
     // Presente do indicativo, 3ª pessoa singular — detecta descrição que já começa com verbo.
     private static readonly HashSet<string> _verbs3rd = new(StringComparer.OrdinalIgnoreCase)
@@ -344,6 +349,8 @@ internal sealed class EnLanguagePack : LanguagePack
         "web"    => "web components",
         _        => "source code",
     };
+
+    public override string FilesWord(int count) => count == 1 ? "file" : "files";
 
     // Forma verbal (3ª pessoa ou base) → imperativo capitalizado (convenção CC).
     private static readonly Dictionary<string, string> _verbToImperative = new(StringComparer.OrdinalIgnoreCase)

@@ -31,7 +31,7 @@ tags: [fatos-chave, referencia]
 
 ## 📐 Convenções
 - Datas: `AAAA-MM-DD`
-- Commits no formato **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`), descrição em **pt-BR** — é literalmente o que este projeto gera (agora também em **inglês**, conforme o idioma do SO/override — ver [[../Decisoes/Suporte Multilíngue PT-EN]])
+- Convenção de commits: descrição em **pt-BR** iniciada por **verbo** (ex.: `Implementa…`, `Corrige…`). É o que este projeto gera — classifica as mudanças pelos tipos **Conventional Commits** (`feat`/`fix`/`docs`/…) só para **escolher o verbo**, **sem** imprimir o prefixo `tipo:` (também em **inglês**, conforme SO/override — ver [[../Decisoes/Suporte Multilíngue PT-EN]] e [[../02 - Conhecimento/Geração de mensagem - Conventional Commits]])
 - Versionamento `major.minor.BUILD`, build incrementado automaticamente pelo `build.ps1`
 - Commits co-authored quando solicitado push
 - Não fazer commit/push sem pedido explícito
