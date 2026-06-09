@@ -3,16 +3,22 @@
   <metadata>
     <id>GitExtensions.ZimerfeldCommitMsg</id>
 <<<<<<< HEAD
-    <version>1.0.15</version>
+    <version>1.0.43</version>
 =======
-    <version>1.0.16</version>
->>>>>>> release/202606011057
+    <version>1.0.41</version>
+>>>>>>> 19ece6fcb50e79df91c5e14bed1c253576e405fa
     <authors>Zimerfeld</authors>
-    <description>Plugin para GitExtensions que gera automaticamente uma mensagem de commit resumindo em uma frase as mudanças nos arquivos staged, usando o formato Conventional Commits (feat/fix/docs/test/chore).</description>
+    <description>Plugin for GitExtensions that automatically generates commit messages by analyzing the actual content of staged changes. Changes are classified by Conventional Commits type (feat/fix/docs/test/chore/build/refactor) to pick the appropriate verb; the resulting message is a verb-led subject (no literal "type:" prefix) plus a bulleted body. Output is in Brazilian Portuguese or English — selected automatically from the operating system language, with a manual override in the plugin settings. Supports two strategies: comment-based (extracts meaningful comments added to the diff) and filename-based (derives semantic concepts from file names). The message is refreshed automatically whenever files are staged or unstaged while the commit dialog is open.</description>
     <tags>gitextensions plugin commit-message conventional-commits</tags>
     <readme>README.md</readme>
+    <icon>images\icon-128.png</icon>
     <license type="expression">MIT</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+      <group targetFramework="net9.0">
+        <dependency id="GitExtensions.Extensibility" version="[7.0.0, 7.1.0)" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <!-- Plugin DLL -->
@@ -23,5 +29,7 @@
     <!-- README e LICENSE -->
     <file src="..\..\README.md" target="\" />
     <file src="..\..\LICENSE.txt" target="\" />
+    <!-- Ícone exibido no nuget.org (128x128 px recomendado) -->
+    <file src="Resources\icon-128.png" target="images\" />
   </files>
 </package>
