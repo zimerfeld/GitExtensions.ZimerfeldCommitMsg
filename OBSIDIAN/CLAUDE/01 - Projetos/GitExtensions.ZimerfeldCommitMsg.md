@@ -1,11 +1,11 @@
 ---
 tipo: projeto
 criado: 2026-06-01
-atualizado: 2026-06-05
+atualizado: 2026-06-08
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits, i18n]
 status: ativo
 linguagem: C#
-versao: 1.0.35
+versao: 1.0.40
 repo: C:\GitExtensions\ZimerfeldCommitMsg
 ---
 
@@ -32,9 +32,8 @@ C:\GitExtensions\ZimerfeldCommitMsg\
 │   └─ net9.0-windows\                    # saída do build (DLL)
 ├─ OBSIDIAN\CLAUDE\                        # 🧠 este cofre de memória
 ├─ build.ps1                              # incrementa versão + build + deploy + nupkg
-├─ README.md                              # instalação e uso
-├─ FUNCIONALIDADES.md                     # spec detalhada da geração (atualizada pelo build.ps1)
-└─ GitExtensions.ZimerfeldCommitMsg.1.0.19.nupkg
+├─ README.md                              # instalação, uso e spec da geração (espelhado em [[README — Instalação, Uso e Build]])
+└─ GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg
 ```
 
 ## ⚙️ Stack técnica
@@ -59,7 +58,7 @@ C:\GitExtensions\ZimerfeldCommitMsg\
 - Tudo dentro de `try/catch` — o plugin **nunca derruba** o GitExtensions
 
 ## 🧠 Lógica de geração (`CommitMessageGenerator`)
-Formato: `<tipo>: <descrição no idioma ativo>` + corpo opcional. Sem scope. Idioma injetado no construtor (`MessageLanguage`) e os mapas específicos vêm do `LanguagePack` (PT/EN). Ver detalhes em [[Geração de mensagem - Conventional Commits]] e [[Suporte Multilíngue PT-EN]].
+Formato: `<Verbo> <descrição no idioma ativo>` + corpo opcional em bullets. **Sem prefixo `tipo:`** — o tipo CC só escolhe o **verbo** (`feat`+só adições → `Implementa`; `fix` → `Corrige`; etc.); o tipo não é impresso. Subject limitado a 72 chars. Sem scope. Idioma injetado no construtor (`MessageLanguage`) e os mapas específicos vêm do `LanguagePack` (PT/EN). Ver detalhes em [[Geração de mensagem - Conventional Commits]] e [[Suporte Multilíngue PT-EN]].
 - **Estratégia 1 (principal):** extrai comentários adicionados (`+`) do `git diff --cached --no-color`, filtra ruído (separadores, tags XML, código comentado, < 10 chars). O comentário mais impactante vira a descrição; os demais vão no corpo como bullets `- item`
 - **Estratégia 2 (fallback):** `BuildSubject(type, changes)` → verbo do idioma + conceito dominante dos nomes de arquivo (ex: `"Implementa autenticação"` / `"Implement authentication"`)
 - **Corpo em bullets:** até 5 frases de uma linha, uma por arquivo mais significativo, com verbo conforme o status git (`StatusVerb`)
@@ -78,7 +77,7 @@ tools\install.ps1      # instala o plugin
 tools\uninstall.ps1    # remove (não afeta nada mais do GitExtensions)
 tools\update-dll.ps1   # atualiza só a DLL (dev, sem incrementar versão)
 ```
-> O `build.ps1` incrementa `major.minor.BUILD`, sincroniza versão em nuspec + csproj + `FUNCIONALIDADES.md`, builda em Release, copia a DLL p/ `Plugins\` (se Admin) e p/ `tools\net9.0-windows\`, e roda `nuget pack` removendo nupkgs antigos.
+> O `build.ps1` incrementa `major.minor.BUILD`, sincroniza versão em nuspec + csproj + `README.md` (carimba versão + data), builda em Release, copia a DLL p/ `Plugins\` (se Admin) e p/ `tools\net9.0-windows\`, e roda `nuget pack` removendo nupkgs antigos. Passo a passo completo em [[README — Instalação, Uso e Build]].
 
 ## 🔍 inspector (utilitário de dev)
 Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` + reflection para listar tipos/membros públicos de `GitExtensions.Extensibility.dll` e `GitUIPluginInterfaces.dll` — útil pra descobrir a API correta (`IGitPlugin`, `IGitUICommands`, `ICommitMessageManager`, `GitUIEventArgs` etc.) ao evoluir o plugin.
@@ -91,7 +90,7 @@ Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` 
 > `FindCommitTextBox` tenta nomes conhecidos (`Message`, `commitMessageEditor`, `_commitMessage`, `commitMessage`) e cai num fallback heurístico (maior `TextBoxBase` multiline editável). Versões diferentes do GitExtensions mudam esses nomes.
 
 ## 🔢 Versionamento
-- Versão atual: **1.0.35** (csproj + nuspec sincronizados pelo `build.ps1`)
+- Versão atual: **1.0.40** (csproj + nuspec sincronizados pelo `build.ps1`)
 - Esquema: `major.minor.BUILD`, BUILD auto-incrementado a cada build
 - `README.md` carimba versão + data a cada build (FUNCIONALIDADES.md foi removido e unificado no README.md)
 
@@ -102,6 +101,7 @@ Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` 
 - [[2026-06-05 - Suporte multilíngue PT-EN]] — corpo em bullets; arquitetura i18n (LanguagePack + .resx); seletor de idioma; deploy 1.0.35
 
 ## 🔗 Relacionado
+- [[README — Instalação, Uso e Build]] — espelho do `README.md` (instalação, build, requisitos, licença)
 - [[Plugin MEF para GitExtensions]]
 - [[Geração de mensagem - Conventional Commits]]
 - [[Suporte Multilíngue PT-EN]]

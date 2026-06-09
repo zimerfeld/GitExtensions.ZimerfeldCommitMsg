@@ -192,10 +192,29 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
 
             _lastGeneratedMessage = msg;
             tb.Text = msg;
+            // O GitExtensions colore a caixa (linhas longas, assunto, …) ao alterar o texto.
+            // Zeramos esse realce logo após escrever, deixando tudo na cor padrão do tema.
+            ResetTextColors(tb);
             tb.SelectionStart = 0;
             tb.SelectionLength = 0;
         }
         catch { }
+    }
+
+    /// <summary>
+    /// Remove qualquer efeito de cor/realce do texto da caixa de commit, voltando à cor
+    /// padrão do controle. Aplica-se ao RichTextBox usado pelo GitExtensions; outros tipos
+    /// de caixa não têm formatação por trecho e são ignorados. O host pode repintar numa
+    /// edição posterior — aqui só garantimos a mensagem que acabamos de gerar sem cor.
+    /// </summary>
+    private static void ResetTextColors(TextBoxBase tb)
+    {
+        if (tb is not RichTextBox rtb) return;
+
+        rtb.SelectAll();
+        rtb.SelectionColor     = rtb.ForeColor;
+        rtb.SelectionBackColor = rtb.BackColor;
+        rtb.Select(0, 0);
     }
 
     // ── UI helpers ─────────────────────────────────────────────────────────────

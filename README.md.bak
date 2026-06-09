@@ -1,9 +1,14 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
+<<<<<<< HEAD
 **Versão:** 1.0.43
 **Atualizado em:** 2026-06-09
+=======
+**Versão:** 1.0.41
+**Atualizado em:** 2026-06-08
+>>>>>>> 19ece6fcb50e79df91c5e14bed1c253576e405fa
 
-![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/Screenshot.png?v=1.0.39)
+![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/Screenshot.png)
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
@@ -240,12 +245,24 @@ Quando há 2+ arquivos, o corpo lista até **5 bullets**, cada um com uma frase 
 
 Execute o PowerShell **como Administrador**:
 
+Caso o arquivo tenha sido baixado para a pasta C:\Downloads
+
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
 ### Opção B — Manual
+
+Para esse pacote, a instalação manual faça assim:
+
+Caso o arquivo tenha sido baixado para a pasta C:\Downloads
+
+Extraia o arquivo C:\Downloads\gitextensions.zimerfeldcommitmsg.1.0.0.nupkg.
+Você pode renomear para .zip e abrir, ou extrair direto com um descompactador.
+
+Dentro do pacote, pegue esta DLL:
+tools\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll
 
 Copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para:
 
@@ -254,6 +271,14 @@ C:\Program Files\GitExtensions\Plugins\
 ```
 
 Reinicie o GitExtensions.
+
+Feche e abra o GitExtensions novamente.
+Se precisar de permissão de administrador para copiar em Program Files, abra o Explorer ou PowerShell como admin.
+
+Observações importantes:
+
+Esse pacote foi empacotado para net9.0-windows. Se sua versão do GitExtensions não estiver compatível com essa runtime, o plugin pode não carregar.
+Depois de reiniciar, o plugin deve aparecer em Plugins e nas configurações em Settings -> Plugins -> ZimerfeldCommitMsg.
 
 ---
 

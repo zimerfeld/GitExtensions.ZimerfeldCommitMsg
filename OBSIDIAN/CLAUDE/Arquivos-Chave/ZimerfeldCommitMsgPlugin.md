@@ -29,10 +29,13 @@ O atributo `[Export]` é o ponto de descoberta pelo MEF do GitExtensions.
 
 | Campo | Tipo | Propósito |
 |---|---|---|
-| `TemplateKey` | `const string` | `"Zimerfeld: Auto-resumo"` — chave no dropdown |
+| `TemplatePrefix` | `const string` | `"Zimerfeld Commit Msg"` — prefixo dos rótulos no dropdown |
+| `_templateItems` | `(string Label, MessageLanguage? Lang)[]` | 3 itens: Auto (`null`) / PT / EN |
+| `_languageSetting` | `static ChoiceSetting` | `ZimerfeldCommitMsg_Language` — idioma padrão (Auto/PT/EN) exposto em `GetSettings()` |
 | `PluginIcon` | `static Image?` | Ícone do plugin (menu Plugins + dropdown), via `LoadIcon()` |
 | `_syncContext` | `SynchronizationContext?` | Capturado no `Register()` para marshalling UI |
 | `_lastGeneratedMessage` | `string` | Última mensagem gerada — protege texto manual do usuário |
+| `_sessionLanguage` | `MessageLanguage?` | Idioma fixado pelo item de dropdown escolhido (prioridade sobre setting/SO) |
 
 ### `LoadIcon()` → `Image?`
 Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via `Assembly.GetManifestResourceStream`, retorna uma `Bitmap` independente do stream. Falha silenciosa (`null`) se o recurso não existir. Atribuído a `Icon` no construtor quando não-nulo.
@@ -44,12 +47,15 @@ Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via
 ### `Register(IGitUICommands)`
 - Chama `base.Register()`
 - Captura `SynchronizationContext.Current` (UI thread)
-- `AddCommitTemplate(TemplateKey, factory, icon: PluginIcon)` — factory **lazy** instancia `CommitMessageGenerator` sob demanda; ver [[../Fluxos/Template Dropdown (Auto-resumo)]]
+- Para cada um dos 3 `_templateItems`: `AddCommitTemplate(label, () => GenerateForTemplate(workingDir, forced), icon)` — factory **lazy** que fixa `_sessionLanguage` e instancia `CommitMessageGenerator(workingDir, idioma)`; ver [[../Fluxos/Template Dropdown (Auto-resumo)]]
 - Assina `PostRepositoryChanged += OnPostRepositoryChanged`
+
+### `GetSettings()` → expõe `_languageSetting`
+Faz o nó **ZimerfeldCommitMsg** aparecer em Configurações → Plugins (após instalar a DLL ≥ 1.0.36 e reiniciar). `CurrentLanguage()` lê o valor e resolve "Automático" pelo SO; `EffectiveLanguage()` = `_sessionLanguage ?? CurrentLanguage()`.
 
 ### `Unregister(IGitUICommands)`
 - Remove o handler do evento
-- `RemoveCommitTemplate(TemplateKey)`
+- `RemoveCommitTemplate(label)` para cada um dos 3 itens
 - Limpa `_lastGeneratedMessage`
 
 ### `Execute(GitUIEventArgs)` ← menu Plugins

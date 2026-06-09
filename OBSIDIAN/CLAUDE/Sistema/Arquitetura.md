@@ -32,7 +32,7 @@ git subprocess (diff --cached --name-status / diff --cached --no-color)
 Ponto de entrada. Herda de `GitPluginBase`, exportado via MEF.
 
 **Responsabilidades:**
-- Registrar template `"Zimerfeld: Auto-resumo"` (com ícone) no dropdown do `FormCommit` → [[../Fluxos/Template Dropdown (Auto-resumo)]]
+- Registrar **três** templates `"Zimerfeld Commit Msg — <Auto/PT/EN>"` (com ícone) no dropdown do `FormCommit`; cada item força um idioma (`null`=Auto) e fixa `_sessionLanguage` → [[../Fluxos/Template Dropdown (Auto-resumo)]]
 - Ouvir `PostRepositoryChanged` → disparar [[../Fluxos/Stage Trigger]]
 - Implementar `Execute()` → acionar via menu Plugins
 - Encontrar o `TextBoxBase` do `FormCommit` aberto (busca por nome e por fallback área)

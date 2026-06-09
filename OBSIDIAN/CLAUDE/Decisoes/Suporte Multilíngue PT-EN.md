@@ -103,7 +103,7 @@ embutido no **assembly principal** como recurso neutro. `Strings.cs` mantém doi
 
 | Português-BR | English |
 |---|---|
-| `feat: Implementa autenticação` | `feat: Implement authentication` |
+| `Implementa autenticação` | `Implement authentication` |
 | `- Adiciona autenticação` | `- Add authentication` |
 
 `Resolve`: `Português/Portuguese`→PtBr, `Inglês/English`→En (override força); `Automático/Automatic`

@@ -255,54 +255,31 @@ internal sealed class CommitMessageGenerator
         var changes = ParseChanges(nameStatus);
         if (changes.Count == 0) return string.Empty;
 
-        var types    = DetermineAllTypes(changes);
-        var type     = types[0];
-        // pt-BR: traduz comentários ingleses, descartando traduções insuficientes.
-        // Inglês: comentários passam intactos (inglês permanece inglês; pt-BR permanece pt-BR).
-        var comments = _language == MessageLanguage.PtBr
-            ? ExtractDiffComments().Select(TranslateToPortuguese).OfType<string>().ToList()
-            : ExtractDiffComments();
+        var types = DetermineAllTypes(changes);
 
-        string desc, body;
+        // Primeira linha (log): verbo CC do tipo dominante + total de arquivos + tipos envolvidos.
+        var title = BuildConsolidatedTitle(types[0], changes, types);
 
-        var readmeTitle = ReadStagedReadmeTitle(changes);
+        // Corpo: até 5 linhas dos arquivos de maior impacto. Cada linha vem do comentário
+        // do diff (traduzido para pt-BR) ou do título do README; na falta, do conceito do nome.
+        var commentsByFile = ExtractCommentsByFile();
+        var readmeTitle    = ReadStagedReadmeTitle(changes);
+        var body           = BuildBody(changes, commentsByFile, readmeTitle);
 
-        if (readmeTitle is not null)
-        {
-            desc = NormalizeDesc(readmeTitle);
-            body = comments.Count > 0
-                ? string.Join("\n", comments.Select(c => $"- {FormatTitle(type, changes, NormalizeDesc(c))}"))
-                : BuildBody(changes);
-        }
-        else if (comments.Count > 0)
-        {
-            var mainClause = ExtractMainClause(comments[0]);
-            bool wasShortened = mainClause.Length < comments[0].Length;
-
-            if (wasShortened)
-            {
-                // Primeiro comentário é muito específico para o subject; usa frase funcional
-                // geral para evitar repetição entre título e primeiro bullet do body.
-                desc = BuildSubject(type, changes);
-                body = string.Join("\n", comments.Select(c => $"- {FormatTitle(type, changes, NormalizeDesc(c))}"));
-            }
-            else
-            {
-                desc = NormalizeDesc(mainClause);
-                var bodyComments = comments.Skip(1).ToList();
-                body = bodyComments.Count > 0
-                    ? string.Join("\n", bodyComments.Select(c => $"- {FormatTitle(type, changes, NormalizeDesc(c))}"))
-                    : BuildBody(changes);
-            }
-        }
-        else
-        {
-            desc = BuildSubject(type, changes);
-            body = BuildBody(changes);
-        }
-
-        var title = TruncateTitle(FormatTitle(type, changes, desc));
         return body.Length > 0 ? $"{title}\n\n{body}" : title;
+    }
+
+    /// <summary>
+    /// Primeira linha do commit, em formato de log consolidado: verbo imperativo do
+    /// tipo CC dominante + total de arquivos alterados + lista de todos os tipos envolvidos.
+    /// Ex.: "Adiciona 6 arquivos (feat, fix, docs)".
+    /// </summary>
+    private string BuildConsolidatedTitle(string type, List<FileChange> changes, List<string> types)
+    {
+        var verb     = TypeVerb(type, changes);
+        var fileWord = _lang.FilesWord(changes.Count);
+        var typeList = string.Join(", ", types);
+        return TruncateTitle($"{verb} {changes.Count} {fileWord} ({typeList})");
     }
 
     /// <summary>
@@ -337,31 +314,28 @@ internal sealed class CommitMessageGenerator
     // ── Extração de comentários do diff ───────────────────────────────────────
 
     /// <summary>
-    /// Lê git diff --cached e coleta comentários alterados (linhas + e -).
-    /// Linhas adicionadas (+): prioridade = tipo do arquivo (source=4, web=3, …).
-    /// Linhas removidas  (-): prioridade = tipo do arquivo − 1 (contexto do que mudou).
-    /// Retorna ordenado por prioridade → comentário mais impactante primeiro.
+    /// Lê git diff --cached e agrupa os comentários alterados (linhas + e -) por arquivo.
+    /// A priorização por impacto entre arquivos é feita depois, em BuildBody.
     /// </summary>
-    private List<string> ExtractDiffComments()
+    private Dictionary<string, List<string>> ExtractCommentsByFile()
     {
-        var diff    = RunGit("diff", "--cached", "--no-color");
-        var buckets = new SortedDictionary<int, List<string>>(Comparer<int>.Create((a, b) => b.CompareTo(a)));
-        var seen    = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        int total   = 0;
-        int filePriority = 2;
-        bool isMdFile    = false;
+        var diff   = RunGit("diff", "--cached", "--no-color");
+        var byFile = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        var seen   = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        string? currentFile = null;
+        bool isMdFile = false;
 
         foreach (var line in diff.Split('\n'))
         {
             // Detecta o arquivo atual: "+++ b/caminho"
             if (line.StartsWith("+++ b/"))
             {
-                var filePath = line[6..].Trim();
-                filePriority = CommentFilePriority(filePath);
+                currentFile = line[6..].Trim();
                 // Em .md, headings "# Texto" são estrutura Markdown, não comentários de código
-                isMdFile = filePath.EndsWith(".md", StringComparison.OrdinalIgnoreCase);
+                isMdFile = currentFile.EndsWith(".md", StringComparison.OrdinalIgnoreCase);
                 continue;
             }
+            if (currentFile is null) continue;
 
             // Processa linhas adicionadas (+) e removidas (-); ignora cabeçalhos +++/---
             bool isAdded   = line.Length >= 2 && line[0] == '+' && !line.StartsWith("+++");
@@ -371,23 +345,34 @@ internal sealed class CommitMessageGenerator
             var text = ExtractCommentText(line[1..].TrimStart(), isMdFile);
             if (text is null || !seen.Add(text)) continue;
 
-            // Linhas removidas têm prioridade um grau menor que as adicionadas —
-            // assim só dominam quando não há comentários adicionados do mesmo nível
-            int priority = isAdded ? filePriority : Math.Max(0, filePriority - 1);
-
-            if (!buckets.TryGetValue(priority, out var list))
-                buckets[priority] = list = [];
-
+            if (!byFile.TryGetValue(currentFile, out var list))
+                byFile[currentFile] = list = [];
             list.Add(text);
-            if (++total >= 15) break;
         }
 
-        // Dentro do mesmo nível de prioridade, comentários mais longos primeiro
-        // (comprimento como proxy do impacto/valor descritivo da alteração)
-        return buckets.Values
-            .SelectMany(l => l.OrderByDescending(c => c.Length))
-            .Take(5)
-            .ToList();
+        return byFile;
+    }
+
+    /// <summary>
+    /// Melhor comentário para descrever um arquivo: traduz para pt-BR (descartando
+    /// traduções insuficientes), escolhe o mais descritivo (maior) e recorta a cláusula
+    /// principal. Para o README, usa o título como fallback. Retorna null quando não há
+    /// texto útil — BuildBody então deriva a descrição do nome do arquivo.
+    /// </summary>
+    private string? BestComment(string path, Dictionary<string, List<string>> byFile, string? readmeTitle)
+    {
+        var raw = byFile.TryGetValue(path, out var list) ? list : [];
+        var usable = _language == MessageLanguage.PtBr
+            ? raw.Select(TranslateToPortuguese).OfType<string>()
+            : raw;
+
+        var best = usable.OrderByDescending(c => c.Length).FirstOrDefault();
+
+        if (best is null && readmeTitle is not null &&
+            Path.GetFileName(path).Equals("README.md", StringComparison.OrdinalIgnoreCase))
+            best = readmeTitle;
+
+        return best is null ? null : ExtractMainClause(best);
     }
 
     /// <summary>
@@ -581,23 +566,24 @@ internal sealed class CommitMessageGenerator
 
     // ── Step 2 — Conventional Commits type ────────────────────────────────────
 
-    private static string DetermineType(List<FileChange> changes)
+    /// <summary>Tipo Conventional Commits de um único arquivo (caminho/categoria/status).</summary>
+    private static string TypeOf(FileChange change)
     {
-        var categories = changes.Select(c => GetCategory(c.Path)).ToList();
+        if (IsTestPath(change)) return "test";
 
-        if (categories.All(c => c == "test") || changes.All(IsTestPath)) return "test";
-        if (categories.All(c => c == "docs"))                             return "docs";
-        if (categories.All(c => c == "build"))                            return "build";
-        if (categories.All(c => c == "config"))                           return "chore";
-
-        int added    = changes.Count(c => c.Status is 'A' or 'C');
-        int deleted  = changes.Count(c => c.Status == 'D');
-        int modified = changes.Count(c => c.Status is 'M' or 'R' or 'T');
-
-        if (added > 0 && added >= modified && deleted == 0) return "feat";
-        if (deleted > 0 && deleted > added && modified == 0) return "chore";
-        if (modified > 0 && added == 0 && deleted == 0)     return "fix";
-        return added > modified ? "feat" : "refactor";
+        return GetCategory(change.Path) switch
+        {
+            "docs"   => "docs",
+            "build"  => "build",
+            "config" => "chore",
+            _ => change.Status switch
+            {
+                'A' or 'C'        => "feat",
+                'D'               => "chore",
+                'M' or 'R' or 'T' => "fix",
+                _                 => "refactor"
+            }
+        };
     }
 
     /// <summary>
@@ -605,42 +591,12 @@ internal sealed class CommitMessageGenerator
     /// </summary>
     private static List<string> DetermineAllTypes(List<FileChange> changes)
     {
-        var types = new HashSet<string>(StringComparer.Ordinal);
-
-        foreach (var change in changes)
-        {
-            string t;
-            if (IsTestPath(change))
-            {
-                t = "test";
-            }
-            else
-            {
-                t = GetCategory(change.Path) switch
-                {
-                    "docs"   => "docs",
-                    "build"  => "build",
-                    "config" => "chore",
-                    _ => change.Status switch
-                    {
-                        'A' or 'C'        => "feat",
-                        'D'               => "chore",
-                        'M' or 'R' or 'T' => "fix",
-                        _                 => "refactor"
-                    }
-                };
-            }
-            types.Add(t);
-        }
-
+        var types = new HashSet<string>(changes.Select(TypeOf), StringComparer.Ordinal);
         var order = new[] { "feat", "fix", "refactor", "perf", "test", "build", "ci", "chore", "docs", "style" };
         return [.. types.OrderBy(t => Array.IndexOf(order, t) is var i && i >= 0 ? i : 99)];
     }
 
     // ── Step 3 — Subject: descrição funcional em pt-BR ────────────────────────
-
-    private string BuildSubject(string type, List<FileChange> changes) =>
-        BuildFunctionalPhrase(changes);
 
     // ── Verbo imperativo (idioma-específico) ───────────────────────────────────
 
@@ -655,65 +611,57 @@ internal sealed class CommitMessageGenerator
         return _lang.TypeVerb(type, onlyAdditions, hasAdditions, hasDeletions);
     }
 
+    // ── Step 4 — Corpo: até 5 linhas dos arquivos de maior impacto ──────────────
+
     /// <summary>
-    /// Formata o título completo: detecta verbo inicial em <paramref name="desc"/>
-    /// e o normaliza; caso contrário, prefixa o verbo mapeado do tipo CC.
-    /// Exemplos: "filtrar stems" → "Filtra stems", "autenticação" → "Adiciona autenticação"
+    /// Monta o corpo: ordena os arquivos por impacto (CommentFilePriority) e descreve
+    /// um por linha. Os de maior impacto vêm primeiro; quando não geram texto útil, os
+    /// de menor impacto preenchem as linhas restantes (até 5, sem repetir).
     /// </summary>
-    private string FormatTitle(string type, List<FileChange> changes, string desc)
+    private string BuildBody(List<FileChange> changes,
+        Dictionary<string, List<string>> commentsByFile, string? readmeTitle)
     {
-        if (desc.Length == 0)
-            return TypeVerb(type, changes);
+        var lines = new List<string>();
+        var seen  = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        var (verb, remainder) = _lang.LeadingVerb(desc);
-        if (verb is not null)
-            return remainder.Length > 0 ? $"{verb} {remainder}" : verb;
+        foreach (var c in changes.OrderByDescending(c => CommentFilePriority(c.Path)))
+        {
+            var line = FormatFileLine(c, BestComment(c.Path, commentsByFile, readmeTitle));
+            if (line.Length == 0 || !seen.Add(line)) continue;
 
-        return $"{TypeVerb(type, changes)} {desc}";
+            lines.Add(line);
+            if (lines.Count == 5) break;
+        }
+
+        return string.Join("\n", lines.Select(l => $"- {l}"));
     }
 
-    // ── Step 4 — Body: bullets das mudanças mais significativas ──────────────
-
-    private string BuildBody(List<FileChange> changes)
+    /// <summary>
+    /// Descreve um arquivo em uma linha. Com comentário: detecta o verbo inicial ou
+    /// prefixa o verbo do tipo CC do arquivo. Sem comentário: deriva o conceito do nome,
+    /// prefixado pelo verbo de status (Adiciona/Remove/Renomeia/Atualiza).
+    /// Retorna "" quando não há nada útil a dizer sobre o arquivo.
+    /// </summary>
+    private string FormatFileLine(FileChange change, string? desc)
     {
-        if (changes.Count == 1) return string.Empty;
+        if (desc is { Length: > 0 })
+        {
+            var normalized = NormalizeDesc(desc);
 
-        var bullets = changes
-            .OrderByDescending(c => CommentFilePriority(c.Path))
-            .Select(c =>
-            {
-                var raw = ExtractRawConcept(Path.GetFileNameWithoutExtension(c.Path));
-                if (raw is null) return null;
-                var concept = MapConcept(raw);
-                return $"- {_lang.StatusVerb(c.Status)} {concept}";
-            })
-            .OfType<string>()
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Take(5)
-            .ToList();
+            var (verb, remainder) = _lang.LeadingVerb(normalized);
+            if (verb is not null)
+                return remainder.Length > 0 ? $"{verb} {remainder}" : verb;
 
-        return string.Join("\n", bullets);
+            var typeVerb = _lang.TypeVerb(TypeOf(change),
+                change.Status is 'A' or 'C', change.Status is 'A' or 'C', change.Status == 'D');
+            return $"{typeVerb} {normalized}";
+        }
+
+        var raw = ExtractRawConcept(Path.GetFileNameWithoutExtension(change.Path));
+        return raw is null ? string.Empty : $"{_lang.StatusVerb(change.Status)} {MapConcept(raw)}";
     }
 
     // ── Concept extraction ─────────────────────────────────────────────────────
-
-    private List<string> ExtractUniqueConcepts(List<FileChange> changes)
-    {
-        var freq = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var c in changes)
-        {
-            var raw = ExtractRawConcept(Path.GetFileNameWithoutExtension(c.Path));
-            if (raw is null) continue;
-            freq[raw] = freq.TryGetValue(raw, out var n) ? n + 1 : 1;
-        }
-
-        return freq
-            .OrderByDescending(kv => kv.Value)
-            .Select(kv => kv.Key)
-            .Take(3)
-            .ToList();
-    }
 
     private string? ExtractRawConcept(string filename)
     {
@@ -753,37 +701,7 @@ internal sealed class CommitMessageGenerator
         return name;
     }
 
-    private string BuildFunctionalPhrase(List<FileChange> changes)
-    {
-        if (changes.Count == 1)
-        {
-            var raw = ExtractRawConcept(Path.GetFileNameWithoutExtension(changes[0].Path));
-            return raw is not null ? MapConcept(raw) : FallbackPhrase(changes);
-        }
-
-        var concepts = ExtractUniqueConcepts(changes);
-        if (concepts.Count == 0) return FallbackPhrase(changes);
-
-        // Título: conceito mais dominante (frequente) — síntese global das mudanças
-        return concepts
-            .Select(MapConcept)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .First();
-    }
-
     private string MapConcept(string raw) => _lang.MapConcept(raw, HumanizeName);
-
-    private string FallbackPhrase(List<FileChange> changes)
-    {
-        var category = changes
-            .Select(c => GetCategory(c.Path))
-            .GroupBy(c => c)
-            .OrderByDescending(g => g.Count())
-            .Select(g => g.Key)
-            .FirstOrDefault() ?? "source";
-
-        return _lang.FallbackPhrase(category);
-    }
 
     // ── Generic helpers ────────────────────────────────────────────────────────
 
@@ -832,28 +750,6 @@ internal sealed class CommitMessageGenerator
         if (title.Length <= maxLen) return title;
         var cut = title.LastIndexOf(' ', maxLen - 2);
         return cut > 8 ? title[..cut] + "…" : title[..(maxLen - 1)] + "…";
-    }
-
-    private static string GetCommonDirectory(List<string> paths)
-    {
-        var dirs = paths
-            .Select(p => (Path.GetDirectoryName(p) ?? string.Empty)
-                .Replace('\\', '/')
-                .Split('/', StringSplitOptions.RemoveEmptyEntries))
-            .ToList();
-
-        if (dirs.Count == 0 || dirs[0].Length == 0) return string.Empty;
-
-        var common = dirs[0].ToList();
-        foreach (var parts in dirs.Skip(1))
-        {
-            var limit = Math.Min(common.Count, parts.Length);
-            var i = 0;
-            while (i < limit && common[i] == parts[i]) i++;
-            common = common.Take(i).ToList();
-            if (common.Count == 0) break;
-        }
-        return string.Join("/", common);
     }
 
     // ── Git subprocess ─────────────────────────────────────────────────────────

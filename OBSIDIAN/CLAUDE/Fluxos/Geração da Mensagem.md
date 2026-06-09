@@ -24,10 +24,13 @@ ParseChanges() → List<FileChange>
         │       └──► TranslateToPortuguese()
         │
         └──► Montagem
-                typeStr = Join(types, ", ")
-                title   = TruncateTitle(typeStr + ": " + desc)
-                output  = title + "\n\n" + body
+                title  = TruncateTitle(FormatTitle(type, changes, desc))  // <Verbo> <desc> — SEM "tipo:"
+                output = body.Length > 0 ? title + "\n\n" + body : title
 ```
+
+> ⚠️ **Sem prefixo `tipo:`.** Apesar de `DetermineAllTypes` retornar uma lista, só `types[0]`
+> é usado — e apenas para escolher o **verbo** em `FormatTitle`/`TypeVerb`. Os tipos não são
+> impressos (a decisão [[../Decisoes/Título como Lista de Types]] foi superada em 2026-06-05).
 
 ## Passo 1 — ParseChanges
 
@@ -61,7 +64,7 @@ outro               → "refactor"
 Retorna lista de types únicos, ordenados:
 `feat → fix → refactor → perf → test → build → ci → chore → docs → style`
 
-Exemplo: `["feat", "docs", "chore"]`
+Exemplo: `["feat", "docs", "chore"]` → **só `types[0]` (`feat`) é usado**, para escolher o verbo.
 
 ## Passo 3 — Estratégia de descrição (prioridade decrescente)
 
@@ -100,49 +103,50 @@ O primeiro comentário (mais impactante) vira `desc`. Os demais vão para o body
 **ExtractMainClause:** separa `desc` no primeiro conector de propósito (` para `, ` pois `, ` porque `, ` — `) para manter só a cláusula principal.
 
 ### 3c. Fallback (sem comentários, sem README)
-`desc = BuildSubject(type, changes)` — gera verbo pt-BR + frase funcional do conceito dominante.
-Exemplos: `"adicionar autenticação"`, `"corrigir gerenciamento de usuários"`.
+`desc = BuildSubject(type, changes)` → frase funcional do conceito dominante, **sem verbo** (ex.: `"autenticação"`, `"gerenciamento de usuários"`). O verbo é adicionado depois por `FormatTitle` → `"Implementa autenticação"`, `"Corrige gerenciamento de usuários"`.
 
-## Passo 4 — Corpo arquitetural (BuildBody)
+## Passo 4 — Corpo em bullets (BuildBody)
 
-Ativo quando há 2+ arquivos com conceitos/camadas distintos.
+Ativo quando há **2+ arquivos**. Ordena por relevância do arquivo (`CommentFilePriority`) e gera até **5 bullets** `- <StatusVerb> <conceito>`, com `Distinct`.
 
-**Extração de conceitos:** filename sem extensão → remove prefixo `I` de interface → remove sufixo arquitetural (`Service`, `Repository`, `Controller`…) → mapeia para frase pt-BR.
+**Extração de conceito por arquivo:** filename sem extensão → remove prefixo `I` de interface → remove sufixo arquitetural (`Service`, `Repository`, `Controller`…) → `MapConcept` para frase no idioma ativo.
 
-**Extração de camadas:** sufixos como `Service`→`serviço`, `Repository`→`repositório`, `Controller`→`controlador`.
+**StatusVerb:** `A`/`C` → Adiciona/Add · `D` → Remove/Remove · `R` → Renomeia/Rename · demais → Atualiza/Update.
 
 Exemplo de body gerado:
 ```
-Abrange autenticação e gerenciamento de usuários nas camadas de serviço e repositório.
+- Adiciona autenticação
+- Adiciona gerenciamento de usuários
 ```
+*(O antigo corpo em prosa "Abrange … nas camadas …" — e `ArchLayers`/`JoinPhrases` — foram removidos.)*
 
 ## Passo 5 — Montagem final
 
 ```
-typeStr = Join(types, ", ")                         → ex: "feat, docs, chore"
-title   = TruncateTitle(typeStr + ": " + desc)      → ex: "feat: adicionar autenticação"
-output  = body.Length > 0 ? title + "\n\n" + body : title
+title  = TruncateTitle(FormatTitle(type, changes, desc))   → ex: "Implementa autenticação"
+output = body.Length > 0 ? title + "\n\n" + body : title
 ```
 
-`TruncateTitle` limita a 72 chars, cortando no último espaço e adicionando `…`.
+- `FormatTitle`: se `desc` começa com verbo conhecido (`LeadingVerb`), normaliza-o; senão prefixa `TypeVerb(type, …)`. **Não** acrescenta `tipo:`.
+- `TruncateTitle` limita a 72 chars, cortando no último espaço e adicionando `…`.
 
-Formato final (Conventional Commits):
+Formato final (verbo + objeto, sem prefixo de tipo):
 ```
-feat: adicionar autenticação
+Implementa autenticação
 
-Abrange autenticação e gerenciamento de token nas camadas de serviço e repositório.
+- Adiciona autenticação
+- Adiciona gerenciamento de token
 ```
 
 ## Exemplos de saída
 
 | Staged | Saída |
 |---|---|
-| `AuthService.cs` adicionado | `feat: adicionar autenticação` |
-| `README.md` modificado | `docs: atualizar documentação` |
-| `.cs` modificado + `.yml` alterado | `fix, chore: corrigir código-fonte` |
-| `.cs` novo + `.md` + `appsettings.json` | `feat, docs, chore: adicionar código-fonte` |
-| `.cs` com comentário `// filtrar stems` staged | `feat: filtrar stems` |
-| `.cs` novo sem comentário, `UserService` + `UserRepository` | `feat: adicionar gerenciamento de usuários\n\nInclui as camadas de serviço e repositório.` |
+| `AuthService.cs` adicionado | `Implementa autenticação` |
+| `UserService.cs` modificado | `Corrige gerenciamento de usuários` |
+| `README.md` modificado | `Atualiza documentação` |
+| `UserService.cs` + `TokenService.cs` novos | `Implementa gerenciamento de usuários`<br>`- Adiciona gerenciamento de usuários`<br>`- Adiciona gerenciamento de token` |
+| `.cs` com comentário `// filtra stems com ponto` | `Filtra stems com ponto` |
 
 ## Relacionado
 
