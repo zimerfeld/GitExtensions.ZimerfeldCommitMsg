@@ -3,16 +3,18 @@
     Gera o icone do plugin ZimerfeldCommitMsg via codigo (GDI+ / C#).
 
 .DESCRIPTION
-    Recria a identidade visual original (quadrado arredondado teal + "Z" branco)
-    e acrescenta o objeto-tema: um dicionario aberto com as paginas rotuladas
-    PT / EN, evocando a documentacao/mensagem de commit traduzida.
+    Cartao arredondado teal com um dicionario/livro aberto ocupando todo o espaco,
+    com as paginas rotuladas BR / EN, evocando a documentacao/mensagem de commit
+    traduzida. Sem a letra "Z" (removida); o livro e o elemento dominante.
 
     Renderiza em qualquer tamanho. Por padrao gera:
       - Resources\icon-128.png  (exibido no nuget.org)
       - Resources\icon.png      (16x16, usado na UI do GitExtensions)
 
 .EXAMPLE
-    pwsh ./tools/generate-icon.ps1
+    # Use o Windows PowerShell (powershell.exe). No pwsh 7 o System.Drawing e
+    # fragmentado (tipos em System.Drawing.Primitives) e o Add-Type inline falha.
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./tools/generate-icon.ps1
 #>
 [CmdletBinding()]
 param(
@@ -68,9 +70,9 @@ public static class IconGen
     static PointF[] Page(float S, bool left)
     {
         float cx = S * 0.5f;
-        float spineTopY = S * 0.34f, spineBotY = S * 0.66f;
-        float outX = left ? S * 0.135f : S * 0.865f;
-        float topOuterY = S * 0.41f, botOuterY = S * 0.72f;
+        float spineTopY = S * 0.09f, spineBotY = S * 0.80f;
+        float outX = left ? S * 0.05f : S * 0.95f;
+        float topOuterY = S * 0.18f, botOuterY = S * 0.88f;
         return new[] {
             new PointF(cx,   spineTopY),
             new PointF(outX, topOuterY),
@@ -138,9 +140,13 @@ public static class IconGen
                 // Fundo: quadrado arredondado com gradiente teal
                 float pad = S * 0.045f;
                 var rect = new RectangleF(pad, pad, S - 2 * pad, S - 2 * pad);
-                using (var bg = Rounded(rect, S * 0.22f))
+                var bg = Rounded(rect, S * 0.22f);
                 using (var grad = new LinearGradientBrush(rect, TealLight, TealDark, LinearGradientMode.Vertical))
                     g.FillPath(grad, bg);
+
+                // Recorta tudo o que vem a seguir ao cartão arredondado: o livro ocupa todo o
+                // espaço da imagem sem vazar para fora das bordas/cantos do cartão.
+                g.SetClip(bg);
 
                 // ===== Livro aberto =====
                 float cx = S * 0.5f;
@@ -149,8 +155,8 @@ public static class IconGen
 
                 // Segundo plano: pilha de paginas (>3 cada lado) deslocada para baixo/fora
                 int   stack = 5;
-                float ox = S * 0.010f;   // deslocamento lateral (para fora)
-                float oy = S * 0.018f;   // deslocamento vertical (para baixo)
+                float ox = S * 0.008f;   // deslocamento lateral (para fora)
+                float oy = S * 0.014f;   // deslocamento vertical (para baixo)
                 using (var creamBrush = new SolidBrush(Cream))
                 using (var edgePen    = new Pen(PageEdge, S * 0.006f) { LineJoin = LineJoin.Round })
                 {
@@ -172,25 +178,21 @@ public static class IconGen
                     g.DrawPolygon(border, leftTop);
                     g.DrawPolygon(border, rightTop);
                     // vinco central (lombada)
-                    g.DrawLine(border, cx, S * 0.34f, cx, S * 0.66f);
+                    g.DrawLine(border, cx, S * 0.09f, cx, S * 0.80f);
                 }
 
-                // Rotulos: PT (verde + amarelo) | EN (vermelho + azul)
+                // Rotulos: BR (verde + amarelo) | EN (vermelho + azul)
+                // ty = centro vertical das paginas (topo ~0.13, base ~0.84 na posicao dos rotulos)
                 var ff = new FontFamily("Segoe UI");
-                float em = S * 0.155f;
-                float ty = S * 0.55f;
-                Glyph(g, "P", ff, em, Green,  GreenDark, S * 0.010f, S * 0.270f, ty, S);
-                Glyph(g, "T", ff, em, Yellow, Amber,     S * 0.014f, S * 0.375f, ty, S);
-                Glyph(g, "E", ff, em, Red,    RedDark,   S * 0.010f, S * 0.625f, ty, S);
-                Glyph(g, "N", ff, em, Blue,   BlueDark,  S * 0.010f, S * 0.730f, ty, S);
+                float em = S * 0.22f;
+                float ty = S * 0.485f;
+                Glyph(g, "B", ff, em, Green,  GreenDark, S * 0.013f, S * 0.215f, ty, S);
+                Glyph(g, "R", ff, em, Yellow, Amber,     S * 0.017f, S * 0.360f, ty, S);
+                Glyph(g, "E", ff, em, Red,    RedDark,   S * 0.013f, S * 0.640f, ty, S);
+                Glyph(g, "N", ff, em, Blue,   BlueDark,  S * 0.013f, S * 0.785f, ty, S);
 
-                // "Z" da marca, no topo
-                using (var zf = new Font("Segoe UI", S * 0.24f, FontStyle.Bold, GraphicsUnit.Pixel))
-                using (var wb = new SolidBrush(White))
-                {
-                    var fmt = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-                    g.DrawString("Z", zf, wb, new RectangleF(0, S * 0.05f, S, S * 0.26f), fmt);
-                }
+                g.ResetClip();
+                bg.Dispose();
             }
         }
         return bmp;
