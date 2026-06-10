@@ -9,9 +9,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <NeutralLanguage>pt-BR</NeutralLanguage>
-    <Version>1.0.47</Version>
+    <Version>1.0.49</Version>
     <Authors>Zimerfeld</Authors>
     <Description>GitExtensions plugin that summarizes staged changes into a single commit message sentence</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/zimerfeld/ZimerfeldCommitMsg</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/zimerfeld/ZimerfeldCommitMsg</RepositoryUrl>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <!-- GitExtensions hosts the plugin and supplies WindowsBase at runtime; nothing is
          copied to output (Private=false), so the build-time version conflict between the
