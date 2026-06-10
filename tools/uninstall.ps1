@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Remove o plugin ZimerfeldCommitMsg do GitExtensions sem causar danos ao programa.
@@ -56,9 +56,8 @@ if (-not (Test-Path $target)) {
 
 # -- Check administrator rights -----------------------------------------------
 
-$isAdmin = ([Security.Principal.WindowsPrincipal]
-            [Security.Principal.WindowsIdentity]::GetCurrent()
-           ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+    [Security.Principal.WindowsBuiltInRole]::Administrator)
 
 if (-not $isAdmin) {
     Write-Warning @"
