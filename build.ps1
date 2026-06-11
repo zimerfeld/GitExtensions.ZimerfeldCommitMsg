@@ -47,8 +47,26 @@ Write-Host $newVersion -ForegroundColor Green
 $geProcs = Get-Process -Name GitExtensions -ErrorAction SilentlyContinue
 if ($geProcs) {
     Write-Host "Fechando GitExtensions e plugins..."
-    $geProcs | Stop-Process -Force
-    Start-Sleep -Milliseconds 800
+
+    # Tenta fechar de forma graciosa primeiro
+    foreach ($p in $geProcs) {
+        $null = $p.CloseMainWindow()
+    }
+
+    # Aguarda ate 10s pelo encerramento gracioso
+    $deadline = (Get-Date).AddSeconds(10)
+    while ((Get-Process -Name GitExtensions -ErrorAction SilentlyContinue) -and (Get-Date) -lt $deadline) {
+        Start-Sleep -Milliseconds 300
+    }
+
+    # Se ainda persistir, forca o encerramento
+    $still = Get-Process -Name GitExtensions -ErrorAction SilentlyContinue
+    if ($still) {
+        Write-Host "Forcando encerramento do GitExtensions..."
+        $still | Stop-Process -Force
+        Start-Sleep -Milliseconds 500
+    }
+
     Write-Host "GitExtensions encerrado."
 } else {
     Write-Host "GitExtensions nao esta em execucao."
