@@ -1,9 +1,16 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
+<<<<<<< HEAD
 **Versão:** 1.0.53
 **Atualizado em:** 2026-06-11
 
 ![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotDropDown.png)
+=======
+**Versão:** 1.0.54
+**Atualizado em:** 2026-06-11
+
+![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotDropdown.png?v=1.0.39)
+>>>>>>> feature/build
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
