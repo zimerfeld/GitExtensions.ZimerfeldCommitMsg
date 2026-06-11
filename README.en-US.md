@@ -1,0 +1,327 @@
+﻿# GitExtensions.ZimerfeldCommitMsg
+
+**Version:** 1.0.58
+**Updated:** 2026-06-11
+
+[English](README.en-US.md) | [Português-BR](README.pt-BR.md)
+
+![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUsage.png)
+
+Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatically generates commit messages by analyzing the real content of staged changes. Changes are classified by **Conventional Commits** types (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) to choose the appropriate **verb**, and the resulting message is a **verb-led sentence** followed by a bulleted body — **without** the `type:` prefix. **Multilingual**: generates output in **Brazilian Portuguese or English**, automatically detected from the operating system language, with a **manual override** in the plugin settings.
+
+---
+
+## High-level features
+
+- **Automatic generation** of the commit message from the real staged diff content, not only from file names.
+- **Conventional Commits-guided verb** — classifies changes into types (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) and prefixes the corresponding **verb** (third-person present in pt-BR / imperative in English). The type itself **does not** appear in the message.
+- **Multilingual (Portuguese/English)** — language selected automatically from the OS, with a manual override selector.
+- **Two content strategies**: diff comment-based (primary) and file name-based (fallback).
+- **Bulleted body** — up to 5 one-line sentences, each summarizing the most significant change in a file.
+- **English → Portuguese translation** of comments (only when the output is pt-BR); for English output, comments are kept as-is.
+- **Three integration modes**: commit dialog template, Plugins menu, and auto-refresh on stage/unstage.
+- **Non-destructive** — never overwrites text typed manually by the user.
+
+---
+
+## Multilingual (Portuguese / English)
+
+The plugin generates the entire message (description, body, and verbs) **in the selected language**, and also localizes UI messages (warning dialogs).
+
+### Language selection
+
+There are **two ways** to choose the language, using the same bilingual labels so they remain clear regardless of the system language:
+
+**1. In the commit screen template dropdown** — three items, one per language (quick choice per commit):
+
+```text
+Zimerfeld Commit Msg — Automático/Automatic
+Zimerfeld Commit Msg — Português/Portuguese
+Zimerfeld Commit Msg — Inglês/English
+```
+
+![Commit template dropdown with the three language items](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUsage.png)
+
+**2. In Settings → Plugins → ZimerfeldCommitMsg** — the **"Idioma da mensagem / Message language"** selector defines the **default** used by the Plugins menu and auto-refresh.
+
+| Option | Behavior |
+|---|---|
+| `Automático/Automatic` | **Default.** Detects from the operating system/GitExtensions language (`pt-*` → Portuguese; anything else → English). |
+| `Português/Portuguese` | Forces Brazilian Portuguese output. |
+| `Inglês/English` | Forces English output. |
+
+> Choosing a language item in the dropdown also **pins** that language for auto-refresh while the dialog is open. The override takes precedence over the OS language; automatic detection uses `CultureInfo.CurrentUICulture`.
+>
+> **Note:** the **ZimerfeldCommitMsg** node only appears in the **Settings → Plugins** tree after the DLL with the selector (≥ 1.0.36) is installed and GitExtensions is restarted.
+
+### Side-by-side example
+
+| Português-BR | English |
+|---|---|
+| `Implementa autenticação` | `Implement authentication` |
+| `- Adiciona autenticação` | `- Add authentication` |
+| `- Adiciona processamento de pagamento` | `- Add payment processing` |
+| `- Adiciona gerenciamento de token` | `- Add token management` |
+
+---
+
+## Integration modes
+
+### Template in the commit dialog
+
+The commit window template dropdown includes one item per language — **"Zimerfeld Commit Msg — Automático/Automatic"**, **"— Português/Portuguese"**, and **"— Inglês/English"**. Select one and the message is generated in that language and automatically filled into the text field.
+
+### Plugins menu
+
+Open **Plugins → ZimerfeldCommitMsg**. The commit dialog opens with the message already filled in.
+
+### Auto-refresh on stage/unstage
+
+While the commit dialog is open, the message is automatically updated whenever files are staged or unstaged. Text typed manually is never overwritten.
+
+---
+
+## Generated message format
+
+```text
+<Verb> <description in the active language>
+
+- <bullet 1>
+- <bullet 2>
+```
+
+- **No `type:` prefix** — the first line starts directly with the **verb** selected from the type, such as `Implement`, `Fix`, or `Update`.
+- **No scope** — avoids redundancy with the project name.
+- **No color highlighting** — uses `git diff --no-color` to avoid ANSI codes.
+- **72-character limit** on the first line, trimming at the last space and adding `…`.
+- **Description and verbs in the active language** (Brazilian Portuguese or English).
+- **Optional body** — up to 5 one-line bullets, generated when there are 2+ files or extra comments.
+
+![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotCommitMsg.png)
+
+### Detected types (define the verb)
+
+Each staged file receives a type. The first-line **verb** comes from the **highest-priority** type across all files (order: `feat` → `fix` → `refactor` → `perf` → `test` → `build` → `ci` → `chore` → `docs` → `style`). **The type is not printed** — it only selects the verb.
+
+| Type | Assigned to a file when… |
+|---|---|
+| `feat` | source code file **added** (status `A`/`C`, source/web category) |
+| `fix` | source code file **modified/renamed** (status `M`/`R`/`T`) |
+| `docs` | documentation file (`.md`, `.txt`, `.rst`, `.adoc`) |
+| `test` | test path (`test`/`tests`/`spec` folder or `Test`/`Spec` suffix) |
+| `chore` | configuration file (`.json`, `.yml`, etc.) **or** any **deleted** file (status `D`) |
+| `build` | build file (`.csproj`, `.sln`, `Dockerfile`, etc.) |
+| `refactor` | remaining cases without a clear pattern |
+
+---
+
+## How the message is generated
+
+### Strategy 1 — Diff comment-based (primary)
+
+Runs `git diff --cached --no-color` and collects **comment** lines that were **added** (`+`) or **removed** (`-`). Added comments are prioritized by **file category** (source = 4 > web = 3 > build = 2 / config = 1 / docs = 1; test files = 0); removed comments receive one lower priority level. Up to 15 lines are scanned and up to **5 comments** are used; within the same priority, longer comments come first.
+
+#### Recognized patterns
+
+| Syntax | Languages |
+|---|---|
+| `// text` or `/// text` | C#, Java, JavaScript, TypeScript, Go |
+| `# text` | Python, Shell, YAML, Ruby |
+
+#### Rejected comments
+
+| Condition | Rejected example |
+|---|---|
+| Visual separator | `// ─────────────────────` |
+| XML documentation tag | `/// <summary>` |
+| Commented-out code (has `{` `}`) | `// if (x) { return; }` |
+| Commented-out code (method call) | `// method(argument)` |
+| Too short (< 10 chars) | `// ok` |
+| No spaces (not a sentence) | `// TODO` |
+
+#### How comments are used
+
+The most impactful comment becomes the first-line **description** (with the initial verb normalized to third-person/imperative). The remaining comments appear in the **body** as list items:
+
+```text
+Validate the token before processing the request
+
+- Filter requests without an authentication header
+```
+
+> If the selected comment contains a justification connector (` para `, ` pois `, ` porque `, …), the part after the connector is discarded from the first line, and the description uses the functional phrase from file names (Strategy 2) to avoid repeating the bullets.
+
+When the output is **Brazilian Portuguese**, English comments are automatically translated before being used (and discarded if the translation remains more than 25% English). When the output is **English**, comments are kept as-is (and Portuguese comments remain in Portuguese). Branch names (`feature/…`, `release/…`) and Conventional Commits types are preserved during translation.
+
+---
+
+### Strategy 2 — File name-based (fallback)
+
+Used when no valid comment is found in the diff.
+
+#### Semantic concept extraction
+
+For each staged file, the file name (without extension) goes through:
+
+1. **Interface prefix removal** — `IUserService` → `UserService`
+2. **Architectural suffix removal** (longest match first):
+
+   `ServiceTests`, `ControllerTests`, `RepositoryTests` …
+   `Service`, `Controller`, `Repository`, `Manager`, `Handler`, `Generator` …
+   `Middleware`, `Validator`, `Mapper`, `Factory`, `Builder` …
+   `Tests`, `Test`, `Spec`, `Mock`, `Command`, `Query`, `Event` …
+   `Dto`, `ViewModel`, `Model`, `Entity`, `Config`, `Settings` …
+   `Facade`, `Adapter`, `Client`, `Endpoint`, `Base`, `Impl` …
+
+3. **Quality filters:**
+   - Name with a dot in the stem → rejected (for example, `GitExtensions.ZimerfeldCommitMsg`)
+   - More than 2 PascalCase words without a dictionary entry → rejected (project names)
+
+#### Concept → pt-BR phrase mapping (examples)
+
+| Extracted concept | Generated phrase |
+|---|---|
+| `Auth` / `Authentication` | autenticação |
+| `User` / `Users` | gerenciamento de usuários |
+| `Token` / `Jwt` | gerenciamento de token / autenticação JWT |
+| `Payment` | processamento de pagamento |
+| `Order` | processamento de pedidos |
+| `Notification` | notificações |
+| `Cache` | cache |
+| `Migration` | migração de banco de dados |
+| `Report` | relatórios |
+| `CommitMessage` | mensagem de commit |
+
+#### Verbs by type
+
+The verb is selected by type and, in some cases, by change context:
+
+| Type | Verb (pt-BR) | Verb (en) | Condition |
+|---|---|---|---|
+| `feat` | Implementa / Adiciona | Implement / Add | `Implementa` when there are only additions; `Adiciona` otherwise |
+| `fix` | Corrige | Fix | — |
+| `refactor` | Refatora | Refactor | — |
+| `docs` | Documenta / Atualiza | Document / Update | `Documenta` when there are additions; `Atualiza` otherwise |
+| `build` | Configura | Configure | — |
+| `chore` | Remove / Configura | Remove / Configure | `Remove` when there are deletions; `Configura` otherwise |
+| `test` | Adiciona | Add | — |
+| `perf` | Otimiza | Optimize | — |
+| `ci` | Configura | Configure | — |
+| `style` | Padroniza | Standardize | — |
+
+> If the description already starts with a known verb (for example, the comment `filter stems…`), it is **normalized** (pt-BR: third-person present → `Filtra`; en: imperative → `Filter`) instead of prefixing a new type-based verb.
+
+#### Message body
+
+When there are 2+ files, the body lists up to **5 bullets**, each with a one-line sentence summarizing the most significant change in a file (ordered by file relevance). Each bullet verb follows the git status (added/removed/renamed/modified):
+
+```text
+- Add authentication
+- Add payment processing
+- Add token management
+```
+
+---
+
+## Generated message examples
+
+| Staged files | Generated message (pt-BR) | Generated message (en) |
+|---|---|---|
+| `AuthService.cs` added | `Implementa autenticação` | `Implement authentication` |
+| `PaymentService.cs` added | `Implementa processamento de pagamento` | `Implement payment processing` |
+| `UserService.cs` modified | `Corrige gerenciamento de usuários` | `Fix user management` |
+| `README.md` modified | `Atualiza documentação` | `Update documentation` |
+| `UserService.cs` + `TokenService.cs` added | `Implementa gerenciamento de usuários`<br>`- Adiciona gerenciamento de usuários`<br>`- Adiciona gerenciamento de token` | `Implement user management`<br>`- Add user management`<br>`- Add token management` |
+| `.cs` modified with comment `// Valida o token antes de processar a requisição` | `Valida o token antes de processar a requisição` | _(pt comment is kept as-is)_ |
+
+---
+
+## Requirements
+
+- PowerShell 5.1 or later
+- **Administrator** permission to install/uninstall
+
+---
+
+## Installation
+
+### Option A — Via PowerShell (recommended)
+
+Run PowerShell **as Administrator**:
+
+```powershell
+cd C:\GitExtensions\ZimerfeldCommitMsg\tools
+.\install.ps1
+```
+
+![install.ps1 output confirming plugin installation](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotInstall.png)
+
+### Option B — Manual
+
+Copy `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` to:
+
+```text
+C:\Program Files\GitExtensions\Plugins\
+```
+
+Restart GitExtensions.
+
+---
+
+## Uninstallation
+
+```powershell
+cd C:\GitExtensions\ZimerfeldCommitMsg\tools
+.\uninstall.ps1
+```
+
+![uninstall.ps1 output confirming plugin removal](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUninstall.png)
+
+Removing the DLL does not affect any other part of GitExtensions.
+
+---
+
+## Build and versioning
+
+Each time `build.ps1` runs, the script:
+
+1. Reads the current version from `.nuspec`
+2. Increments `build` by +1 → `major.minor.build`
+3. Updates `.nuspec`, `.csproj`, and the READMEs with the new version and date
+4. Compiles in Release
+5. Copies the DLL to `C:\Program Files\GitExtensions\Plugins\` *(requires Admin)*
+6. Updates `tools\net9.0-windows\` with the new DLL
+7. Generates `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
+8. Removes `.nupkg` files from previous versions
+
+```powershell
+cd C:\GitExtensions\ZimerfeldCommitMsg
+.\build.ps1
+```
+
+![build.ps1 output with version increment and packaging](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotBuild.png)
+
+### Fast deploy (without incrementing version)
+
+To update only the DLL during development:
+
+```powershell
+cd C:\GitExtensions\ZimerfeldCommitMsg\tools
+.\update-dll.ps1
+```
+
+![update-dll.ps1 output updating only the DLL](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUpdate.png)
+
+---
+
+## Related plugins
+
+### [GitExtensions.ZimerfeldTree](https://www.nuget.org/packages/GitExtensions.ZimerfeldTree/)
+
+Plugin for GitExtensions that displays branches hierarchically in a persistent, non-modal tree window. Branches separated by `/` are shown as nested folder nodes under three fixed sections — LOCAL, REMOTES, and tags. By **zimerfeld**.
+
+---
+
+## License
+
+[MIT](LICENSE.txt)
