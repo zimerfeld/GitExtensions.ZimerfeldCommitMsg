@@ -1,4 +1,10 @@
-﻿# <img src="https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/src/GitExtensions.ZimerfeldCommitMsg/Resources/icon-128.png" alt="" width="48" height="48" align="absmiddle"> GitExtensions.ZimerfeldCommitMsg
+﻿**Version:** 1.0.63
+**Updated:** 2026-06-11
+
+**Versão:** 1.0.63
+**Atualizado em:** 2026-06-11
+
+# <img src="https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/src/GitExtensions.ZimerfeldCommitMsg/Resources/icon-128.png" alt="" width="48" height="48" align="absmiddle"> GitExtensions.ZimerfeldCommitMsg
 
 <p align="right">
   <sub>· Help keep this project always updated 💜</sub><br>
