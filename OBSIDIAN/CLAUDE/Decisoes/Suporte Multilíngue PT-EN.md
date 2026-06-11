@@ -62,7 +62,7 @@ Classe abstrata + `PtBrLanguagePack` + `EnLanguagePack`. Expõe:
    `Zimerfeld Commit Msg — Automático/Automatic | — Português/Portuguese | — Inglês/English`.
    Escolher um **fixa** o idioma (`_sessionLanguage`) para o auto-refresh manter o mesmo.
 
-   ![[Anexos/Screenshot.png]]
+   ![[Anexos/ScreenshotDropdown.png]]
 2. **`ChoiceSetting` em Configurações → Plugins → ZimerfeldCommitMsg** — define o **padrão**
    (menu Plugins + auto-refresh). O nó só aparece na árvore quando a DLL com `GetSettings()`
    (≥ 1.0.36) está instalada e o GitExtensions reiniciado.
