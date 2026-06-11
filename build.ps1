@@ -25,17 +25,35 @@ $build      = [int]$parts[2] + 1
 $newVersion = "$major.$minor.$build"
 
 # -- 1b. Detectar mudancas -----------------------------------------------------
-# So' incrementa a versao (e recompila/empacota) se houver fonte mais novo que a
-# DLL ja' compilada. Sem mudancas => mantem a versao atual e encerra.
-$dll     = "$PSScriptRoot\src\GitExtensions.ZimerfeldCommitMsg\bin\Release\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
+# Incrementa a versao (e recompila/empacota) se qualquer ENTRADA DO PACOTE for mais
+# nova que o .nupkg ja' gerado. Entradas = fontes (*.cs/*.csproj/*.nuspec/*.resx/*.png)
+# E os textos empacotados (READMEs, LICENSE, scripts de install). Assim, mudar so' um
+# .md ou texto tambem gera pacote novo. Sem mudancas => mantem a versao e encerra.
+#
+# Comparamos contra o .nupkg (e nao a DLL) de proposito: quando so' um texto muda, o
+# build incremental do dotnet nao regenera a DLL (timestamp antigo), o que faria o
+# script rebuildar eternamente. O .nupkg e' sempre reescrito no pack, sendo a
+# referencia correta para "ja' empacotado nesta forma".
 $srcRoot = "$PSScriptRoot\src\GitExtensions.ZimerfeldCommitMsg"
-$srcFiles = Get-ChildItem $srcRoot -Recurse -File -Include *.cs,*.csproj,*.nuspec,*.resx,*.png |
-            Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
-$newestSrc = ($srcFiles | Measure-Object -Property LastWriteTimeUtc -Maximum).Maximum
+$inputs  = @()
+$inputs += Get-ChildItem $srcRoot -Recurse -File -Include *.cs,*.csproj,*.nuspec,*.resx,*.png |
+           Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
+$inputs += @(
+    "$PSScriptRoot\README.md",
+    "$PSScriptRoot\README.pt-BR.md",
+    "$PSScriptRoot\README.en-US.md",
+    "$PSScriptRoot\LICENSE.txt",
+    "$PSScriptRoot\tools\install.ps1",
+    "$PSScriptRoot\tools\uninstall.ps1"
+) | Where-Object { Test-Path $_ } | Get-Item
+$newestInput = ($inputs | Measure-Object -Property LastWriteTimeUtc -Maximum).Maximum
 
-if ((Test-Path $dll) -and $newestSrc -le (Get-Item $dll).LastWriteTimeUtc) {
+$lastPkg = Get-ChildItem "$outDir\GitExtensions.ZimerfeldCommitMsg.*.nupkg" -ErrorAction SilentlyContinue |
+           Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+
+if ($lastPkg -and $newestInput -le $lastPkg.LastWriteTimeUtc) {
     Write-Host ""
-    Write-Host "Nenhuma mudanca detectada nos fontes -- versao mantida em $current (build/pack ignorados)." -ForegroundColor Cyan
+    Write-Host "Nenhuma mudanca detectada (fontes ou textos) -- versao mantida em $current (build/pack ignorados)." -ForegroundColor Cyan
     exit 0
 }
 

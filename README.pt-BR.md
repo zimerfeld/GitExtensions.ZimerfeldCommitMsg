@@ -1,6 +1,6 @@
-# GitExtensions.ZimerfeldCommitMsg
+﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.57
+**Versão:** 1.0.58
 **Atualizado em:** 2026-06-11
 
 [English](README.en-US.md) | [Português-BR](README.pt-BR.md)
