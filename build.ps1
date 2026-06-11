@@ -81,15 +81,25 @@ $csprojContent = Get-Content $csproj -Raw -Encoding UTF8
 $csprojContent = $csprojContent -replace '<Version>[^<]+</Version>', "<Version>$newVersion</Version>"
 [System.IO.File]::WriteAllText($csproj, $csprojContent, [System.Text.Encoding]::UTF8)
 
-# -- 4. Atualizar README.md ----------------------------------------------------
-$readmeDoc = "$PSScriptRoot\README.md"
-if (Test-Path $readmeDoc) {
-    $today   = (Get-Date).ToString("yyyy-MM-dd")
-    $content = Get-Content $readmeDoc -Raw -Encoding UTF8
-    $content = $content -replace '\*\*Versão:\*\* [^\r\n]+', "**Versão:** $newVersion"
-    $content = $content -replace '\*\*Atualizado em:\*\* [^\r\n]+', "**Atualizado em:** $today"
-    [System.IO.File]::WriteAllText($readmeDoc, $content, [System.Text.Encoding]::UTF8)
-    Write-Host "README.md atualizado para $newVersion ($today)"
+# -- 4. Atualizar READMEs ------------------------------------------------------
+$today = (Get-Date).ToString("yyyy-MM-dd")
+$readmeDocs = @(
+    "$PSScriptRoot\README.md",
+    "$PSScriptRoot\README.pt-BR.md",
+    "$PSScriptRoot\README.en-US.md"
+)
+foreach ($readmeDoc in $readmeDocs) {
+    if (Test-Path $readmeDoc) {
+        $content = Get-Content $readmeDoc -Raw -Encoding UTF8
+        $content = $content -replace '\*\*Version / Vers[aã]o:\*\* [^\r\n]+', "**Version / Versão:** $newVersion"
+        $content = $content -replace '\*\*Updated / Atualizado em:\*\* [^\r\n]+', "**Updated / Atualizado em:** $today"
+        $content = $content -replace '\*\*Versão:\*\* [^\r\n]+', "**Versão:** $newVersion"
+        $content = $content -replace '\*\*Atualizado em:\*\* [^\r\n]+', "**Atualizado em:** $today"
+        $content = $content -replace '\*\*Version:\*\* [^\r\n]+', "**Version:** $newVersion"
+        $content = $content -replace '\*\*Updated:\*\* [^\r\n]+', "**Updated:** $today"
+        [System.IO.File]::WriteAllText($readmeDoc, $content, [System.Text.Encoding]::UTF8)
+        Write-Host "$(Split-Path $readmeDoc -Leaf) atualizado para $newVersion ($today)"
+    }
 }
 
 # -- 5. Build ------------------------------------------------------------------

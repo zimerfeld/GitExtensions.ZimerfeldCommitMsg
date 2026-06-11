@@ -19,6 +19,8 @@
     <file src="..\..\tools\uninstall.ps1" target="tools\" />
     <!-- README e LICENSE -->
     <file src="..\..\README.md" target="\" />
+    <file src="..\..\README.pt-BR.md" target="\" />
+    <file src="..\..\README.en-US.md" target="\" />
     <file src="..\..\LICENSE.txt" target="\" />
     <!-- Ícone exibido no nuget.org (128x128 px recomendado) -->
     <file src="Resources\icon-128.png" target="images\" />
