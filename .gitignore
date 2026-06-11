@@ -18,6 +18,9 @@ gitextensions.shared/
 *.user
 *.suo
 
+# Arquivos de backup gerados pelo build.ps1
+*.bak
+
 # OS
 Thumbs.db
 .DS_Store

@@ -1,10 +1,6 @@
 # 2026-06-05 — Suporte multilíngue PT-EN + corpo em bullets
 
-<<<<<<< HEAD
 ![[Anexos/ScreenshotDropDown.png]]
-=======
-![[Anexos/ScreenshotDropdown.png]]
->>>>>>> feature/build
 
 ## Objetivo
 1. **Corpo em bullets:** abaixo do subject CC, gerar até **5 frases de uma linha** (cada uma com `-`)
