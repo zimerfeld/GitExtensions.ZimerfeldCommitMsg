@@ -1,6 +1,13 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Version:** 1.0.59
+<p align="right">
+  <sub>Help keep this project always updated 💜</sub><br>
+  <a href="https://github.com/sponsors/zimerfeld">
+    <img src="https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor @zimerfeld on GitHub Sponsors">
+  </a>
+</p>
+
+**Version:** 1.0.60
 **Updated:** 2026-06-11
 
 [English](README.en-US.md) | [Português-BR](README.pt-BR.md)
