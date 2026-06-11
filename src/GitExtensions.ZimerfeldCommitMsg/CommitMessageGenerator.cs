@@ -446,20 +446,12 @@ internal sealed class CommitMessageGenerator
     }
 
     /// <summary>
-    /// Extrai a cláusula principal de um comentário, descartando justificativas introduzidas
-    /// por conectores específicos do idioma (pt-BR " para ", " pois "…; inglês " to ", " because "…).
-    /// Exemplo: "filtrar stems com ponto para evitar nomes de assembly"
-    ///       →  "filtrar stems com ponto"
+    /// Retorna o comentário completo, preservando a frase inteira.
+    /// O corte da "cláusula principal" no primeiro conector de propósito
+    /// (" para ", " pois "…) foi desativado porque encurtava as frases e as
+    /// deixava sem sentido (ex.: "filtrar stems com ponto" perdia o propósito).
     /// </summary>
-    private string ExtractMainClause(string comment)
-    {
-        foreach (var conn in _lang.MainClauseConnectors)
-        {
-            var idx = comment.IndexOf(conn, StringComparison.OrdinalIgnoreCase);
-            if (idx > 8) return comment[..idx].Trim();   // mínimo de 8 chars antes do conector
-        }
-        return comment;
-    }
+    private string ExtractMainClause(string comment) => comment;
 
     /// <summary>
     /// Normaliza um comentário para uso como descrição: 1ª letra minúscula,
@@ -744,8 +736,8 @@ internal sealed class CommitMessageGenerator
             .Select(w => w.Length >= 2 && w.All(char.IsUpper) ? w : w.ToLowerInvariant()));
     }
 
-    // Garante que o título do commit respeita o limite recomendado de 72 chars
-    private static string TruncateTitle(string title, int maxLen = 72)
+    // Garante que o título do commit respeita o limite de 80 chars
+    private static string TruncateTitle(string title, int maxLen = 80)
     {
         if (title.Length <= maxLen) return title;
         var cut = title.LastIndexOf(' ', maxLen - 2);

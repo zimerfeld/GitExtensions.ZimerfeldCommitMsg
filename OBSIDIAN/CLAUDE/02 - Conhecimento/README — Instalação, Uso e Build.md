@@ -38,6 +38,9 @@ Zimerfeld Commit Msg — Automático/Automatic
 Zimerfeld Commit Msg — Português/Portuguese
 Zimerfeld Commit Msg — Inglês/English
 ```
+
+![[ScreenshotDropDown.png]]
+
 **2. Em Configurações → Plugins → ZimerfeldCommitMsg** — o seletor **"Idioma da mensagem / Message language"** (`ChoiceSetting` `ZimerfeldCommitMsg_Language`) define o **padrão** usado pelo menu Plugins e pelo auto-refresh.
 
 | Opção | Comportamento |
@@ -73,6 +76,8 @@ Zimerfeld Commit Msg — Inglês/English
 - **Sem scope**; **sem cor** (`git diff --no-color`, evita ANSI).
 - **Limite de 72 caracteres** na primeira linha (`TruncateTitle` corta no último espaço + `…`).
 - **Corpo opcional** — até 5 bullets de uma linha (gerado com 2+ arquivos ou comentários extras).
+
+![[ScreenshotCommitMsg.png]]
 
 ### Tipos detectados (definem o verbo)
 Cada arquivo staged recebe um tipo (`DetermineAllTypes`). O verbo da primeira linha vem do tipo de **maior prioridade** (ordem: `feat` → `fix` → `refactor` → `perf` → `test` → `build` → `ci` → `chore` → `docs` → `style`). **Só o verbo é impresso.**
@@ -182,6 +187,9 @@ Usada quando nenhum comentário válido é encontrado. Para cada arquivo staged,
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
+
+![[ScreenshotInstall.png]]
+
 **Opção B — Manual:** copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para `C:\Program Files\GitExtensions\Plugins\` e reinicie o GitExtensions.
 
 ## 🗑️ Desinstalação
@@ -189,6 +197,9 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\uninstall.ps1
 ```
+
+![[ScreenshotUninstall.png]]
+
 A remoção da DLL não afeta nenhuma outra parte do GitExtensions.
 
 ## 🛠️ Build e versionamento
@@ -206,11 +217,17 @@ A cada execução do `build.ps1`, o script:
 cd C:\GitExtensions\ZimerfeldCommitMsg
 .\build.ps1
 ```
+
+![[ScreenshotBuild.png]]
+
 **Deploy rápido (sem incrementar versão):**
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\update-dll.ps1
 ```
+
+![[ScreenshotUpdate.png]]
+
 Ver [[Versionamento]] e [[Instalação e Deploy]].
 
 ## 🤝 Plugins relacionados
