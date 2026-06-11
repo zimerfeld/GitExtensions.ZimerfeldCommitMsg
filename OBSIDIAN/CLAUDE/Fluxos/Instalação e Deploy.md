@@ -40,6 +40,16 @@ Cópia para nupkg:
 
 Se não encontrar pasta de plugins → aviso, sem erro. Se não tiver Admin → erro explícito com instruções.
 
+![[ScreenshotInstall.png]]
+
+### uninstall.ps1 / update-dll.ps1
+
+`uninstall.ps1` remove a DLL do diretório de plugins; `update-dll.ps1` recopia a DLL sem mexer na versão (deploy rápido em desenvolvimento).
+
+![[ScreenshotUninstall.png]]
+
+![[ScreenshotUpdate.png]]
+
 ## Fluxo via NuGet PMC
 
 O `install.ps1` aceita parâmetros `$installPath`, `$toolsPath`, `$package`, `$project` (convenção NuGet). Quando chamado pelo NuGet Package Manager Console do Visual Studio, `$toolsPath` é passado automaticamente apontando para a pasta `tools\` do pacote.
@@ -49,6 +59,8 @@ O `install.ps1` aceita parâmetros `$installPath`, `$toolsPath`, `$package`, `$p
 O `.nuspec` descreve o pacote. O `build.ps1` chama `nuget pack` apontando para o `.nuspec`. O pacote gerado fica na raiz: `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`.
 
 Versões antigas do `.nupkg` são deletadas automaticamente.
+
+![[ScreenshotBuild.png]]
 
 ## Após instalação
 

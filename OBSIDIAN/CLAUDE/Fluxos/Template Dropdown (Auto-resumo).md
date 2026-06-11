@@ -10,6 +10,8 @@ Passos executados quando o usuário seleciona um dos **três itens** (um por idi
 
 É **uma das três portas de entrada** do plugin — ver também [[Stage Trigger]] (evento automático) e o `Execute()` do menu Plugins ([[../Arquivos-Chave/ZimerfeldCommitMsgPlugin]]).
 
+![[ScreenshotDropDown.png]]
+
 ## Registro (acontece uma vez, no `Register()`)
 
 ```csharp

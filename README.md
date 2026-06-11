@@ -1,9 +1,9 @@
 ﻿# GitExtensions.ZimerfeldCommitMsg
 
-**Versão:** 1.0.52
-**Atualizado em:** 2026-06-10
+**Versão:** 1.0.53
+**Atualizado em:** 2026-06-11
 
-![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/Screenshot.png?v=1.0.39)
+![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotDropDown.png)
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
@@ -37,6 +37,8 @@ Zimerfeld Commit Msg — Automático/Automatic
 Zimerfeld Commit Msg — Português/Portuguese
 Zimerfeld Commit Msg — Inglês/English
 ```
+
+![Dropdown de templates de commit com os três itens de idioma](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotDropDown.png)
 
 **2. Em Configurações → Plugins → ZimerfeldCommitMsg** — o seletor **"Idioma da mensagem / Message language"** define o **padrão** usado pelo menu Plugins e pelo auto-refresh.
 
@@ -89,6 +91,8 @@ Enquanto o diálogo de commit estiver aberto, a mensagem é atualizada automatic
 - **Limite de 72 caracteres** na primeira linha (corta no último espaço e adiciona `…`).
 - **Descrição e verbos no idioma ativo** (português-BR ou inglês).
 - **Corpo opcional** — até 5 bullets de uma linha, gerado quando há 2+ arquivos ou comentários extras.
+
+![Mensagem de commit gerada no diálogo de commit do GitExtensions](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotCommitMsg.png)
 
 ### Tipos detectados (definem o verbo)
 
@@ -245,6 +249,8 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
+![Saída do install.ps1 confirmando a instalação do plugin](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotInstall.png)
+
 ### Opção B — Manual
 
 Copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para:
@@ -263,6 +269,8 @@ Reinicie o GitExtensions.
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\uninstall.ps1
 ```
+
+![Saída do uninstall.ps1 confirmando a remoção do plugin](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUninstall.png)
 
 A remoção da DLL não afeta nenhuma outra parte do GitExtensions.
 
@@ -286,6 +294,8 @@ cd C:\GitExtensions\ZimerfeldCommitMsg
 .\build.ps1
 ```
 
+![Saída do build.ps1 com incremento de versão e empacotamento](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotBuild.png)
+
 ### Deploy rápido (sem incrementar versão)
 
 Para atualizar apenas a DLL durante desenvolvimento:
@@ -294,6 +304,8 @@ Para atualizar apenas a DLL durante desenvolvimento:
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\update-dll.ps1
 ```
+
+![Saída do update-dll.ps1 atualizando apenas a DLL](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUpdate.png)
 
 ---
 
