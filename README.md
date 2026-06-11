@@ -1,6 +1,6 @@
 ﻿# <img src="https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/src/GitExtensions.ZimerfeldCommitMsg/Resources/icon-128.png" alt="" width="48" height="48" align="absmiddle"> GitExtensions.ZimerfeldCommitMsg
 
-**Version / Versão:** 1.0.58
+**Version / Versão:** 1.0.59
 **Updated / Atualizado em:** 2026-06-11
 
 GitExtensions plugin that automatically generates commit messages from staged changes, with output in Brazilian Portuguese or English.
@@ -9,8 +9,8 @@ Plugin para GitExtensions que gera mensagens de commit automaticamente a partir 
 
 ## Language / Idioma
 
-- [English documentation](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.en-US.md)
-- [Documentação em português-BR](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.pt-BR.md)
+- [English (United States)](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.en-US.md)
+- [Português (Brasil)](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.pt-BR.md)
 
 ![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotCommitMsg.png)
 

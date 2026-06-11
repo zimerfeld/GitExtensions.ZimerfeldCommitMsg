@@ -26,9 +26,10 @@ $newVersion = "$major.$minor.$build"
 
 # -- 1b. Detectar mudancas -----------------------------------------------------
 # Incrementa a versao (e recompila/empacota) se qualquer ENTRADA DO PACOTE for mais
-# nova que o .nupkg ja' gerado. Entradas = fontes (*.cs/*.csproj/*.nuspec/*.resx/*.png)
-# E os textos empacotados (READMEs, LICENSE, scripts de install). Assim, mudar so' um
-# .md ou texto tambem gera pacote novo. Sem mudancas => mantem a versao e encerra.
+# nova que o .nupkg ja' gerado. Entradas = fontes (*.cs/*.csproj/*.nuspec/*.resx/*.png),
+# QUALQUER *.md do repositorio (raiz e subpastas) e os demais textos empacotados
+# (LICENSE, scripts de install). Assim, editar qualquer .md ou texto tambem gera pacote
+# novo. Sem mudancas => mantem a versao e encerra.
 #
 # Comparamos contra o .nupkg (e nao a DLL) de proposito: quando so' um texto muda, o
 # build incremental do dotnet nao regenera a DLL (timestamp antigo), o que faria o
@@ -38,10 +39,11 @@ $srcRoot = "$PSScriptRoot\src\GitExtensions.ZimerfeldCommitMsg"
 $inputs  = @()
 $inputs += Get-ChildItem $srcRoot -Recurse -File -Include *.cs,*.csproj,*.nuspec,*.resx,*.png |
            Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
+# Qualquer *.md em todo o repositorio (raiz e subpastas) conta como entrada, para nao
+# precisar manter uma lista fixa ao adicionar/editar READMEs ou outras notas .md.
+$inputs += Get-ChildItem $PSScriptRoot -Recurse -File -Include *.md |
+           Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
 $inputs += @(
-    "$PSScriptRoot\README.md",
-    "$PSScriptRoot\README.pt-BR.md",
-    "$PSScriptRoot\README.en-US.md",
     "$PSScriptRoot\LICENSE.txt",
     "$PSScriptRoot\tools\install.ps1",
     "$PSScriptRoot\tools\uninstall.ps1"
