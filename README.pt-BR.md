@@ -1,20 +1,19 @@
-﻿**Versão:** 1.0.63
-**Atualizado em:** 2026-06-11
+﻿# GitExtensions.ZimerfeldCommitMsg
 
-# GitExtensions.ZimerfeldCommitMsg
+![Icone](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/src/GitExtensions.ZimerfeldCommitMsg/Resources/icon-128.png)
 
-<p align="right">
-  <sub>Ajude a manter este projeto sempre atualizado 💜</sub><br>
-  <a href="https://github.com/sponsors/zimerfeld">
-    <img src="https://img.shields.io/badge/Apoiar-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Apoiar @zimerfeld no GitHub Sponsors">
-  </a>
-</p>
+- Ajude a manter este projeto sempre atualizado 💜
 
-[English](README.en-US.md) | [Português-BR](README.pt-BR.md)
+![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)
+[GitHub Sponsor](https://github.com/sponsors/zimerfeld)
+
+Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
 ![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUsage.png)
 
-Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
+[English](README.en-US.md) | [Português-BR](README.pt-BR.md)
+
+[...Mais informações](https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg "Mais informações sobre GitExtensions.ZimerfeldTree package")
 
 ---
 
@@ -51,11 +50,11 @@ Zimerfeld Commit Msg — Inglês/English
 
 **2. Em Configurações → Plugins → ZimerfeldCommitMsg** — o seletor **"Idioma da mensagem / Message language"** define o **padrão** usado pelo menu Plugins e pelo auto-refresh.
 
-| Opção | Comportamento |
-|---|---|
+| Opção                  | Comportamento                                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `Automático/Automatic` | **Padrão.** Detecta pelo idioma do sistema operacional/GitExtensions (`pt-*` → português; qualquer outro → inglês). |
-| `Português/Portuguese` | Força a saída em português-BR. |
-| `Inglês/English` | Força a saída em inglês. |
+| `Português/Portuguese` | Força a saída em português-BR.                                                                                      |
+| `Inglês/English`       | Força a saída em inglês.                                                                                            |
 
 > Escolher um item de idioma no dropdown **fixa** aquele idioma também para o auto-refresh enquanto o diálogo estiver aberto. O override prevalece sobre o idioma do SO; a detecção automática usa `CultureInfo.CurrentUICulture`.
 >
@@ -63,12 +62,12 @@ Zimerfeld Commit Msg — Inglês/English
 
 ### Exemplo lado a lado
 
-| Português-BR | English |
-|---|---|
-| `Implementa autenticação` | `Implement authentication` |
-| `- Adiciona autenticação` | `- Add authentication` |
+| Português-BR                            | English                    |
+| --------------------------------------- | -------------------------- |
+| `Implementa autenticação`               | `Implement authentication` |
+| `- Adiciona autenticação`               | `- Add authentication`     |
 | `- Adiciona processamento de pagamento` | `- Add payment processing` |
-| `- Adiciona gerenciamento de token` | `- Add token management` |
+| `- Adiciona gerenciamento de token`     | `- Add token management`   |
 
 ---
 
@@ -110,15 +109,15 @@ Enquanto o diálogo de commit estiver aberto, a mensagem é atualizada automatic
 
 Cada arquivo staged recebe um tipo. O **verbo** da primeira linha vem do tipo de **maior prioridade** entre todos os arquivos (ordem: `feat` → `fix` → `refactor` → `perf` → `test` → `build` → `ci` → `chore` → `docs` → `style`). **O tipo não é impresso** — só seleciona o verbo.
 
-| Tipo | Atribuído a um arquivo quando… |
-|---|---|
-| `feat` | arquivo de código **adicionado** (status `A`/`C`, categoria source/web) |
-| `fix` | arquivo de código **modificado/renomeado** (status `M`/`R`/`T`) |
-| `docs` | arquivo de documentação (`.md`, `.txt`, `.rst`, `.adoc`) |
-| `test` | caminho de teste (pasta `test`/`tests`/`spec` ou sufixo `Test`/`Spec`) |
-| `chore` | arquivo de configuração (`.json`, `.yml`, etc.) **ou** qualquer arquivo **deletado** (status `D`) |
-| `build` | arquivo de build (`.csproj`, `.sln`, `Dockerfile`, etc.) |
-| `refactor` | demais casos sem padrão claro |
+| Tipo       | Atribuído a um arquivo quando…                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------- |
+| `feat`     | arquivo de código **adicionado** (status `A`/`C`, categoria source/web)                           |
+| `fix`      | arquivo de código **modificado/renomeado** (status `M`/`R`/`T`)                                   |
+| `docs`     | arquivo de documentação (`.md`, `.txt`, `.rst`, `.adoc`)                                          |
+| `test`     | caminho de teste (pasta `test`/`tests`/`spec` ou sufixo `Test`/`Spec`)                            |
+| `chore`    | arquivo de configuração (`.json`, `.yml`, etc.) **ou** qualquer arquivo **deletado** (status `D`) |
+| `build`    | arquivo de build (`.csproj`, `.sln`, `Dockerfile`, etc.)                                          |
+| `refactor` | demais casos sem padrão claro                                                                     |
 
 ---
 
@@ -130,21 +129,21 @@ Executa `git diff --cached --no-color` e coleta as linhas de **comentário** que
 
 #### Padrões reconhecidos
 
-| Sintaxe | Linguagens |
-|---|---|
+| Sintaxe                   | Linguagens                           |
+| ------------------------- | ------------------------------------ |
 | `// texto` ou `/// texto` | C#, Java, JavaScript, TypeScript, Go |
-| `# texto` | Python, Shell, YAML, Ruby |
+| `# texto`                 | Python, Shell, YAML, Ruby            |
 
 #### Comentários rejeitados
 
-| Condição | Exemplo rejeitado |
-|---|---|
-| Separador visual | `// ─────────────────────` |
-| Tag XML de documentação | `/// <summary>` |
-| Código comentado (tem `{` `}`) | `// if (x) { return; }` |
-| Código comentado (chamada de método) | `// método(argumento)` |
-| Texto muito curto (< 10 chars) | `// ok` |
-| Sem espaço (não é frase) | `// TODO` |
+| Condição                             | Exemplo rejeitado          |
+| ------------------------------------ | -------------------------- |
+| Separador visual                     | `// ─────────────────────` |
+| Tag XML de documentação              | `/// <summary>`            |
+| Código comentado (tem `{` `}`)       | `// if (x) { return; }`    |
+| Código comentado (chamada de método) | `// método(argumento)`     |
+| Texto muito curto (< 10 chars)       | `// ok`                    |
+| Sem espaço (não é frase)             | `// TODO`                  |
 
 #### Como os comentários são usados
 
@@ -156,7 +155,7 @@ Valida o token antes de processar a requisição
 - Filtra requisições sem cabeçalho de autenticação
 ```
 
-> Se o comentário escolhido contém um conector de justificativa (` para `, ` pois `, ` porque `, …), a parte após o conector é descartada da primeira linha, e a descrição passa a usar a frase funcional dos nomes de arquivo (Estratégia 2) para evitar repetição com os bullets.
+> Se o comentário escolhido contém um conector de justificativa (`para`, `pois`, `porque`, …), a parte após o conector é descartada da primeira linha, e a descrição passa a usar a frase funcional dos nomes de arquivo (Estratégia 2) para evitar repetição com os bullets.
 
 Quando a saída é **português-BR**, comentários em inglês são traduzidos automaticamente antes de serem usados (e descartados se a tradução ficar com mais de 25% de inglês). Quando a saída é **inglês**, os comentários passam intactos (e comentários em português permanecem em português). Nomes de branch (`feature/…`, `release/…`) e tipos Conventional Commits são preservados na tradução.
 
@@ -186,35 +185,35 @@ Para cada arquivo staged, o nome (sem extensão) passa por:
 
 #### Mapeamento de conceito → frase em pt-BR (exemplos)
 
-| Conceito extraído | Frase gerada |
-|---|---|
-| `Auth` / `Authentication` | autenticação |
-| `User` / `Users` | gerenciamento de usuários |
-| `Token` / `Jwt` | gerenciamento de token / autenticação JWT |
-| `Payment` | processamento de pagamento |
-| `Order` | processamento de pedidos |
-| `Notification` | notificações |
-| `Cache` | cache |
-| `Migration` | migração de banco de dados |
-| `Report` | relatórios |
-| `CommitMessage` | mensagem de commit |
+| Conceito extraído         | Frase gerada                              |
+| ------------------------- | ----------------------------------------- |
+| `Auth` / `Authentication` | autenticação                              |
+| `User` / `Users`          | gerenciamento de usuários                 |
+| `Token` / `Jwt`           | gerenciamento de token / autenticação JWT |
+| `Payment`                 | processamento de pagamento                |
+| `Order`                   | processamento de pedidos                  |
+| `Notification`            | notificações                              |
+| `Cache`                   | cache                                     |
+| `Migration`               | migração de banco de dados                |
+| `Report`                  | relatórios                                |
+| `CommitMessage`           | mensagem de commit                        |
 
 #### Verbos por tipo
 
 O verbo é escolhido pelo tipo (e, em alguns casos, pelo contexto das mudanças):
 
-| Tipo | Verbo (pt-BR) | Verbo (en) | Condição |
-|---|---|---|---|
-| `feat` | Implementa / Adiciona | Implement / Add | `Implementa` quando só há adições; `Adiciona` caso contrário |
-| `fix` | Corrige | Fix | — |
-| `refactor` | Refatora | Refactor | — |
-| `docs` | Documenta / Atualiza | Document / Update | `Documenta` quando há adições; `Atualiza` caso contrário |
-| `build` | Configura | Configure | — |
-| `chore` | Remove / Configura | Remove / Configure | `Remove` quando há deleções; `Configura` caso contrário |
-| `test` | Adiciona | Add | — |
-| `perf` | Otimiza | Optimize | — |
-| `ci` | Configura | Configure | — |
-| `style` | Padroniza | Standardize | — |
+| Tipo       | Verbo (pt-BR)         | Verbo (en)         | Condição                                                     |
+| ---------- | --------------------- | ------------------ | ------------------------------------------------------------ |
+| `feat`     | Implementa / Adiciona | Implement / Add    | `Implementa` quando só há adições; `Adiciona` caso contrário |
+| `fix`      | Corrige               | Fix                | —                                                            |
+| `refactor` | Refatora              | Refactor           | —                                                            |
+| `docs`     | Documenta / Atualiza  | Document / Update  | `Documenta` quando há adições; `Atualiza` caso contrário     |
+| `build`    | Configura             | Configure          | —                                                            |
+| `chore`    | Remove / Configura    | Remove / Configure | `Remove` quando há deleções; `Configura` caso contrário      |
+| `test`     | Adiciona              | Add                | —                                                            |
+| `perf`     | Otimiza               | Optimize           | —                                                            |
+| `ci`       | Configura             | Configure          | —                                                            |
+| `style`    | Padroniza             | Standardize        | —                                                            |
 
 > Se a descrição já começa com um verbo conhecido (ex.: o comentário `filtrar stems…`), ele é **normalizado** (pt-BR: 3ª pessoa do presente → `Filtra`; en: imperativo → `Filter`) em vez de prefixar um novo verbo do tipo.
 
@@ -232,14 +231,14 @@ Quando há 2+ arquivos, o corpo lista até **5 bullets**, cada um com uma frase 
 
 ## Exemplos de mensagens geradas
 
-| Arquivos staged | Mensagem gerada (pt-BR) | Mensagem gerada (en) |
-|---|---|---|
-| `AuthService.cs` adicionado | `Implementa autenticação` | `Implement authentication` |
-| `PaymentService.cs` adicionado | `Implementa processamento de pagamento` | `Implement payment processing` |
-| `UserService.cs` modificado | `Corrige gerenciamento de usuários` | `Fix user management` |
-| `README.md` modificado | `Atualiza documentação` | `Update documentation` |
-| `UserService.cs` + `TokenService.cs` adicionados | `Implementa gerenciamento de usuários`<br>`- Adiciona gerenciamento de usuários`<br>`- Adiciona gerenciamento de token` | `Implement user management`<br>`- Add user management`<br>`- Add token management` |
-| `.cs` modificado com comentário `// Valida o token antes de processar a requisição` | `Valida o token antes de processar a requisição` | _(comentário em pt passa intacto)_ |
+| Arquivos staged                                                                     | Mensagem gerada (pt-BR)                                                                                                 | Mensagem gerada (en)                                                               |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `AuthService.cs` adicionado                                                         | `Implementa autenticação`                                                                                               | `Implement authentication`                                                         |
+| `PaymentService.cs` adicionado                                                      | `Implementa processamento de pagamento`                                                                                 | `Implement payment processing`                                                     |
+| `UserService.cs` modificado                                                         | `Corrige gerenciamento de usuários`                                                                                     | `Fix user management`                                                              |
+| `README.md` modificado                                                              | `Atualiza documentação`                                                                                                 | `Update documentation`                                                             |
+| `UserService.cs` + `TokenService.cs` adicionados                                    | `Implementa gerenciamento de usuários`<br>`- Adiciona gerenciamento de usuários`<br>`- Adiciona gerenciamento de token` | `Implement user management`<br>`- Add user management`<br>`- Add token management` |
+| `.cs` modificado com comentário `// Valida o token antes de processar a requisição` | `Valida o token antes de processar a requisição`                                                                        | _(comentário em pt passa intacto)_                                                 |
 
 ---
 
@@ -296,7 +295,7 @@ A cada execução do `build.ps1`, o script:
 2. Incrementa o `build` em +1 → `major.minor.build`
 3. Atualiza `.nuspec`, `.csproj` e os READMEs com a nova versão e data
 4. Compila em Release
-5. Copia a DLL para `C:\Program Files\GitExtensions\Plugins\` *(requer Admin)*
+5. Copia a DLL para `C:\Program Files\GitExtensions\Plugins\` _(requer Admin)_
 6. Atualiza `tools\net9.0-windows\` com a DLL nova
 7. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
 8. Remove `.nupkg` de versões anteriores
