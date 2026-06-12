@@ -20,12 +20,12 @@ Plugin para GitExtensions que gera mensagens de commit automaticamente a partir 
 
 ![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotCommitMsg.png)
 
-## Language / Idioma
+## Languages / Idiomas
 
 - [English (United States)](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.en-US.md)
 - [Português (Brasil)](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.pt-BR.md)
 
-## Package
+## Package / Pacote
 
 - [NuGet package](https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/)
 - [GitHub repository](https://github.com/zimerfeld/ZimerfeldCommitMsg)
