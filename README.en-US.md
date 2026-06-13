@@ -25,6 +25,8 @@ Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatica
 - **Two content strategies**: diff comment-based (primary) and file name-based (fallback).
 - **Bulleted body** — up to 5 one-line sentences, each summarizing the most significant change in a file.
 - **English → Portuguese translation** of comments (only when the output is pt-BR); for English output, comments are kept as-is.
+- **Sentence sanitizing** — discards comments with **unbalanced delimiters** (`()`, `[]`, `{}`, quotes `"` `'` `` ` ``, `<>`) or that **end in a dangling connector** (`of`, `to`, `with`…); among the valid candidates it picks the **highest-quality** one (not the longest).
+- **Never empty** — when there are staged files, it always produces at least the summary line (`<verb> N files`).
 - **Three integration modes**: commit dialog template, Plugins menu, and auto-refresh on stage/unstage.
 - **Non-destructive** — never overwrites text typed manually by the user.
 
@@ -125,7 +127,7 @@ Each staged file receives a type. The first-line **verb** comes from the **highe
 
 ### Strategy 1 — Diff comment-based (primary)
 
-Runs `git diff --cached --no-color` and collects **comment** lines that were **added** (`+`) or **removed** (`-`). Added comments are prioritized by **file category** (source = 4 > web = 3 > build = 2 / config = 1 / docs = 1; test files = 0); removed comments receive one lower priority level. Up to 15 lines are scanned and up to **5 comments** are used; within the same priority, longer comments come first.
+Runs `git diff --cached --no-color` and collects **comment** lines that were **added** (`+`) or **removed** (`-`). Added comments are prioritized by **file category** (source = 4 > web = 3 > build = 2 / config = 1 / docs = 1; test files = 0); removed comments receive one lower priority level. Up to **5 comments** are used (one per file, most to least relevant). Within a single file, instead of taking the longest comment, the plugin **scores** the candidates — rewarding a closed sentence, balanced length (~20–72 chars), and a leading verb — and picks the highest-scoring one.
 
 #### Recognized patterns
 
@@ -144,6 +146,8 @@ Runs `git diff --cached --no-color` and collects **comment** lines that were **a
 | Commented-out code (method call) | `// method(argument)`      |
 | Too short (< 10 chars)           | `// ok`                    |
 | No spaces (not a sentence)       | `// TODO`                  |
+| **Unbalanced delimiter**         | `// builds the tree (recursive` |
+| **Ends in a dangling connector** | `// maps the token to`     |
 
 #### How comments are used
 

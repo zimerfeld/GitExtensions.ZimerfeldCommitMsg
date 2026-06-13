@@ -266,7 +266,14 @@ internal sealed class CommitMessageGenerator
         var readmeTitle    = ReadStagedReadmeTitle(changes);
         var body           = BuildBody(changes, commentsByFile, readmeTitle);
 
-        return body.Length > 0 ? $"{title}\n\n{body}" : title;
+        var message = body.Length > 0 ? $"{title}\n\n{body}" : title;
+
+        // Garantia final: havendo mudanças em stage, NUNCA retornar vazio.
+        // Se por qualquer caminho de borda o resultado vier em branco, devolve
+        // ao menos a linha-resumo (verbo do tipo dominante + contagem de arquivos).
+        return string.IsNullOrWhiteSpace(message)
+            ? TruncateTitle($"{TypeVerb(types[0], changes)} {changes.Count} {_lang.FilesWord(changes.Count)}")
+            : message;
     }
 
     /// <summary>
@@ -366,10 +373,15 @@ internal sealed class CommitMessageGenerator
             ? raw.Select(TranslateToPortuguese).OfType<string>()
             : raw;
 
-        var best = usable.OrderByDescending(c => c.Length).FirstOrDefault();
+        // Mantém só frases "fechadas" e escolhe a de maior score (não a mais longa).
+        var best = usable.Where(IsCleanSentence)
+                         .OrderByDescending(ScoreCandidate)
+                         .ThenByDescending(c => c.Length)
+                         .FirstOrDefault();
 
         if (best is null && readmeTitle is not null &&
-            Path.GetFileName(path).Equals("README.md", StringComparison.OrdinalIgnoreCase))
+            Path.GetFileName(path).Equals("README.md", StringComparison.OrdinalIgnoreCase) &&
+            IsCleanSentence(readmeTitle))
             best = readmeTitle;
 
         return best is null ? null : ExtractMainClause(best);
@@ -442,7 +454,86 @@ internal sealed class CommitMessageGenerator
         if (text.Contains('{') || text.Contains('}')) return null;
         if (Regex.IsMatch(text, @"\w+\([^)]*\)")) return null;
 
+        // Delimitadores desbalanceados: abertura sem fechamento (ou o inverso).
+        // Frases assim — "monta a árvore (recursivo" — saem sem sentido no commit.
+        if (!DelimitersBalanced(text)) return null;
+
         return text;
+    }
+
+    /// <summary>
+    /// true se todos os delimitadores estão balanceados: parênteses, colchetes e
+    /// chaves casados e na ordem certa; aspas duplas ("), crases (`) e aspas simples (')
+    /// em número par; e quantidade igual de &lt; e &gt;. Pega o caso "tem abertura mas
+    /// falta o fechamento" (ou vice-versa). Os sinais de menor/maior são contados (não
+    /// empilhados) para não confundir comparações em prosa; as aspas simples entre letras
+    /// (apóstrofes de contração: "don't", "it's") são ignoradas, contando só as de delimitação.
+    /// </summary>
+    private static bool DelimitersBalanced(string text)
+    {
+        int paren = 0, bracket = 0, brace = 0;
+        foreach (var ch in text)
+        {
+            switch (ch)
+            {
+                case '(': paren++;   break;
+                case ')': if (--paren   < 0) return false; break;
+                case '[': bracket++; break;
+                case ']': if (--bracket < 0) return false; break;
+                case '{': brace++;   break;
+                case '}': if (--brace   < 0) return false; break;
+            }
+        }
+        if (paren != 0 || bracket != 0 || brace != 0) return false;
+        if (text.Count(c => c == '"')  % 2 != 0)                 return false;
+        if (text.Count(c => c == '`')  % 2 != 0)                 return false;
+        if (text.Count(c => c == '<') != text.Count(c => c == '>')) return false;
+
+        // Aspas simples como delimitador: conta só as que NÃO estão entre duas letras,
+        // para não confundir apóstrofes de contração inglesa ("don't", "it's").
+        int singleQuotes = 0;
+        for (int i = 0; i < text.Length; i++)
+        {
+            if (text[i] != '\'') continue;
+            bool insideWord = i > 0 && i < text.Length - 1 &&
+                              char.IsLetter(text[i - 1]) && char.IsLetter(text[i + 1]);
+            if (!insideWord) singleQuotes++;
+        }
+        if (singleQuotes % 2 != 0) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// true se a frase está "fechada" o bastante para virar uma linha de commit:
+    /// delimitadores balanceados E não termina em palavra de ligação solta
+    /// (preposição/artigo/conjunção), que denuncia um comentário cortado.
+    /// </summary>
+    private bool IsCleanSentence(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return false;
+        if (!DelimitersBalanced(text))       return false;
+
+        var lastWord = text.TrimEnd('.', ',', ';', ':', ' ', '\t')
+                           .Split(' ', '\t', StringSplitOptions.RemoveEmptyEntries)
+                           .LastOrDefault();
+        return lastWord is null || !_lang.DanglingTrailingWords.Contains(lastWord);
+    }
+
+    /// <summary>
+    /// Pontua um candidato a descrição: premia comprimento próximo do ideal
+    /// (~20–72 chars) e frases de ação (começam com verbo conhecido); penaliza
+    /// resíduo de código (=, ;) e espaços duplos. Substitui o critério antigo de
+    /// "pega o mais comprido", que tendia a escolher justamente o mais truncado.
+    /// </summary>
+    private int ScoreCandidate(string text)
+    {
+        int len = text.Length;
+        int score = len is >= 20 and <= 72 ? 25 : -Math.Abs(46 - len) / 3;
+        if (_lang.LeadingVerb(NormalizeDesc(text)).Verb is not null) score += 15;
+        if (text.Contains('=') || text.Contains(';')) score -= 10;
+        if (text.Contains("  ", StringComparison.Ordinal)) score -= 5;
+        return score;
     }
 
     /// <summary>
@@ -636,7 +727,7 @@ internal sealed class CommitMessageGenerator
     /// </summary>
     private string FormatFileLine(FileChange change, string? desc)
     {
-        if (desc is { Length: > 0 })
+        if (desc is { Length: > 0 } && IsCleanSentence(desc))
         {
             var normalized = NormalizeDesc(desc);
 
