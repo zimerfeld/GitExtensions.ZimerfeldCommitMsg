@@ -8,10 +8,10 @@
 ![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)
 [GitHub Sponsor](https://github.com/sponsors/zimerfeld)
 
-**Version:** 1.0.67
+**Version:** 1.0.68
 **Updated:** 2026-06-13
 
-**Versão:** 1.0.67
+**Versão:** 1.0.68
 **Atualizado em:** 2026-06-13
 
 GitExtensions plugin that automatically generates commit messages from staged changes, with output in Brazilian Portuguese or English.
