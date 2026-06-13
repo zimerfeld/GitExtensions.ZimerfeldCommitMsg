@@ -41,6 +41,11 @@ internal abstract class LanguagePack
     // ── Conectores que introduzem justificativa (corta a cláusula principal) ─
     public abstract IReadOnlyList<string> MainClauseConnectors { get; }
 
+    // ── Palavras de ligação que, no FIM da frase, indicam corte sem fechamento ─
+    // (preposições, artigos, conjunções soltas). Usado pelo saneador de frases
+    // para descartar comentários truncados como "filtra itens com" ou "mapeia para".
+    public abstract IReadOnlySet<string> DanglingTrailingWords { get; }
+
     // ── Frase de fallback por categoria de arquivo ──────────────────────────
     public abstract string FallbackPhrase(string category);
 
@@ -169,6 +174,16 @@ internal sealed class PtBrLanguagePack : LanguagePack
         " para ", " pois ", " porque ", " já que ", " a fim de ",
         " quando ", " caso ", " evitando ", " — ", " - ",
     ];
+
+    public override IReadOnlySet<string> DanglingTrailingWords { get; } =
+        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "de", "da", "do", "das", "dos", "para", "pra", "com", "sem", "em",
+            "no", "na", "nos", "nas", "num", "numa", "por", "pelo", "pela",
+            "e", "ou", "que", "a", "o", "as", "os", "ao", "aos", "à", "às",
+            "um", "uma", "entre", "sobre", "sob", "ante", "após", "até",
+            "desde", "durante", "como", "quando", "se", "mas", "porém", "então",
+        };
 
     public override string FallbackPhrase(string category) => category switch
     {
@@ -339,6 +354,15 @@ internal sealed class EnLanguagePack : LanguagePack
         " to ", " because ", " in order to ", " so that ",
         " when ", " if ", " avoiding ", " — ", " - ",
     ];
+
+    public override IReadOnlySet<string> DanglingTrailingWords { get; } =
+        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "of", "to", "for", "with", "without", "in", "on", "at", "by",
+            "and", "or", "that", "the", "a", "an", "as", "from", "into",
+            "when", "if", "but", "so", "than", "then", "over", "under",
+            "between", "about", "onto", "via",
+        };
 
     public override string FallbackPhrase(string category) => category switch
     {

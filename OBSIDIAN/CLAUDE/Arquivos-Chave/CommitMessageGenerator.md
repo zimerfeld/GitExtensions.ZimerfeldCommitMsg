@@ -3,7 +3,7 @@ tipo: arquivo
 tags: [arquivo, gerador, núcleo, c#]
 arquivo: src/GitExtensions.ZimerfeldCommitMsg/CommitMessageGenerator.cs
 linhas: 1052
-atualizado: 2026-06-01
+atualizado: 2026-06-13
 ---
 
 # CommitMessageGenerator.cs
@@ -45,7 +45,7 @@ Núcleo do plugin. `internal sealed class` com um único campo de instância: `_
 | `ExtractDiffComments()` | ~451 | Lê diff, rankeia comentários por prioridade de arquivo |
 | `CommentFilePriority(string)` | ~499 | Prioridade 0–4 por categoria de arquivo |
 | `ExtractCommentText(string)` | ~521 | Detecta `//`, `///`, `#` em linhas de diff |
-| `CleanCommentText(string)` | ~543 | Filtra separadores, tags XML, código comentado |
+| `CleanCommentText(string)` | ~543 | Filtra separadores, tags XML, código comentado e **delimitadores desbalanceados** |
 
 ### Tradução
 | Método | Linha | Descrição |
@@ -118,6 +118,25 @@ Agrupados por domínio: identidade/acesso, usuário, comércio, comunicação, i
 
 ### PreservePattern (~L358)
 Regex `const` que casa **nomes de branch gitflow** (`feature/…`, `release/…`, `hotfix/…`, `bugfix/…`, `support/…`, etc.) e **tipos Conventional Commits** (`feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`). Usado por `TranslateToPortuguese` para mascarar/restaurar esses tokens sem traduzi-los.
+
+---
+
+## Saneamento e qualidade das frases *(2026-06-13)*
+
+Três camadas adicionadas para eliminar frases sem sentido, delimitadores sem par e saída vazia:
+
+| Método | Descrição |
+|---|---|
+| `DelimitersBalanced(string)` | `static`. true se `()`, `[]`, `{}` estão casados e na ordem certa; aspas `"`, crases `` ` `` e aspas simples `'` em número par; e contagem igual de `<`/`>`. Aspas simples **entre letras** (apóstrofes de contração: `don't`, `it's`) são ignoradas — conta só as de delimitação. `<`/`>` são contados (não empilhados) para não brigar com comparações em prosa. Chamado por `CleanCommentText`. |
+| `IsCleanSentence(string)` | Instância. `DelimitersBalanced` **e** não termina em palavra de ligação solta (preposição/artigo/conjunção), via `LanguagePack.DanglingTrailingWords`. |
+| `ScoreCandidate(string)` | Instância. Pontua candidatos a `desc`: premia comprimento ~20–72 e início por verbo (`LeadingVerb`); penaliza `=`, `;` e espaços duplos. Substitui o critério antigo "pega o mais comprido". |
+
+- **`CleanCommentText`** agora rejeita também comentários com `!DelimitersBalanced`.
+- **`BestComment`** filtra por `IsCleanSentence` e ordena por `ScoreCandidate` (depois por comprimento), em vez de só `OrderByDescending(c => c.Length)`.
+- **`FormatFileLine`** revalida o `desc` com `IsCleanSentence`; reprovando, cai no conceito do nome do arquivo.
+- **`Generate`** ganhou guarda final: com mudanças em stage, nunca retorna vazio (devolve `<verbo> N arquivos` no pior caso).
+
+Listas `DanglingTrailingWords` (preposições/artigos/conjunções por idioma) ficam em `LanguagePack` — ver [[../Sistema/Arquitetura]].
 
 ---
 

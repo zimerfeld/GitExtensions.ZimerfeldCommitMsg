@@ -25,6 +25,8 @@ Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera autom
 - **Duas estratégias de conteúdo**: baseada em comentários do diff (principal) e baseada em nomes de arquivo (fallback).
 - **Corpo em bullets** — até 5 frases de uma linha, cada uma resumindo a mudança mais significativa de um arquivo.
 - **Tradução inglês → português** dos comentários (apenas quando a saída é pt-BR); em inglês, os comentários passam intactos.
+- **Saneamento das frases** — descarta comentários com **delimitadores desbalanceados** (`()`, `[]`, `{}`, aspas `"` `'` `` ` ``, `<>`) ou que **terminem em palavra de ligação solta** (`de`, `para`, `que`…); entre os candidatos válidos, escolhe o de **melhor qualidade** (não o mais longo).
+- **Nunca vazio** — havendo arquivos em stage, sempre produz ao menos a linha-resumo (`<verbo> N arquivos`).
 - **Três modos de integração**: template no diálogo de commit, menu Plugins e auto-refresh ao stage/unstage.
 - **Não destrutivo** — nunca sobrescreve texto digitado manualmente pelo usuário.
 
@@ -125,7 +127,7 @@ Cada arquivo staged recebe um tipo. O **verbo** da primeira linha vem do tipo de
 
 ### Estratégia 1 — Baseada em comentários do diff (principal)
 
-Executa `git diff --cached --no-color` e coleta as linhas de **comentário** que foram **adicionadas** (`+`) ou **removidas** (`-`). As adicionadas têm prioridade pela **categoria do arquivo** (source = 4 > web = 3 > build = 2 / config = 1 / docs = 1; arquivos de teste = 0); as removidas entram com prioridade um grau menor. São varridas até 15 linhas e usados até **5 comentários**; dentro de uma mesma prioridade, os mais longos vêm primeiro.
+Executa `git diff --cached --no-color` e coleta as linhas de **comentário** que foram **adicionadas** (`+`) ou **removidas** (`-`). As adicionadas têm prioridade pela **categoria do arquivo** (source = 4 > web = 3 > build = 2 / config = 1 / docs = 1; arquivos de teste = 0); as removidas entram com prioridade um grau menor. São usados até **5 comentários** (um por arquivo, do mais relevante ao menos). Dentro de um mesmo arquivo, em vez de pegar o comentário mais comprido, o plugin **pontua** os candidatos — premiando frase fechada, comprimento equilibrado (~20–72 chars) e início por verbo — e escolhe o de maior nota.
 
 #### Padrões reconhecidos
 
@@ -144,6 +146,8 @@ Executa `git diff --cached --no-color` e coleta as linhas de **comentário** que
 | Código comentado (chamada de método) | `// método(argumento)`     |
 | Texto muito curto (< 10 chars)       | `// ok`                    |
 | Sem espaço (não é frase)             | `// TODO`                  |
+| **Delimitador desbalanceado**        | `// monta a árvore (recursivo` |
+| **Termina em palavra de ligação solta** | `// mapeia o token para`   |
 
 #### Como os comentários são usados
 

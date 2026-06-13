@@ -1,7 +1,7 @@
 ---
 tipo: fluxo
 tags: [fluxo, generate, pipeline, conventional-commits]
-atualizado: 2026-06-02
+atualizado: 2026-06-13
 ---
 
 # Fluxo: Geração da Mensagem de Commit
@@ -89,8 +89,10 @@ Linhas removidas têm prioridade -1 em relação às adicionadas do mesmo arquiv
 - Tags XML (`<summary>`, `<param>`)
 - Código comentado (tem `{` `}` ou chamada de método)
 - Muito curto (< 10 chars) ou sem espaço
+- **Delimitadores desbalanceados** — `()`, `[]`, `{}`, aspas `"` `'` `` ` ``, e contagem desigual de `<`/`>` (`DelimitersBalanced`). Apóstrofes de contração (`don't`) são ignoradas.
+- **Termina em palavra de ligação solta** — preposição/artigo/conjunção no fim da frase (`…para`, `…de`, `…to`, `…of`), via `IsCleanSentence` + `LanguagePack.DanglingTrailingWords`.
 
-Máximo: 5 comentários, 15 linhas processadas.
+Máximo: 5 comentários (um por arquivo).
 
 **Tradução en→pt-BR:**
 1. Frases compostas (longest-match first): `"doesn't match"` → `"não corresponde"`
@@ -98,9 +100,9 @@ Máximo: 5 comentários, 15 linhas processadas.
 3. Palavras individuais: `returns` → `retorna`
 4. Se ainda >25% inglês após tradução → descarta (qualidade insuficiente)
 
-O primeiro comentário (mais impactante) vira `desc`. Os demais vão para o body como marcadores `- item`.
+O comentário do arquivo mais impactante vira `desc`. Os demais vão para o body como marcadores `- item`.
 
-**ExtractMainClause:** separa `desc` no primeiro conector de propósito (` para `, ` pois `, ` porque `, ` — `) para manter só a cláusula principal.
+**Seleção por score (`ScoreCandidate`):** dentro de um mesmo arquivo, em vez de pegar o comentário mais comprido, cada candidato (já saneado por `IsCleanSentence`) recebe uma nota — premiando comprimento equilibrado (~20–72 chars) e início por verbo (`LeadingVerb`), penalizando resíduo de código (`=`, `;`) e espaços duplos. Escolhe-se o de maior nota; empate, o mais longo.
 
 ### 3c. Fallback (sem comentários, sem README)
 `desc = BuildSubject(type, changes)` → frase funcional do conceito dominante, **sem verbo** (ex.: `"autenticação"`, `"gerenciamento de usuários"`). O verbo é adicionado depois por `FormatTitle` → `"Implementa autenticação"`, `"Corrige gerenciamento de usuários"`.
@@ -129,6 +131,7 @@ output = body.Length > 0 ? title + "\n\n" + body : title
 
 - `FormatTitle`: se `desc` começa com verbo conhecido (`LeadingVerb`), normaliza-o; senão prefixa `TypeVerb(type, …)`. **Não** acrescenta `tipo:`.
 - `TruncateTitle` limita a 72 chars, cortando no último espaço e adicionando `…`.
+- **Garantia de saída não-vazia:** havendo arquivos em stage, `Generate` nunca retorna vazio — se por qualquer borda o resultado vier em branco, devolve ao menos a linha-resumo (`<verbo> N arquivos`). Stage vazio de verdade continua retornando `string.Empty` (correto).
 
 Formato final (verbo + objeto, sem prefixo de tipo):
 ```

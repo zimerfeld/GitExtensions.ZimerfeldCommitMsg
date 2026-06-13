@@ -1,7 +1,7 @@
 ---
 tipo: conhecimento
 criado: 2026-06-01
-atualizado: 2026-06-09
+atualizado: 2026-06-13
 tags: [conhecimento, conventional-commits, git, algoritmo, i18n]
 ---
 
@@ -20,6 +20,7 @@ tags: [conhecimento, conventional-commits, git, algoritmo, i18n]
 - **Sem scope**; **sem cor** (`git diff --no-color`).
 - Primeira linha ≤ 72 chars (`TruncateTitle`).
 - Descrição, verbos e bullets no idioma resolvido (pt-BR ou inglês), via `LanguagePack`.
+- **Nunca vazio com stage não-vazio:** `Generate` garante ao menos a linha-resumo (`<verbo> N arquivos`) caso todo o resto falhe. Stage realmente vazio → `string.Empty` (correto).
 
 ## Tipos detectados (`DetermineAllTypes`) — definem o verbo
 Cada arquivo recebe um tipo; o verbo vem do tipo de maior prioridade (`types[0]`):
@@ -53,9 +54,9 @@ Se a `desc` já começa com verbo conhecido (`LeadingVerb`), ele é normalizado 
 ## Estratégia 1 — comentários do diff (principal)
 1. `git diff --cached --no-color`.
 2. Coleta linhas de **comentário adicionadas (`+`) e removidas (`-`)** (`//`, `///`; `#` fora de `.md`). Removidas entram com prioridade um grau menor.
-3. **Rejeita** ruído: < 10 chars, sem espaço, separadores visuais (`// ─────`), tags XML (`<summary>`), código comentado (`{`/`}` ou chamada `metodo(arg)`).
-4. Prioriza por categoria do arquivo (source=4 > web=3 > build=2 / config=1 / docs=1; teste=0); até 5 comentários, 15 linhas; na mesma prioridade, os mais longos primeiro.
-5. O 1º comentário vira a `desc` (após `ExtractMainClause` cortar conector de justificativa); os demais viram bullets `- <FormatTitle>`.
+3. **Rejeita** ruído: < 10 chars, sem espaço, separadores visuais (`// ─────`), tags XML (`<summary>`), código comentado (`{`/`}` ou chamada `metodo(arg)`), **delimitadores desbalanceados** (`DelimitersBalanced`: `()`/`[]`/`{}`/aspas `"` `'` `` ` ``/`<>`) e frases que **terminam em palavra de ligação solta** (`IsCleanSentence` + `DanglingTrailingWords`).
+4. Prioriza por categoria do arquivo (source=4 > web=3 > build=2 / config=1 / docs=1; teste=0); até 5 comentários (um por arquivo).
+5. Por arquivo, escolhe o comentário de maior **score** (`ScoreCandidate`: comprimento ~20–72 + início por verbo; penaliza resíduo de código) — não mais o simplesmente mais longo. Esse vira a `desc`; os demais viram bullets `- <FormatTitle>`.
 
 ```
 Valida o token antes de processar a requisição
