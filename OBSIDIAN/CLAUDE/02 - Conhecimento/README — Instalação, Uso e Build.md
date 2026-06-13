@@ -233,6 +233,9 @@ Ver [[Versionamento]] e [[Instalação e Deploy]].
 ## 🤝 Plugins relacionados
 - **[GitExtensions.ZimerfeldTree](https://www.nuget.org/packages/GitExtensions.ZimerfeldTree/)** — exibe branches hierarquicamente numa janela de árvore persistente e não-modal; branches separados por `/` viram nós de pasta aninhados sob LOCAL, REMOTES e tags. Por **zimerfeld**. Ver [[GitExtensions.ZimerfeldTree]].
 
+## 💜 Apoie o projeto
+Ajude a manter este projeto sempre atualizado via **GitHub Sponsors**: [github.com/sponsors/zimerfeld](https://github.com/sponsors/zimerfeld). O badge no topo do `README.md` (e o `.github/FUNDING.yml`) aponta para essa mesma URL; o README empacotado leva o link clicável para a página do pacote no nuget.org.
+
 ## 📄 Licença
 [MIT](LICENSE.txt)
 
