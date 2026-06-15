@@ -77,7 +77,7 @@ Zimerfeld Commit Msg — Inglês/English
 - **Limite de 72 caracteres** na primeira linha (`TruncateTitle` corta no último espaço + `…`).
 - **Corpo opcional** — até 5 bullets de uma linha (gerado com 2+ arquivos ou comentários extras).
 
-![[ScreenshotCommitMsg.png]]
+![[ScreenShots/ScreenshotCommitMsg.png]]
 
 ### Tipos detectados (definem o verbo)
 Cada arquivo staged recebe um tipo (`DetermineAllTypes`). O verbo da primeira linha vem do tipo de **maior prioridade** (ordem: `feat` → `fix` → `refactor` → `perf` → `test` → `build` → `ci` → `chore` → `docs` → `style`). **Só o verbo é impresso.**
@@ -188,7 +188,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
-![[ScreenshotInstall.png]]
+![[ScreenShots/ScreenshotInstall.png]]
 
 **Opção B — Manual:** copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para `C:\Program Files\GitExtensions\Plugins\` e reinicie o GitExtensions.
 
@@ -198,7 +198,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\uninstall.ps1
 ```
 
-![[ScreenshotUninstall.png]]
+![[ScreenShots/ScreenshotUninstall.png]]
 
 A remoção da DLL não afeta nenhuma outra parte do GitExtensions.
 
@@ -218,7 +218,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg
 .\build.ps1
 ```
 
-![[ScreenshotBuild.png]]
+![[ScreenShots/ScreenshotBuild.png]]
 
 **Deploy rápido (sem incrementar versão):**
 ```powershell
@@ -226,7 +226,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\update-dll.ps1
 ```
 
-![[ScreenshotUpdate.png]]
+![[ScreenShots/ScreenshotUpdate.png]]
 
 Ver [[Versionamento]] e [[Instalação e Deploy]].
 
@@ -234,7 +234,7 @@ Ver [[Versionamento]] e [[Instalação e Deploy]].
 - **[GitExtensions.ZimerfeldTree](https://www.nuget.org/packages/GitExtensions.ZimerfeldTree/)** — exibe branches hierarquicamente numa janela de árvore persistente e não-modal; branches separados por `/` viram nós de pasta aninhados sob LOCAL, REMOTES e tags. Por **zimerfeld**. Ver [[GitExtensions.ZimerfeldTree]].
 
 ## 💜 Apoie o projeto
-Ajude a manter este projeto sempre atualizado via **GitHub Sponsors**: [github.com/sponsors/zimerfeld](https://github.com/sponsors/zimerfeld). O badge no topo do `README.md` (e o `.github/FUNDING.yml`) aponta para essa mesma URL; o README empacotado leva o link clicável para a página do pacote no nuget.org.
+Ajude a manter este projeto sempre atualizado via **GitHub Sponsors**: [github.com/sponsors/zimerfeld](https://github.com/sponsors/zimerfeld), ou via **Ko-fi**: [ko-fi.com/C0D621FCGD](https://ko-fi.com/C0D621FCGD). No topo do `README.md`, lado a lado e com as mesmas dimensões (altura de 28px), ficam o badge **Sponsor** (shields.io, `style=for-the-badge`) e o botão oficial **"Buy me a coffee"** do Ko-fi (`<img src="https://storage.ko-fi.com/cdn/kofi2.png" height="28">` clicável para a URL do Ko-fi); o `.github/FUNDING.yml` aponta para o GitHub Sponsors, e o README empacotado leva o link clicável para a página do pacote no nuget.org.
 
 ## 📄 Licença
 [MIT](LICENSE.txt)
