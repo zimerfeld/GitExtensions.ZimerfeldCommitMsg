@@ -5,10 +5,14 @@
 - Ajude a manter este projeto sempre atualizado 💜
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
+
+**Versão:** 1.0.70
+**Atualizado em:** 2026-06-14
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
-![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUsage.png)
+![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUsage.png)
 
 [English](README.en-US.md) | [Português-BR](README.pt-BR.md)
 
@@ -47,7 +51,7 @@ Zimerfeld Commit Msg — Português/Portuguese
 Zimerfeld Commit Msg — Inglês/English
 ```
 
-![Dropdown de templates de commit com os três itens de idioma](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUsage.png)
+![Dropdown de templates de commit com os três itens de idioma](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUsage.png)
 
 **2. Em Configurações → Plugins → ZimerfeldCommitMsg** — o seletor **"Idioma da mensagem / Message language"** define o **padrão** usado pelo menu Plugins e pelo auto-refresh.
 
@@ -104,7 +108,7 @@ Enquanto o diálogo de commit estiver aberto, a mensagem é atualizada automatic
 - **Descrição e verbos no idioma ativo** (português-BR ou inglês).
 - **Corpo opcional** — até 5 bullets de uma linha, gerado quando há 2+ arquivos ou comentários extras.
 
-![Mensagem de commit gerada no diálogo de commit do GitExtensions](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotCommitMsg.png)
+![Mensagem de commit gerada no diálogo de commit do GitExtensions](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotCommitMsg.png)
 
 ### Tipos detectados (definem o verbo)
 
@@ -137,16 +141,16 @@ Executa `git diff --cached --no-color` e coleta as linhas de **comentário** que
 
 #### Comentários rejeitados
 
-| Condição                             | Exemplo rejeitado          |
-| ------------------------------------ | -------------------------- |
-| Separador visual                     | `// ─────────────────────` |
-| Tag XML de documentação              | `/// <summary>`            |
-| Código comentado (tem `{` `}`)       | `// if (x) { return; }`    |
-| Código comentado (chamada de método) | `// método(argumento)`     |
-| Texto muito curto (< 10 chars)       | `// ok`                    |
-| Sem espaço (não é frase)             | `// TODO`                  |
-| **Delimitador desbalanceado**        | `// monta a árvore (recursivo` |
-| **Termina em palavra de ligação solta** | `// mapeia o token para`   |
+| Condição                                | Exemplo rejeitado              |
+| --------------------------------------- | ------------------------------ |
+| Separador visual                        | `// ─────────────────────`     |
+| Tag XML de documentação                 | `/// <summary>`                |
+| Código comentado (tem `{` `}`)          | `// if (x) { return; }`        |
+| Código comentado (chamada de método)    | `// método(argumento)`         |
+| Texto muito curto (< 10 chars)          | `// ok`                        |
+| Sem espaço (não é frase)                | `// TODO`                      |
+| **Delimitador desbalanceado**           | `// monta a árvore (recursivo` |
+| **Termina em palavra de ligação solta** | `// mapeia o token para`       |
 
 #### Como os comentários são usados
 
@@ -263,7 +267,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
-![Saída do install.ps1 confirmando a instalação do plugin](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotInstall.png)
+![Saída do install.ps1 confirmando a instalação do plugin](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotInstall.png)
 
 ### Opção B — Manual
 
@@ -284,7 +288,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\uninstall.ps1
 ```
 
-![Saída do uninstall.ps1 confirmando a remoção do plugin](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUninstall.png)
+![Saída do uninstall.ps1 confirmando a remoção do plugin](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUninstall.png)
 
 A remoção da DLL não afeta nenhuma outra parte do GitExtensions.
 
@@ -308,7 +312,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg
 .\build.ps1
 ```
 
-![Saída do build.ps1 com incremento de versão e empacotamento](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotBuild.png)
+![Saída do build.ps1 com incremento de versão e empacotamento](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotBuild.png)
 
 ### Deploy rápido (sem incrementar versão)
 
@@ -319,7 +323,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\update-dll.ps1
 ```
 
-![Saída do update-dll.ps1 atualizando apenas a DLL](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUpdate.png)
+![Saída do update-dll.ps1 atualizando apenas a DLL](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUpdate.png)
 
 ---
 

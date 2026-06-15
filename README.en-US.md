@@ -5,10 +5,14 @@
 - Help keep this project always updated 💜
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
+
+**Version:** 1.0.70
+**Updated:** 2026-06-14
 
 Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatically generates commit messages by analyzing the real content of staged changes. Changes are classified by **Conventional Commits** types (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) to choose the appropriate **verb**, and the resulting message is a **verb-led sentence** followed by a bulleted body — **without** the `type:` prefix. **Multilingual**: generates output in **Brazilian Portuguese or English**, automatically detected from the operating system language, with a **manual override** in the plugin settings.
 
-![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUsage.png)
+![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUsage.png)
 
 [English](README.en-US.md) | [Português-BR](README.pt-BR.md)
 
@@ -47,7 +51,7 @@ Zimerfeld Commit Msg — Português/Portuguese
 Zimerfeld Commit Msg — Inglês/English
 ```
 
-![Commit template dropdown with the three language items](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUsage.png)
+![Commit template dropdown with the three language items](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUsage.png)
 
 **2. In Settings → Plugins → ZimerfeldCommitMsg** — the **"Idioma da mensagem / Message language"** selector defines the **default** used by the Plugins menu and auto-refresh.
 
@@ -104,7 +108,7 @@ While the commit dialog is open, the message is automatically updated whenever f
 - **Description and verbs in the active language** (Brazilian Portuguese or English).
 - **Optional body** — up to 5 one-line bullets, generated when there are 2+ files or extra comments.
 
-![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotCommitMsg.png)
+![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotCommitMsg.png)
 
 ### Detected types (define the verb)
 
@@ -137,16 +141,16 @@ Runs `git diff --cached --no-color` and collects **comment** lines that were **a
 
 #### Rejected comments
 
-| Condition                        | Rejected example           |
-| -------------------------------- | -------------------------- |
-| Visual separator                 | `// ─────────────────────` |
-| XML documentation tag            | `/// <summary>`            |
-| Commented-out code (has `{` `}`) | `// if (x) { return; }`    |
-| Commented-out code (method call) | `// method(argument)`      |
-| Too short (< 10 chars)           | `// ok`                    |
-| No spaces (not a sentence)       | `// TODO`                  |
+| Condition                        | Rejected example                |
+| -------------------------------- | ------------------------------- |
+| Visual separator                 | `// ─────────────────────`      |
+| XML documentation tag            | `/// <summary>`                 |
+| Commented-out code (has `{` `}`) | `// if (x) { return; }`         |
+| Commented-out code (method call) | `// method(argument)`           |
+| Too short (< 10 chars)           | `// ok`                         |
+| No spaces (not a sentence)       | `// TODO`                       |
 | **Unbalanced delimiter**         | `// builds the tree (recursive` |
-| **Ends in a dangling connector** | `// maps the token to`     |
+| **Ends in a dangling connector** | `// maps the token to`          |
 
 #### How comments are used
 
@@ -263,7 +267,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
-![install.ps1 output confirming plugin installation](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotInstall.png)
+![install.ps1 output confirming plugin installation](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotInstall.png)
 
 ### Option B — Manual
 
@@ -284,7 +288,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\uninstall.ps1
 ```
 
-![uninstall.ps1 output confirming plugin removal](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUninstall.png)
+![uninstall.ps1 output confirming plugin removal](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUninstall.png)
 
 Removing the DLL does not affect any other part of GitExtensions.
 
@@ -308,7 +312,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg
 .\build.ps1
 ```
 
-![build.ps1 output with version increment and packaging](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotBuild.png)
+![build.ps1 output with version increment and packaging](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotBuild.png)
 
 ### Fast deploy (without incrementing version)
 
@@ -319,7 +323,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\update-dll.ps1
 ```
 
-![update-dll.ps1 output updating only the DLL](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenshotUpdate.png)
+![update-dll.ps1 output updating only the DLL](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUpdate.png)
 
 ---
 
