@@ -249,11 +249,19 @@ internal sealed class CommitMessageGenerator
 
     public string Generate()
     {
-        var nameStatus = RunGit("diff", "--cached", "--name-status");
-        if (string.IsNullOrWhiteSpace(nameStatus)) return string.Empty;
-
-        var changes = ParseChanges(nameStatus);
-        if (changes.Count == 0) return string.Empty;
+        var changes = GetStagedChanges();
+        if (changes.Count == 0)
+        {
+            // O parse principal pode falhar (timeout do git, index.lock durante o
+            // auto-refresh de stage/unstage, saída inesperada) MESMO havendo arquivos
+            // em stage. Nesse caso NUNCA retornamos vazio: devolvemos ao menos a
+            // contagem de arquivos afetados. Se realmente nada estiver em stage, a
+            // contagem vem 0 e a mensagem vazia é o correto (não há o que commitar).
+            var staged = CountStagedFiles();
+            return staged > 0
+                ? TruncateTitle($"{_lang.TypeVerb(string.Empty, false, false, false)} {staged} {_lang.FilesWord(staged)}")
+                : string.Empty;
+        }
 
         var types = DetermineAllTypes(changes);
 
@@ -835,9 +843,62 @@ internal sealed class CommitMessageGenerator
         return cut > 8 ? title[..cut] + "…" : title[..(maxLen - 1)] + "…";
     }
 
+    // ── Detecção dos arquivos staged (resiliente) ───────────────────────────────
+
+    /// <summary>
+    /// Lê e parseia os arquivos staged via <c>git diff --cached --name-status</c>,
+    /// com retentativa em falha transitória (ex.: index.lock durante stage/unstage).
+    /// </summary>
+    private List<FileChange> GetStagedChanges()
+    {
+        var nameStatus = RunGitResilient("diff", "--cached", "--name-status");
+        return string.IsNullOrWhiteSpace(nameStatus) ? [] : ParseChanges(nameStatus);
+    }
+
+    /// <summary>
+    /// Conta os arquivos staged de forma robusta, base do fallback "nunca vazio".
+    /// Tenta <c>--name-only</c> e, em último caso, <c>status --porcelain</c>
+    /// (entradas com mudança staged na 1ª coluna). Retorna 0 quando nada está em stage.
+    /// </summary>
+    private int CountStagedFiles()
+    {
+        var nameOnly = RunGitResilient("diff", "--cached", "--name-only");
+        var count    = CountNonEmptyLines(nameOnly);
+        if (count > 0) return count;
+
+        // Último recurso: porcelain — coluna 1 (staged) diferente de espaço e de '?'.
+        var porcelain = RunGitResilient("status", "--porcelain");
+        if (string.IsNullOrWhiteSpace(porcelain)) return 0;
+        return porcelain.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                        .Count(l => l.Length >= 2 && l[0] != ' ' && l[0] != '?');
+    }
+
+    private static int CountNonEmptyLines(string text) =>
+        string.IsNullOrWhiteSpace(text)
+            ? 0
+            : text.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Length;
+
     // ── Git subprocess ─────────────────────────────────────────────────────────
 
-    private string RunGit(params string[] args)
+    /// <summary>
+    /// Executa git e retenta apenas quando há FALHA (erro/timeout) — não quando o git
+    /// conclui com sucesso e saída vazia (ex.: nada em stage), evitando latência no
+    /// caso comum. Cobre o index.lock transitório do auto-refresh.
+    /// </summary>
+    private string RunGitResilient(params string[] args)
+    {
+        for (int attempt = 0; ; attempt++)
+        {
+            var (output, ok) = RunGitChecked(args);
+            if (ok || attempt >= 2) return output;   // sucesso, ou esgotou as tentativas
+            Thread.Sleep(120);                         // falha transitória → tenta de novo
+        }
+    }
+
+    private string RunGit(params string[] args) => RunGitChecked(args).Output;
+
+    /// <summary>Executa git; devolve a saída e se o processo concluiu com sucesso (exit 0).</summary>
+    private (string Output, bool Ok) RunGitChecked(string[] args)
     {
         try
         {
@@ -853,10 +914,14 @@ internal sealed class CommitMessageGenerator
             foreach (var a in args) psi.ArgumentList.Add(a);
             using var p = Process.Start(psi)!;
             var output  = p.StandardOutput.ReadToEnd();
-            p.WaitForExit(8_000);
-            return output;
+            if (!p.WaitForExit(8_000))
+            {
+                try { p.Kill(entireProcessTree: true); } catch { /* best-effort */ }
+                return (output, false);                // timeout = falha → permite retentativa
+            }
+            return (output, p.ExitCode == 0);
         }
-        catch { return string.Empty; }
+        catch { return (string.Empty, false); }
     }
 }
 
