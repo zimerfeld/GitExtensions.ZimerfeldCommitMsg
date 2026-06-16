@@ -17,7 +17,7 @@ GitExtensions plugin that automatically generates commit messages from staged ch
 
 Plugin para GitExtensions que gera mensagens de commit automaticamente a partir das alteracoes staged, com saida em portugues-BR ou ingles.
 
-![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotCommitMsg.png)
+![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenShotREADME.png)
 
 ## Languages / Idiomas
 
