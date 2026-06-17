@@ -5,6 +5,10 @@
     Executar como Administrador para tambem fazer o deploy em GitExtensions.
 #>
 
+param(
+    [switch]$Force
+)
+
 $ErrorActionPreference = "Stop"
 
 $nuspec  = "$PSScriptRoot\src\GitExtensions.ZimerfeldCommitMsg\GitExtensions.ZimerfeldCommitMsg.nuspec"
@@ -53,10 +57,14 @@ $newestInput = ($inputs | Measure-Object -Property LastWriteTimeUtc -Maximum).Ma
 $lastPkg = Get-ChildItem "$outDir\GitExtensions.ZimerfeldCommitMsg.*.nupkg" -ErrorAction SilentlyContinue |
            Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
 
-if ($lastPkg -and $newestInput -le $lastPkg.LastWriteTimeUtc) {
+if ((-not $Force) -and $lastPkg -and $newestInput -le $lastPkg.LastWriteTimeUtc) {
     Write-Host ""
     Write-Host "Nenhuma mudanca detectada (fontes ou textos) -- versao mantida em $current (build/pack ignorados)." -ForegroundColor Cyan
     exit 0
+}
+
+if ($Force) {
+    Write-Host "Build forcado: ignorando verificacao incremental." -ForegroundColor Yellow
 }
 
 Write-Host "Versao: $current  ->  " -NoNewline
@@ -124,7 +132,11 @@ foreach ($readmeDoc in $readmeDocs) {
 
 # -- 5. Build ------------------------------------------------------------------
 Write-Host "Compilando..."
-$buildOutput = & dotnet build $csproj -c Release --nologo -v minimal 2>&1
+$buildArgs = @("build", $csproj, "-c", "Release", "--nologo", "-v", "minimal")
+if ($Force) {
+    $buildArgs += "--no-incremental"
+}
+$buildOutput = & dotnet @buildArgs 2>&1
 $buildExit   = $LASTEXITCODE
 $buildOutput | ForEach-Object {
     $line = "$_"
