@@ -6,8 +6,8 @@
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Version:** 1.0.71
-**Updated:** 2026-06-14
+**Version:** 1.0.72
+**Updated:** 2026-06-16
 
 Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatically generates commit messages by analyzing the real content of staged changes. Changes are classified by **Conventional Commits** types (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) to choose the appropriate **verb**, and the resulting message is a **verb-led sentence** followed by a bulleted body — **without** the `type:` prefix. **Multilingual**: generates output in **Brazilian Portuguese or English**, automatically detected from the operating system language, with a **manual override** in the plugin settings.
 
@@ -298,13 +298,14 @@ Removing the DLL does not affect any other part of GitExtensions.
 Each time `build.ps1` runs, the script:
 
 1. Reads the current version from `.nuspec`
-2. Increments `build` by +1 → `major.minor.build`
-3. Updates `.nuspec`, `.csproj`, and the READMEs with the new version and date
-4. Compiles in Release
-5. Copies the DLL to `C:\Program Files\GitExtensions\Plugins\` _(requires Admin)_
-6. Updates `tools\net9.0-windows\` with the new DLL
-7. Generates `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
-8. Removes `.nupkg` files from previous versions
+2. Computes the new version: increments `build` by +1 → `major.minor.build`
+3. Writes the new version and date to the **docs first**: the READMEs and the Obsidian vault
+4. Only then bumps the version in `.nuspec` and `.csproj`
+5. Compiles in Release
+6. Copies the DLL to `C:\Program Files\GitExtensions\Plugins\` _(requires Admin)_
+7. Updates `tools\net9.0-windows\` with the new DLL
+8. Generates `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
+9. Removes `.nupkg` files from previous versions
 
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg

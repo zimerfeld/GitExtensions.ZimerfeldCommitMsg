@@ -1,11 +1,11 @@
 ---
 tipo: projeto
 criado: 2026-06-01
-atualizado: 2026-06-08
+atualizado: 2026-06-16
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits, i18n]
 status: ativo
 linguagem: C#
-versao: 1.0.40
+versao: 1.0.72
 repo: C:\GitExtensions\ZimerfeldCommitMsg
 ---
 
@@ -77,7 +77,7 @@ tools\install.ps1      # instala o plugin
 tools\uninstall.ps1    # remove (não afeta nada mais do GitExtensions)
 tools\update-dll.ps1   # atualiza só a DLL (dev, sem incrementar versão)
 ```
-> O `build.ps1` incrementa `major.minor.BUILD`, sincroniza versão em nuspec + csproj + `README.md` (carimba versão + data), builda em Release, copia a DLL p/ `Plugins\` (se Admin) e p/ `tools\net9.0-windows\`, e roda `nuget pack` removendo nupkgs antigos. Passo a passo completo em [[README — Instalação, Uso e Build]].
+> O `build.ps1` incrementa `major.minor.BUILD`, carimba versão + data **primeiro nos docs** (READMEs + este cofre Obsidian) e **só então** dá o _bump_ em nuspec + csproj, builda em Release, copia a DLL p/ `Plugins\` (se Admin) e p/ `tools\net9.0-windows\`, e roda `nuget pack` removendo nupkgs antigos. Passo a passo completo em [[README — Instalação, Uso e Build]] e [[Versionamento]].
 
 ## 🔍 inspector (utilitário de dev)
 Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` + reflection para listar tipos/membros públicos de `GitExtensions.Extensibility.dll` e `GitUIPluginInterfaces.dll` — útil pra descobrir a API correta (`IGitPlugin`, `IGitUICommands`, `ICommitMessageManager`, `GitUIEventArgs` etc.) ao evoluir o plugin.
@@ -90,9 +90,9 @@ Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` 
 > `FindCommitTextBox` tenta nomes conhecidos (`Message`, `commitMessageEditor`, `_commitMessage`, `commitMessage`) e cai num fallback heurístico (maior `TextBoxBase` multiline editável). Versões diferentes do GitExtensions mudam esses nomes.
 
 ## 🔢 Versionamento
-- Versão atual: **1.0.40** (csproj + nuspec sincronizados pelo `build.ps1`)
+- Versão atual: **1.0.72** (csproj + nuspec sincronizados pelo `build.ps1`)
 - Esquema: `major.minor.BUILD`, BUILD auto-incrementado a cada build
-- `README.md` carimba versão + data a cada build (FUNCIONALIDADES.md foi removido e unificado no README.md)
+- A cada build, o `build.ps1` carimba versão + data nos **READMEs e neste cofre** (notas Projeto, README espelho, Versionamento, Visão Geral) **antes** do bump no nuspec/csproj
 
 ## 📜 Histórico de sessões
 - [[2026-06-01 - Criação do cofre de neurônios CommitMsg]] — mapeamento inicial do projeto

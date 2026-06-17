@@ -1,7 +1,7 @@
 ---
 tipo: sistema
 tags: [build, versão, nupkg, deploy]
-atualizado: 2026-06-09
+atualizado: 2026-06-16
 ---
 
 # Versionamento e Build
@@ -10,7 +10,7 @@ atualizado: 2026-06-09
 
 `major.minor.build` — somente o `build` é incrementado automaticamente pelo `build.ps1`. Major e minor são alterados manualmente.
 
-**Versão atual:** `1.0.40` *(fonte da verdade: `.nuspec` / `.csproj`)*
+**Versão atual:** `1.0.72` *(fonte da verdade: `.nuspec` / `.csproj`)*
 
 > [!note] Recursos `.resx` embutidos (sem satellite assemblies)
 > As strings de UI vivem em `Resources/Strings.resx` (EN neutro) e `Resources/StringsPtBr.resx` (PT),
@@ -23,16 +23,22 @@ atualizado: 2026-06-09
 build.ps1
   │
   ├─ 1. Lê versão atual do .nuspec
-  ├─ 2. Incrementa build (+1) → newVersion
-  ├─ 3. Atualiza .nuspec  ← <version>
-  ├─ 4. Atualiza .csproj  ← <Version>
-  ├─ 5. Atualiza FUNCIONALIDADES.md ← **Versão:** e **Atualizado em:**
+  ├─ 2. Calcula newVersion (build +1)
+  ├─ 3. Escreve nos DOCS primeiro (versão + data):
+  │       ├─ READMEs (README.md / README.pt-BR.md / README.en-US.md)
+  │       └─ cofre Obsidian (Projeto, README espelho, Versionamento, Visão Geral)
+  ├─ 4. Bump no .nuspec  ← <version>
+  ├─ 5. Bump no .csproj  ← <Version>
   ├─ 6. dotnet build -c Release
   ├─ 7. Copia DLL → C:\Program Files\GitExtensions\Plugins\  (requer Admin)
   ├─ 8. Copia DLL → tools\net9.0-windows\  (para o nupkg)
   ├─ 9. nuget pack .nuspec → .nupkg na raiz
   └─ 10. Remove .nupkg de versões anteriores
 ```
+
+> **Ordem proposital:** os docs (READMEs + cofre) são carimbados **antes** do _bump_ no
+> `.nuspec`/`.csproj`. O _pack_ (passo 9) roda **depois** de todos os carimbos, então o `.nupkg`
+> continua sendo o artefato mais recente — o que mantém a detecção de mudanças por timestamp correta.
 
 > Requer `nuget` CLI e permissão de **Administrador** para o deploy. Sem Admin, o passo 7 é pulado com aviso.
 
@@ -42,7 +48,8 @@ build.ps1
 |---|---|
 | `GitExtensions.ZimerfeldCommitMsg.nuspec` | `<version>` |
 | `GitExtensions.ZimerfeldCommitMsg.csproj` | `<Version>` |
-| `FUNCIONALIDADES.md` | `**Versão:**` e `**Atualizado em:**` |
+| `README.md` / `README.pt-BR.md` / `README.en-US.md` | `**Version/Versão:**` e `**Updated/Atualizado em:**` |
+| Cofre Obsidian (4 notas: Projeto, README espelho, Versionamento, Visão Geral) | frontmatter `versao:`/`atualizado:` e a linha "Versão atual" |
 
 ## Deploy rápido (sem incrementar versão)
 

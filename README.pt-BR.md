@@ -6,8 +6,8 @@
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Versão:** 1.0.71
-**Atualizado em:** 2026-06-14
+**Versão:** 1.0.72
+**Atualizado em:** 2026-06-16
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
@@ -298,13 +298,14 @@ A remoção da DLL não afeta nenhuma outra parte do GitExtensions.
 A cada execução do `build.ps1`, o script:
 
 1. Lê a versão atual do `.nuspec`
-2. Incrementa o `build` em +1 → `major.minor.build`
-3. Atualiza `.nuspec`, `.csproj` e os READMEs com a nova versão e data
-4. Compila em Release
-5. Copia a DLL para `C:\Program Files\GitExtensions\Plugins\` _(requer Admin)_
-6. Atualiza `tools\net9.0-windows\` com a DLL nova
-7. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
-8. Remove `.nupkg` de versões anteriores
+2. Calcula a nova versão: incrementa o `build` em +1 → `major.minor.build`
+3. Escreve a nova versão e data **primeiro nos docs**: os READMEs e o cofre Obsidian
+4. Só então dá o _bump_ da versão no `.nuspec` e no `.csproj`
+5. Compila em Release
+6. Copia a DLL para `C:\Program Files\GitExtensions\Plugins\` _(requer Admin)_
+7. Atualiza `tools\net9.0-windows\` com a DLL nova
+8. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
+9. Remove `.nupkg` de versões anteriores
 
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg

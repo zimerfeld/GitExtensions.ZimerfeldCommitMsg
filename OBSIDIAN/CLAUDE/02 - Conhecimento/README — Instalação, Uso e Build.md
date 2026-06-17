@@ -1,17 +1,17 @@
 ---
 tipo: conhecimento
 criado: 2026-06-08
-atualizado: 2026-06-09
+atualizado: 2026-06-16
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.40
+versao: 1.0.72
 ---
 
 # README — Instalação, Uso e Build
 
-> Espelho fiel do `README.md` da raiz do repositório (carimbado em **v1.0.40 / 2026-06-09**), reconciliado com o código em 2026-06-09.
+> Espelho fiel do `README.md` da raiz do repositório (carimbado em **v1.0.72 / 2026-06-16**), reconciliado com o código em 2026-06-16.
 > Nota de projeto: [[GitExtensions.ZimerfeldCommitMsg]]. Lógica em [[Geração de mensagem - Conventional Commits]].
-> O `build.ps1` carimba versão + data no `README.md` a cada build — reespelhar esta nota quando o README mudar de forma significativa.
+> O `build.ps1` carimba versão + data nos READMEs **e nesta nota** (frontmatter `versao:`/`atualizado:`) a cada build — reespelhar o corpo quando o README mudar de forma significativa.
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/…) apenas para **escolher o verbo**; a mensagem é uma **frase iniciada por verbo** + bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado pelo SO, com **override manual**.
 
@@ -205,13 +205,14 @@ A remoção da DLL não afeta nenhuma outra parte do GitExtensions.
 ## 🛠️ Build e versionamento
 A cada execução do `build.ps1`, o script:
 1. Lê a versão atual do `.nuspec`.
-2. Incrementa o `build` em +1 → `major.minor.build`.
-3. Atualiza `.nuspec`, `.csproj` e `README.md` com nova versão e data.
-4. Compila em Release.
-5. Copia a DLL para `C:\Program Files\GitExtensions\Plugins\` *(requer Admin)*.
-6. Atualiza `tools\net9.0-windows\` com a DLL nova.
-7. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`.
-8. Remove `.nupkg` de versões anteriores.
+2. Calcula a nova versão: incrementa o `build` em +1 → `major.minor.build`.
+3. Escreve a nova versão e data **primeiro nos docs**: os READMEs e o cofre Obsidian.
+4. Só então dá o _bump_ da versão no `.nuspec` e no `.csproj`.
+5. Compila em Release.
+6. Copia a DLL para `C:\Program Files\GitExtensions\Plugins\` *(requer Admin)*.
+7. Atualiza `tools\net9.0-windows\` com a DLL nova.
+8. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`.
+9. Remove `.nupkg` de versões anteriores.
 
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg
