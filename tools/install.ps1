@@ -24,7 +24,8 @@ param(
     $installPath,
     $toolsPath,
     $package,
-    $project
+    $project,
+    [string]$Config = "Release"
 )
 
 Set-StrictMode -Version Latest
@@ -36,12 +37,49 @@ $ErrorActionPreference = "Stop"
 # When run standalone, resolve relative to this script's location.
 if ($toolsPath) {
     $dllDir = Join-Path $toolsPath "net9.0-windows"
+    $dllName = "GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
+    $dll     = Join-Path $dllDir $dllName
 } else {
-    $dllDir = Join-Path $PSScriptRoot "net9.0-windows"
-}
+    $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+    $projectRoot = Join-Path $repoRoot "src\GitExtensions.ZimerfeldCommitMsg"
+    $buildScript = Join-Path $repoRoot "build.ps1"
+    $dllName = "GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
+    $dll = Join-Path $projectRoot "bin\$Config\net9.0-windows\$dllName"
 
-$dllName = "GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
-$dll     = Join-Path $dllDir $dllName
+    if ((Test-Path $projectRoot) -and (Test-Path $buildScript)) {
+        $inputs = Get-ChildItem $projectRoot -Recurse -File -Include *.cs,*.csproj,*.resx,*.png |
+                  Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
+        $newestInput = ($inputs | Measure-Object -Property LastWriteTimeUtc -Maximum).Maximum
+
+        if (-not (Test-Path $dll)) {
+            Write-Warning "DLL nao encontrada em bin\$Config. Executando build forcado..."
+            & $buildScript -Force
+            $buildSucceeded = $?
+            $buildExitCode = Get-Variable -Name LASTEXITCODE -ValueOnly -ErrorAction SilentlyContinue
+            if ((-not $buildSucceeded) -or ($buildExitCode -is [int] -and $buildExitCode -ne 0)) { exit 1 }
+        }
+        elseif ($newestInput -and ((Get-Item $dll).LastWriteTimeUtc -lt $newestInput)) {
+            Write-Warning "DLL em bin\$Config esta mais antiga que as fontes/recursos. Executando build forcado..."
+            & $buildScript -Force
+            $buildSucceeded = $?
+            $buildExitCode = Get-Variable -Name LASTEXITCODE -ValueOnly -ErrorAction SilentlyContinue
+            if ((-not $buildSucceeded) -or ($buildExitCode -is [int] -and $buildExitCode -ne 0)) { exit 1 }
+        }
+
+        if (-not (Test-Path $dll)) {
+            Write-Error "DLL nao encontrada apos o build: $dll"
+            exit 1
+        }
+
+        if ($newestInput -and ((Get-Item $dll).LastWriteTimeUtc -lt $newestInput)) {
+            Write-Error "DLL continua mais antiga que as fontes/recursos apos o build: $dll"
+            exit 1
+        }
+    } else {
+        $dllDir = Join-Path $PSScriptRoot "net9.0-windows"
+        $dll = Join-Path $dllDir $dllName
+    }
+}
 
 if (-not (Test-Path $dll)) {
     Write-Error ("DLL nao encontrada: $dll`n`nExecute build.ps1 primeiro para compilar o plugin:`n  pwsh C:\NUGET\ZimerfeldCommitMsg\build.ps1")

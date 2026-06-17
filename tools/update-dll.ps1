@@ -1,13 +1,39 @@
-# Copia o DLL mais recente da pasta de build para os plugins do GitExtensions (requer Admin)
-# Uso rapido durante desenvolvimento, sem incrementar versao ou fazer pack.
+# Copia o DLL mais recente da pasta de build para os plugins do GitExtensions (requer Admin).
+# Se a DLL de bin\Release estiver ausente ou mais antiga que fontes/recursos, executa build.ps1 -Force.
 
 param([string]$Config = "Release")
 
-$dll = "$PSScriptRoot\..\src\GitExtensions.ZimerfeldCommitMsg\bin\$Config\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
+$repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+$projectRoot = Join-Path $repoRoot "src\GitExtensions.ZimerfeldCommitMsg"
+$dll = Join-Path $projectRoot "bin\$Config\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
+$buildScript = Join-Path $repoRoot "build.ps1"
+
+$inputs = Get-ChildItem $projectRoot -Recurse -File -Include *.cs,*.csproj,*.resx,*.png |
+          Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
+$newestInput = ($inputs | Measure-Object -Property LastWriteTimeUtc -Maximum).Maximum
 
 if (-not (Test-Path $dll)) {
-    Write-Warning "DLL nao encontrada: $dll"
-    Write-Host "Execute primeiro: dotnet build -c $Config"
+    Write-Warning "DLL nao encontrada em bin\$Config. Executando build forcado..."
+    & $buildScript -Force
+    $buildSucceeded = $?
+    $buildExitCode = Get-Variable -Name LASTEXITCODE -ValueOnly -ErrorAction SilentlyContinue
+    if ((-not $buildSucceeded) -or ($buildExitCode -is [int] -and $buildExitCode -ne 0)) { exit 1 }
+}
+elseif ($newestInput -and ((Get-Item $dll).LastWriteTimeUtc -lt $newestInput)) {
+    Write-Warning "DLL em bin\$Config esta mais antiga que as fontes/recursos. Executando build forcado..."
+    & $buildScript -Force
+    $buildSucceeded = $?
+    $buildExitCode = Get-Variable -Name LASTEXITCODE -ValueOnly -ErrorAction SilentlyContinue
+    if ((-not $buildSucceeded) -or ($buildExitCode -is [int] -and $buildExitCode -ne 0)) { exit 1 }
+}
+
+if (-not (Test-Path $dll)) {
+    Write-Warning "DLL nao encontrada apos o build: $dll"
+    exit 1
+}
+
+if ($newestInput -and ((Get-Item $dll).LastWriteTimeUtc -lt $newestInput)) {
+    Write-Warning "DLL continua mais antiga que as fontes/recursos apos o build: $dll"
     exit 1
 }
 
