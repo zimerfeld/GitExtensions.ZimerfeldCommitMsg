@@ -48,7 +48,9 @@ Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via
 - Chama `base.Register()`
 - Captura `SynchronizationContext.Current` (UI thread)
 - Para cada um dos 3 `_templateItems`: `AddCommitTemplate(label, () => GenerateForTemplate(workingDir, forced), icon)` — factory **lazy** que fixa `_sessionLanguage` e instancia `CommitMessageGenerator(workingDir, idioma)`; ver [[../Fluxos/Template Dropdown (Auto-resumo)]]
-- Assina `PostRepositoryChanged += OnPostRepositoryChanged`
+- Captura `_gitUiCommands` (fonte do working dir para o Idle)
+- Assina `PostRepositoryChanged += OnPostRepositoryChanged` (auto-refresh ao stage/unstage)
+- Assina `Application.Idle += OnAppIdle` — detecta o `FormCommit` aberto já com arquivos em stage e preenche uma vez por instância (`WeakReference` em `_handledCommitForm`); `RefreshOpenCommitDialog` retorna `bool` (false = UI ainda montando → tenta no próximo Idle). Ambas as assinaturas são desfeitas no `Unregister`
 
 ### `GetSettings()` → expõe `_languageSetting`
 Faz o nó **ZimerfeldCommitMsg** aparecer em Configurações → Plugins (após instalar a DLL ≥ 1.0.36 e reiniciar). `CurrentLanguage()` lê o valor e resolve "Automático" pelo SO; `EffectiveLanguage()` = `_sessionLanguage ?? CurrentLanguage()`.

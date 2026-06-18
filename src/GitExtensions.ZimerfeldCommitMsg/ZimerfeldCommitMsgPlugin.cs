@@ -36,6 +36,13 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     private SynchronizationContext? _syncContext;
     private string _lastGeneratedMessage = string.Empty;
 
+    // Fonte do working dir para o gatilho de Application.Idle (que não traz GitUIEventArgs).
+    private IGitUICommands? _gitUiCommands;
+
+    // Instância de FormCommit já preenchida ao abrir — evita reprocessar a cada Idle
+    // (o evento dispara muitas vezes). WeakReference para não prender o form na memória.
+    private WeakReference<Form>? _handledCommitForm;
+
     // Idioma escolhido explicitamente num item do dropdown (null = seguir o setting/SO).
     // Faz o auto-refresh manter o idioma que o usuário acabou de escolher.
     private MessageLanguage? _sessionLanguage;
@@ -97,7 +104,8 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     public override void Register(IGitUICommands gitUiCommands)
     {
         base.Register(gitUiCommands);
-        _syncContext = SynchronizationContext.Current;
+        _syncContext   = SynchronizationContext.Current;
+        _gitUiCommands = gitUiCommands;
 
         // Um item de template por idioma (Automático/Português/Inglês) — só preenche
         // quando o usuário selecionar explicitamente no dropdown.
@@ -112,14 +120,21 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
 
         // Atualiza a mensagem automaticamente sempre que arquivos entram/saem do stage
         gitUiCommands.PostRepositoryChanged += OnPostRepositoryChanged;
+
+        // Preenche também ao ABRIR o diálogo com arquivos já em stage: não há evento de
+        // "diálogo aberto" na API, então detectamos o FormCommit recém-aberto no Idle da UI.
+        Application.Idle += OnAppIdle;
     }
 
     public override void Unregister(IGitUICommands gitUiCommands)
     {
         gitUiCommands.PostRepositoryChanged -= OnPostRepositoryChanged;
+        Application.Idle -= OnAppIdle;
         foreach (var (label, _) in _templateItems)
             gitUiCommands.RemoveCommitTemplate(label);
         _lastGeneratedMessage = string.Empty;
+        _handledCommitForm    = null;
+        _gitUiCommands        = null;
         base.Unregister(gitUiCommands);
     }
 
@@ -167,7 +182,13 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
     }
 
-    private void RefreshOpenCommitDialog(string workingDir)
+    /// <summary>
+    /// Preenche/atualiza a mensagem no diálogo de commit aberto. Retorna <c>true</c> quando o
+    /// form e a caixa de texto já existem e o caso foi tratado (preenchido, ou deixado intacto
+    /// por conter texto do usuário/mensagem vazia); <c>false</c> quando ainda não há diálogo ou
+    /// a caixa não foi localizada (UI ainda montando) — sinaliza ao Idle para tentar de novo.
+    /// </summary>
+    private bool RefreshOpenCommitDialog(string workingDir)
     {
         try
         {
@@ -177,18 +198,18 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             {
                 if (f.GetType().Name == "FormCommit") { commitForm = f; break; }
             }
-            if (commitForm == null) return;
+            if (commitForm == null) return false;
 
             var tb = FindCommitTextBox(commitForm);
-            if (tb == null) return;
+            if (tb == null) return false;
 
             // Não sobrescreve texto digitado manualmente pelo usuário:
             // só atualiza se a caixa estiver vazia ou contiver a última mensagem gerada por nós
             var current = tb.Text.Trim();
-            if (current.Length > 0 && current != _lastGeneratedMessage.Trim()) return;
+            if (current.Length > 0 && current != _lastGeneratedMessage.Trim()) return true;
 
             var msg = new CommitMessageGenerator(workingDir, EffectiveLanguage()).Generate();
-            if (string.IsNullOrEmpty(msg)) return;
+            if (string.IsNullOrEmpty(msg)) return true;
 
             _lastGeneratedMessage = msg;
             tb.Text = msg;
@@ -197,8 +218,44 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             ResetTextColors(tb);
             tb.SelectionStart = 0;
             tb.SelectionLength = 0;
+            return true;
         }
-        catch { }
+        catch { return false; }
+    }
+
+    /// <summary>
+    /// Idle da UI: preenche o diálogo de commit que abriu já com arquivos em stage (sem evento
+    /// de "diálogo aberto" na API). Trata cada instância de FormCommit uma só vez — o Idle
+    /// dispara com altíssima frequência, então só roda o gerador quando um form NOVO aparece e
+    /// ainda não foi tratado, evitando custo de processo git a cada ciclo ocioso.
+    /// </summary>
+    private void OnAppIdle(object? sender, EventArgs e)
+    {
+        try
+        {
+            Form? commitForm = null;
+            foreach (Form f in Application.OpenForms)
+            {
+                if (f.GetType().Name == "FormCommit") { commitForm = f; break; }
+            }
+
+            // Sem diálogo aberto: limpa o marcador para que a próxima abertura seja tratada.
+            if (commitForm is null) { _handledCommitForm = null; return; }
+
+            // Mesma instância já tratada → nada a fazer (o auto-refresh de stage cuida do resto).
+            if (_handledCommitForm is not null &&
+                _handledCommitForm.TryGetTarget(out var prev) && ReferenceEquals(prev, commitForm))
+                return;
+
+            var workingDir = _gitUiCommands?.Module.WorkingDir;
+            if (string.IsNullOrEmpty(workingDir)) return;
+
+            // Só marca como tratada quando o form/caixa já existem (true); se a UI ainda está
+            // montando (false), deixa para o próximo Idle tentar de novo.
+            if (RefreshOpenCommitDialog(workingDir))
+                _handledCommitForm = new WeakReference<Form>(commitForm);
+        }
+        catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
     }
 
     /// <summary>
