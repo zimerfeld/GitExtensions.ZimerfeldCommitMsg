@@ -2,9 +2,11 @@
 <package>
   <metadata>
     <id>GitExtensions.ZimerfeldCommitMsg</id>
-    <version>1.0.73</version>
+    <version>1.0.76</version>
     <authors>Zimerfeld</authors>
-    <description>Plugin for GitExtensions that automatically generates commit messages by analyzing the actual content of staged changes. Changes are classified by Conventional Commits type (feat/fix/docs/test/chore/build/refactor) to pick the appropriate verb; the resulting message is a verb-led subject (no literal "type:" prefix) plus a bulleted body. Output is in Brazilian Portuguese or English — selected automatically from the operating system language, with a manual override in the plugin settings. Supports two strategies: comment-based (extracts meaningful comments added to the diff) and filename-based (derives semantic concepts from file names). The message is refreshed automatically whenever files are staged or unstaged while the commit dialog is open.</description>
+    <description>Plugin for GitExtensions that automatically generates commit messages by analyzing the actual content of staged changes. Changes are classified by Conventional Commits type (feat/fix/docs/test/chore/build/refactor) to pick the appropriate verb; the resulting message is a verb-led subject (no literal "type:" prefix) plus a bulleted body. Output is in Brazilian Portuguese or English — selected automatically from the operating system language, with a manual override in the plugin settings. Supports two strategies: comment-based (extracts meaningful comments added to the diff) and filename-based (derives semantic concepts from file names). The message is refreshed automatically whenever files are staged or unstaged while the commit dialog is open.
+
+Plugin para o GitExtensions que gera mensagens de commit automaticamente analisando o conteúdo real das alterações em stage. As alterações são classificadas pelo tipo do Conventional Commits (feat/fix/docs/test/chore/build/refactor) para escolher o verbo apropriado; a mensagem resultante é um subject iniciado por verbo (sem o prefixo literal "type:") mais um body em tópicos. A saída é em português do Brasil ou inglês — selecionada automaticamente pelo idioma do sistema operacional, com substituição manual nas configurações do plugin. Suporta duas estratégias: baseada em comentários (extrai comentários significativos adicionados ao diff) e baseada em nomes de arquivo (deriva conceitos semânticos a partir dos nomes dos arquivos). A mensagem é atualizada automaticamente sempre que arquivos entram ou saem do stage com o diálogo de commit aberto.</description>
     <tags>gitextensions plugin commit-message conventional-commits</tags>
     <readme>README.md</readme>
     <icon>images\icon-128.png</icon>

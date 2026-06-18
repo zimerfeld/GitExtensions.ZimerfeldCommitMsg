@@ -43,6 +43,11 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     // (o evento dispara muitas vezes). WeakReference para não prender o form na memória.
     private WeakReference<Form>? _handledCommitForm;
 
+    // Working dir do último preenchimento via Idle. O GitExtensions pode REAPROVEITAR o
+    // mesmo FormCommit ao trocar de repositório; sem rastrear o working dir, o gate por
+    // instância (acima) bloquearia o repreenchimento e a caixa ficaria vazia/desatualizada.
+    private string? _handledWorkingDir;
+
     // Idioma escolhido explicitamente num item do dropdown (null = seguir o setting/SO).
     // Faz o auto-refresh manter o idioma que o usuário acabou de escolher.
     private MessageLanguage? _sessionLanguage;
@@ -134,6 +139,7 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             gitUiCommands.RemoveCommitTemplate(label);
         _lastGeneratedMessage = string.Empty;
         _handledCommitForm    = null;
+        _handledWorkingDir    = null;
         _gitUiCommands        = null;
         base.Unregister(gitUiCommands);
     }
@@ -203,13 +209,29 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             var tb = FindCommitTextBox(commitForm);
             if (tb == null) return false;
 
-            // Não sobrescreve texto digitado manualmente pelo usuário:
-            // só atualiza se a caixa estiver vazia ou contiver a última mensagem gerada por nós
-            var current = tb.Text.Trim();
-            if (current.Length > 0 && current != _lastGeneratedMessage.Trim()) return true;
+            // Não sobrescreve texto digitado manualmente pelo usuário: só atualiza se a caixa
+            // estiver vazia ou contiver a última mensagem gerada por nós. A comparação normaliza
+            // as quebras de linha — a caixa do host pode devolver \r\n enquanto geramos com \n;
+            // sem isso a NOSSA própria mensagem passaria por "texto do usuário" e as atualizações
+            // automáticas travariam, deixando a mensagem do working dir anterior repetida ao
+            // trocar de repositório ou ao fazer stage/unstage.
+            var current = NormalizeNewlines(tb.Text);
+            if (current.Length > 0 && current != NormalizeNewlines(_lastGeneratedMessage)) return true;
 
             var msg = new CommitMessageGenerator(workingDir, EffectiveLanguage()).Generate();
-            if (string.IsNullOrEmpty(msg)) return true;
+            if (string.IsNullOrEmpty(msg))
+            {
+                // Novo working dir sem nada em stage: limpa a NOSSA mensagem anterior para não
+                // repetir a do repositório anterior. Só age quando a caixa ainda contém o que
+                // geramos (texto do usuário já teria retornado acima).
+                if (current.Length > 0)
+                {
+                    _lastGeneratedMessage = string.Empty;
+                    tb.Text = string.Empty;
+                    ResetTextColors(tb);
+                }
+                return true;
+            }
 
             _lastGeneratedMessage = msg;
             tb.Text = msg;
@@ -225,9 +247,10 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
 
     /// <summary>
     /// Idle da UI: preenche o diálogo de commit que abriu já com arquivos em stage (sem evento
-    /// de "diálogo aberto" na API). Trata cada instância de FormCommit uma só vez — o Idle
-    /// dispara com altíssima frequência, então só roda o gerador quando um form NOVO aparece e
-    /// ainda não foi tratado, evitando custo de processo git a cada ciclo ocioso.
+    /// de "diálogo aberto" na API). O Idle dispara com altíssima frequência, então só roda o
+    /// gerador quando há algo NOVO a tratar — um FormCommit recém-aberto OU uma troca de working
+    /// dir no mesmo form (o GitExtensions reaproveita a instância ao trocar de repositório).
+    /// Fora desses casos não faz nada, evitando custo de processo git a cada ciclo ocioso.
     /// </summary>
     private void OnAppIdle(object? sender, EventArgs e)
     {
@@ -239,21 +262,26 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
                 if (f.GetType().Name == "FormCommit") { commitForm = f; break; }
             }
 
-            // Sem diálogo aberto: limpa o marcador para que a próxima abertura seja tratada.
-            if (commitForm is null) { _handledCommitForm = null; return; }
-
-            // Mesma instância já tratada → nada a fazer (o auto-refresh de stage cuida do resto).
-            if (_handledCommitForm is not null &&
-                _handledCommitForm.TryGetTarget(out var prev) && ReferenceEquals(prev, commitForm))
-                return;
+            // Sem diálogo aberto: limpa os marcadores para que a próxima abertura seja tratada.
+            if (commitForm is null) { _handledCommitForm = null; _handledWorkingDir = null; return; }
 
             var workingDir = _gitUiCommands?.Module.WorkingDir;
             if (string.IsNullOrEmpty(workingDir)) return;
 
-            // Só marca como tratada quando o form/caixa já existem (true); se a UI ainda está
+            // Pula só quando NADA mudou: mesma instância de form E mesmo working dir. Trocar de
+            // repositório (mesmo reaproveitando o form) muda o working dir e força o repreenchimento.
+            bool sameForm = _handledCommitForm is not null &&
+                _handledCommitForm.TryGetTarget(out var prev) && ReferenceEquals(prev, commitForm);
+            bool sameDir = string.Equals(_handledWorkingDir, workingDir, StringComparison.OrdinalIgnoreCase);
+            if (sameForm && sameDir) return;
+
+            // Só marca como tratado quando o form/caixa já existem (true); se a UI ainda está
             // montando (false), deixa para o próximo Idle tentar de novo.
             if (RefreshOpenCommitDialog(workingDir))
+            {
                 _handledCommitForm = new WeakReference<Form>(commitForm);
+                _handledWorkingDir = workingDir;
+            }
         }
         catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
     }
@@ -264,6 +292,15 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     /// de caixa não têm formatação por trecho e são ignorados. O host pode repintar numa
     /// edição posterior — aqui só garantimos a mensagem que acabamos de gerar sem cor.
     /// </summary>
+    /// <summary>
+    /// Normaliza quebras de linha para <c>\n</c> e remove espaços nas pontas. Usado para comparar
+    /// a NOSSA mensagem (gerada com <c>\n</c>) com o que a caixa do host devolve, que pode vir com
+    /// <c>\r\n</c>. Sem essa normalização a comparação acusaria diferença e a mensagem que nós
+    /// mesmos escrevemos seria tratada como texto do usuário, congelando o auto-refresh.
+    /// </summary>
+    private static string NormalizeNewlines(string s) =>
+        s.Replace("\r\n", "\n").Replace('\r', '\n').Trim();
+
     private static void ResetTextColors(TextBoxBase tb)
     {
         if (tb is not RichTextBox rtb) return;

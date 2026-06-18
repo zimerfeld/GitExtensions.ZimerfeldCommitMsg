@@ -6,7 +6,7 @@
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Version:** 1.0.73
+**Version:** 1.0.76
 **Updated:** 2026-06-18
 
 Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatically generates commit messages by analyzing the real content of staged changes. Changes are classified by **Conventional Commits** types (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) to choose the appropriate **verb**, and the resulting message is a **verb-led sentence** followed by a bulleted body — **without** the `type:` prefix. **Multilingual**: generates output in **Brazilian Portuguese or English**, automatically detected from the operating system language, with a **manual override** in the plugin settings.

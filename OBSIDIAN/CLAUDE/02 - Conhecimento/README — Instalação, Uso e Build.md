@@ -4,12 +4,12 @@ criado: 2026-06-08
 atualizado: 2026-06-18
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.73
+versao: 1.0.76
 ---
 
 # README — Instalação, Uso e Build
 
-> Espelho fiel do `README.md` da raiz do repositório (carimbado em **v1.0.72 / 2026-06-16**), reconciliado com o código em 2026-06-16.
+> Espelho fiel do `README.md` da raiz do repositório (carimbado em **v1.0.73 / 2026-06-18**), reconciliado com o código em 2026-06-18.
 > Nota de projeto: [[GitExtensions.ZimerfeldCommitMsg]]. Lógica em [[Geração de mensagem - Conventional Commits]].
 > O `build.ps1` carimba versão + data nos READMEs **e nesta nota** (frontmatter `versao:`/`atualizado:`) a cada build — reespelhar o corpo quando o README mudar de forma significativa.
 
@@ -213,6 +213,9 @@ A cada execução do `build.ps1`, o script:
 7. Atualiza `tools\net9.0-windows\` com a DLL nova.
 8. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`.
 9. Remove `.nupkg` de versões anteriores.
+
+> [!info] Conteúdo bilíngue no nuget.org
+> Tudo que aparece na página do pacote em **nuget.org** é **bilíngue (cada parágrafo em inglês + o correspondente em português)**. São duas fontes: a `<description>` do `.nuspec` (exibida no topo) — um parágrafo EN seguido da tradução PT — e o `README.md` (empacotado via `<readme>`), já bilíngue, com rótulos de link também em EN/PT (`Pacote NuGet`, `Repositório no GitHub`). O pacote ainda inclui `README.pt-BR.md` e `README.en-US.md` completos para quem abrir o conteúdo do `.nupkg`.
 
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg
