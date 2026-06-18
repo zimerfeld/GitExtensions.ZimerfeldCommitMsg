@@ -4,12 +4,12 @@ criado: 2026-06-08
 atualizado: 2026-06-18
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.73
+versao: 1.0.82
 ---
 
 # README — Instalação, Uso e Build
 
-> Espelho fiel do `README.md` da raiz do repositório (carimbado em **v1.0.72 / 2026-06-16**), reconciliado com o código em 2026-06-16.
+> Espelho fiel do `README.md` da raiz do repositório (carimbado em **v1.0.73 / 2026-06-18**), reconciliado com o código em 2026-06-18.
 > Nota de projeto: [[GitExtensions.ZimerfeldCommitMsg]]. Lógica em [[Geração de mensagem - Conventional Commits]].
 > O `build.ps1` carimba versão + data nos READMEs **e nesta nota** (frontmatter `versao:`/`atualizado:`) a cada build — reespelhar o corpo quando o README mudar de forma significativa.
 
@@ -61,7 +61,7 @@ Zimerfeld Commit Msg — Inglês/English
 | `- Adiciona gerenciamento de token` | `- Add token management` |
 
 ## 🔌 Modos de integração
-- **Template no diálogo de commit:** um item por idioma no dropdown (`— Automático/Automatic`, `— Português/Portuguese`, `— Inglês/English`); selecione e a mensagem é gerada nesse idioma e preenchida pelo GitExtensions.
+- **Template no diálogo de commit:** um item por idioma no dropdown (`— Automático/Automatic`, `— Português/Portuguese`, `— Inglês/English`). Ao **abrir** o menu, o host gera os 3 idiomas na hora (frescos do stage); ao **clicar**, a caixa recebe a mensagem daquele idioma e o plugin detecta a escolha (via `TextChanged`) para **fixar** o idioma do auto-refresh. Ver [[../Fluxos/Template Dropdown (Auto-resumo)]].
 - **Menu Plugins:** `Plugins → ZimerfeldCommitMsg` valida o repositório (`IsValidGitWorkingDir`) e abre `StartCommitDialog` com a mensagem já preenchida.
 - **Auto-preenchimento ao abrir e ao stage/unstage:** ao **abrir** o diálogo já com arquivos em stage, preenche automaticamente (detecção do `FormCommit` novo via `Application.Idle`, tratado uma vez por instância com `WeakReference`); e enquanto o diálogo estiver aberto, `PostRepositoryChanged` regenera a mensagem quando arquivos entram/saem do stage. Só sobrescreve se a caixa estiver vazia ou contiver `_lastGeneratedMessage`. Ver [[Stage Trigger]].
 
@@ -213,6 +213,9 @@ A cada execução do `build.ps1`, o script:
 7. Atualiza `tools\net9.0-windows\` com a DLL nova.
 8. Gera `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`.
 9. Remove `.nupkg` de versões anteriores.
+
+> [!info] Conteúdo bilíngue no nuget.org
+> Tudo que aparece na página do pacote em **nuget.org** é **bilíngue (cada parágrafo em inglês + o correspondente em português)**. São duas fontes: a `<description>` do `.nuspec` (exibida no topo) — um parágrafo EN seguido da tradução PT — e o `README.md` (empacotado via `<readme>`), já bilíngue, com rótulos de link também em EN/PT (`Pacote NuGet`, `Repositório no GitHub`). O pacote ainda inclui `README.pt-BR.md` e `README.en-US.md` completos para quem abrir o conteúdo do `.nupkg`.
 
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg

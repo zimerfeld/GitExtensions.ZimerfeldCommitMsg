@@ -1090,6 +1090,13 @@ internal sealed class CommitMessageGenerator
                 CreateNoWindow         = true,
                 StandardOutputEncoding = Encoding.UTF8
             };
+            // core.quotepath=false: sem isso, caminhos com acento/não-ASCII voltam
+            // octal-escapados e entre aspas (ex.: "Instala\303\247\303\243o") — bytes
+            // que são todos ASCII, escapam do guard de não-ASCII e vazam lixo (ex.: "243o")
+            // para a mensagem. Com o flag, o git emite o caminho em UTF-8 puro (a saída já é
+            // lida como UTF-8), e nomes acentuados são corretamente tratados como não-ASCII.
+            psi.ArgumentList.Add("-c");
+            psi.ArgumentList.Add("core.quotepath=false");
             foreach (var a in args) psi.ArgumentList.Add(a);
             using var p = Process.Start(psi)!;
             var output  = p.StandardOutput.ReadToEnd();

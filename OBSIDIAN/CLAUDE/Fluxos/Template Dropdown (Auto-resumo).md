@@ -29,8 +29,9 @@ foreach (var (label, lang) in _templateItems)   // Auto/null, PT, EN
 ```
 
 - `AddCommitTemplate(label, factory, icon)` registra uma entrada **nomeada** por item; a API é **plana** (sem submenu), por isso são 3 itens, não um submenu de idioma.
-- `GenerateForTemplate` fixa `_sessionLanguage = forced` e instancia `CommitMessageGenerator(workingDir, forced ?? CurrentLanguage())` — o auto-refresh subsequente mantém o idioma escolhido.
-- A `factory` é um **delegate preguiçoso**: não roda no registro, só quando o usuário **seleciona** a opção.
+- `GenerateForTemplate` instancia `CommitMessageGenerator(workingDir, forced ?? CurrentLanguage())`, registra o texto gerado (`msg → idioma`, via `RememberTemplateMessage`) e retorna a string. **Não** fixa idioma aqui — ver abaixo.
+- ⚠️ A `factory` **não roda no clique**: o host (`CommitTemplateManager.RegisteredTemplates`) a invoca ao **ABRIR** o dropdown, uma vez para **cada** item (Auto/PT/EN). O clique só aplica via `ReplaceMessage` o texto já materializado, **sem** rechamar a factory nem dar callback de clique.
+- **Fixação de idioma (pinning):** como a factory roda para todos os itens na abertura (fixar ali fixaria sempre o último, EN), a escolha é detectada de outro jeito: assinamos o `TextChanged` da caixa (`EnsureTextChangedHook`); quando ela vira exatamente uma das mensagens registradas (`DetectTemplateSelection`), fixamos `_sessionLanguage` no idioma daquele item. O auto-refresh então regenera fresco do stage nesse idioma (`EffectiveLanguage = _sessionLanguage ?? CurrentLanguage`). Vale enquanto o diálogo vive.
 - `PluginIcon` é o ícone (PNG embutido) exibido ao lado do rótulo no dropdown e também no menu Plugins. Ver [[../Arquivos-Chave/ZimerfeldCommitMsgPlugin]].
 
 ## Sequência ao clicar
@@ -39,33 +40,29 @@ foreach (var (label, lang) in _templateItems)   // Auto/null, PT, EN
 Usuário abre o diálogo de commit (FormCommit)
         │
         ▼
-Abre o dropdown de templates de mensagem
-        │   (3 itens "Zimerfeld Commit Msg — Auto/PT/EN" com ícone)
+Usuário ABRE o dropdown de templates de mensagem
+        │   host enumera RegisteredTemplates → invoca a factory dos 3 itens
         ▼
-Usuário seleciona um item "Zimerfeld Commit Msg — …"
+GenerateForTemplate(WorkingDir, forced)  ×3  (Auto, PT, EN)
+        │   new CommitMessageGenerator(WorkingDir, idioma).Generate()  ← pipeline completo
+        │   RememberTemplateMessage(msg → idioma)
+        ▼
+host materializa o texto de cada item no menu
         │
         ▼
-GitExtensions invoca a factory registrada do item
-        │
+Usuário CLICA num item "Zimerfeld Commit Msg — …"
+        │   host: ReplaceMessage(textoMaterializado)  → caixa = mensagem do idioma
         ▼
-GenerateForTemplate(WorkingDir, forced)
-        │   fixa _sessionLanguage = forced (idioma do item)
+TextChanged dispara → DetectTemplateSelection(caixa)
+        │   caixa == mensagem registrada? → fixa _sessionLanguage = idioma do item
         ▼
-new CommitMessageGenerator(WorkingDir, idioma).Generate()   ← pipeline completo
-        │   git diff --cached --name-status
-        │   git diff --cached --no-color
-        │   → "<Verbo> <descrição>" + corpo em bullets   (SEM prefixo "tipo:")
-        ▼
-Retorna string da mensagem
-        │
-        ▼
-GitExtensions preenche a caixa de mensagem do FormCommit
+auto-refresh (stage/unstage) regenera fresco do stage em EffectiveLanguage()
 ```
 
 ## Detalhe dos passos
 
-1. **Seleção** — o usuário escolhe a entrada no dropdown. O GitExtensions é quem dispara a factory; o plugin não intercepta o clique diretamente.
-2. **Instanciação sob demanda** — cada seleção cria um `CommitMessageGenerator` **novo**, vinculado ao `WorkingDir` lido no momento do clique (sem estado entre chamadas).
+1. **Abertura do menu** — o host dispara a factory dos **3 itens** ao abrir o dropdown (não no clique). O plugin não intercepta o clique diretamente; reconhece a escolha depois, pelo `TextChanged` da caixa.
+2. **Instanciação sob demanda** — cada item cria um `CommitMessageGenerator` **novo**, vinculado ao `WorkingDir` lido na abertura do menu (sem estado entre chamadas).
 3. **Geração** — roda o pipeline completo de [[Geração da Mensagem]]:
    - `ParseChanges` → tipos via `DetermineAllTypes`
    - comentários do diff (ranqueados + traduzidos en→pt-BR, preservando branches e tipos CC — ver [[../Decisoes/Preservação de Branches e Tipos CC]])
@@ -78,7 +75,7 @@ GitExtensions preenche a caixa de mensagem do FormCommit
 | Aspecto | Dropdown (este fluxo) | Menu Plugins (`Execute`) | Evento (`PostRepositoryChanged`) |
 |---|---|---|---|
 | Disparo | Usuário seleciona o template | Usuário clica em Plugins → ZimerfeldCommitMsg | Stage/unstage de arquivos |
-| Quem preenche a caixa | GitExtensions | `StartCommitDialog(commitMessage:)` | O plugin (`tb.Text = msg`) |
+| Quem preenche a caixa | GitExtensions (plugin detecta a escolha via `TextChanged` e fixa o idioma) | `StartCommitDialog(commitMessage:)` | O plugin (`tb.Text = msg`) |
 | Validação de repo | — (host gerencia) | `IsValidGitWorkingDir()` + `MessageBox` | Ignora se `WorkingDir` vazio |
 | Sem mudanças staged | Caixa recebe string vazia | `MessageBox` "Nenhuma mudança staged" | Não atualiza (`Generate()` vazio) |
 | Protege texto manual | N/A (usuário pediu) | N/A (abre diálogo novo) | **Sim** — só sobrescreve vazio ou `_lastGeneratedMessage` |
@@ -87,7 +84,7 @@ GitExtensions preenche a caixa de mensagem do FormCommit
 ## Observações
 
 - Este caminho **não** exibe `MessageBox`: se não houver staged changes, a factory retorna `string.Empty` e o GitExtensions simplesmente não preenche nada.
-- Como a factory é avaliada a cada seleção, **reselecionar** o template regenera a mensagem com o estado atual do stage.
+- Como a factory é avaliada a cada **abertura** do dropdown, reabrir o menu regenera as 3 mensagens com o estado atual do stage (sempre frescas).
 - Os 3 templates são removidos no `Unregister()` via `RemoveCommitTemplate(label)` para cada item.
 
 ## Relacionado

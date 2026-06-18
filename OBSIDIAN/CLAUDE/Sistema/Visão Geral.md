@@ -19,7 +19,7 @@ Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de
 | UI Framework | Windows Forms (herdado do GitExtensions) |
 | Assembly de saída | `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` |
 | Namespace | `GitExtensions.ZimerfeldCommitMsg` |
-| Versão atual | `1.0.73` |
+| Versão atual | `1.0.82` |
 | Idiomas | Português-BR / Inglês (auto pelo SO + override) |
 | Autor | Zimerfeld |
 
