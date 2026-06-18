@@ -20,7 +20,7 @@ if (-not (Test-Path $dll)) {
     if ((-not $buildSucceeded) -or ($buildExitCode -is [int] -and $buildExitCode -ne 0)) { exit 1 }
 }
 elseif ($newestInput -and ((Get-Item $dll).LastWriteTimeUtc -lt $newestInput)) {
-    Write-Warning "DLL em bin\$Config esta mais antiga que as fontes/recursos. Executando build forcado..."
+    Write-Warning "DLL em bin\$Config esta mais antiga que as fontes/recursos em tools\net9.0-windows."
     & $buildScript -Force
     $buildSucceeded = $?
     $buildExitCode = Get-Variable -Name LASTEXITCODE -ValueOnly -ErrorAction SilentlyContinue

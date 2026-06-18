@@ -65,7 +65,7 @@ if ((-not $Force) -and $lastPkg -and $newestInput -le $lastPkg.LastWriteTimeUtc)
 }
 
 if ($Force) {
-    Write-Host "Build forcado: ignorando verificacao incremental." -ForegroundColor Yellow
+    Write-Host "Executando build...ignorando verificacao incremental." -ForegroundColor Yellow
 }
 
 Write-Host "Versao: $current  ->  " -NoNewline
