@@ -5,7 +5,7 @@ atualizado: 2026-06-18
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits, i18n]
 status: ativo
 linguagem: C#
-versao: 1.0.73
+versao: 1.0.82
 repo: C:\GitExtensions\ZimerfeldCommitMsg
 ---
 
@@ -50,9 +50,10 @@ C:\GitExtensions\ZimerfeldCommitMsg\
   - `System.ComponentModel.Composition.dll`
 
 ## ✨ Funcionalidades principais
-- **Template no diálogo de commit:** opção no dropdown de templates preenche a mensagem (`AddCommitTemplate`)
+- **Template no diálogo de commit:** um item por idioma via `AddCommitTemplate(Func<string>)`. **Como o host chama:** `CommitTemplateManager.RegisteredTemplates` é enumerado ao **abrir** o dropdown e invoca o `Func` de **cada** item ali (em ordem), materializando o texto; o **clique** aplica esse texto via `ReplaceMessage` (replace) **sem** rechamar o `Func` nem dar callback de clique. Logo, "mensagem nova a cada clique" vem do host: abrir o menu gera os 3 idiomas na hora (frescos do stage) e o item clicado substitui a caixa. **Detecção da escolha + fixação de idioma:** como o `Func` roda para **todos** os itens na abertura, `GenerateForTemplate` **não** fixa idioma ali (fixaria sempre o último); em vez disso registra `msg → idioma` (`RememberTemplateMessage`) e assina o `TextChanged` da caixa (`EnsureTextChangedHook`); quando a caixa vira exatamente uma dessas mensagens (`DetectTemplateSelection`), fixa `_sessionLanguage` no idioma do item clicado → o auto-refresh (`EffectiveLanguage` = `_sessionLanguage ?? CurrentLanguage`) passa a regenerar **fresco do stage nesse idioma**. A fixação vale enquanto o diálogo vive (reiniciada ao fechar). **REGRA — stage vazio:** acionar um item do dropdown com o stage **sem arquivos** limpa **qualquer** texto da caixa (`ClearOpenCommitDialog`); como a geração só é vazia quando nada está em stage (com arquivos staged nunca é vazia), `msg` vazia ⟺ stage vazio. Obs.: o host avalia o `Func` na **abertura** do dropdown, então a limpeza ocorre ao abrir o menu com stage vazio (mesmo resultado vazio para os 3 idiomas)
 - **Menu Plugins → ZimerfeldCommitMsg:** abre o `StartCommitDialog` com a mensagem já preenchida (`Execute`)
-- **Auto-preenchimento ao abrir e ao (un)stage:** ao **abrir** o `FormCommit` já com arquivos em stage, preenche automaticamente (detecção do form novo via `Application.Idle`, tratado uma vez por instância com `WeakReference`); e assina `PostRepositoryChanged` para regenerar ao stage/unstage. Só atualiza se a caixa estiver vazia (ou contiver a última mensagem que nós geramos). **Nunca sobrescreve texto digitado pelo usuário**
+- **Re-sincronização CIRÚRGICA a cada abertura da janela de commit (REGRA):** toda vez que um `FormCommit` abre — seja pelo GitExtensions, pelo menu Plugins → ZimerfeldCommitMsg, ou por outro plugin (ex.: ZimerfeldTree) — o plugin re-vincula **só o que pode ter mudado** (`ResyncForCommitDialog`): **(1) GARANTE os 3 templates do dropdown** (`EnsureCommitTemplates`, idempotente — `AddCommitTemplate` só adiciona se o nome não existe no storage estático), de modo que **qualquer** plugin que abra o FormCommit tenha o dropdown gerando texto mesmo que a re-registração **assíncrona** do host (ao trocar de repo) ainda não tenha recolocado os templates; (2) re-aponta a fonte de settings; (3) garante **uma** assinatura de `PostRepositoryChanged`; (4) reinicia o estado de sessão. Resolve o `IGitUICommands` do capturado **ou do próprio FormCommit** (`UICommands` por reflexão), então funciona com commands defasado/nulo. **Não** remove nada nem mexe no `Application.Idle`. Detectado no `Application.Idle`; roda **uma vez por janela** (`_resyncedCommitForm`). ⚠️ Substitui o ciclo completo `Unregister`→`Register` anterior, que removia os templates e podia deixá-los removidos numa falha parcial — quebrando a geração via dropdown
+- **Auto-preenchimento ao abrir e ao (un)stage:** ao **abrir** o `FormCommit` já com arquivos em stage, preenche automaticamente (detecção do form novo via `Application.Idle`, tratado uma vez por instância com `WeakReference`); e assina `PostRepositoryChanged` para regenerar ao stage/unstage. Só atualiza se a caixa estiver vazia (ou contiver a última mensagem que nós geramos). **Nunca sobrescreve texto digitado pelo usuário**. **Working dir = o do PRÓPRIO diálogo** (`GitModuleForm.Module.WorkingDir` por reflexão, via `GetCommitFormWorkingDir`), com fallback ao `IGitUICommands` capturado — corrige o bug de "parar de funcionar ao trocar de repositório/branch", em que a geração rodava no working dir antigo (stage diferente → mensagem errada/vazia)
 - **Multilíngue (PT/EN):** `ChoiceSetting` "Idioma da mensagem / Message language" com rótulos bilíngues (`Automático/Automatic`, `Português/Portuguese`, `Inglês/English`); Auto detecta pelo `CultureInfo.CurrentUICulture`. Toda a saída + diálogos de UI são localizados. Ver [[Suporte Multilíngue PT-EN]]
 - Marshalling seguro pra UI thread via `SynchronizationContext` capturado no `Register()`
 - Tudo dentro de `try/catch` — o plugin **nunca derruba** o GitExtensions
@@ -90,7 +91,7 @@ Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` 
 > `FindCommitTextBox` tenta nomes conhecidos (`Message`, `commitMessageEditor`, `_commitMessage`, `commitMessage`) e cai num fallback heurístico (maior `TextBoxBase` multiline editável). Versões diferentes do GitExtensions mudam esses nomes.
 
 ## 🔢 Versionamento
-- Versão atual: **1.0.73** (csproj + nuspec sincronizados pelo `build.ps1`)
+- Versão atual: **1.0.82** (csproj + nuspec sincronizados pelo `build.ps1`)
 - Esquema: `major.minor.BUILD`, BUILD auto-incrementado a cada build
 - A cada build, o `build.ps1` carimba versão + data nos **READMEs e neste cofre** (notas Projeto, README espelho, Versionamento, Visão Geral) **antes** do bump no nuspec/csproj
 
