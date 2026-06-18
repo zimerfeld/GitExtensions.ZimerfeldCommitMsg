@@ -109,9 +109,9 @@ O comentário do arquivo mais impactante vira `desc`. Os demais vão para o body
 
 ## Passo 4 — Corpo em bullets (BuildBody)
 
-Ativo quando há **2+ arquivos**. Ordena por relevância do arquivo (`CommentFilePriority`) e gera até **5 bullets** `- <StatusVerb> <conceito>`, com `Distinct`.
+Gera **ao menos um bullet**, mesmo com um único arquivo. Ordena por relevância do arquivo (`CommentFilePriority`) e gera até **5 bullets** `- <StatusVerb> <conceito>`, com `Distinct`.
 
-**Extração de conceito por arquivo:** filename sem extensão → remove prefixo `I` de interface → remove sufixo arquitetural (`Service`, `Repository`, `Controller`…) → `MapConcept` para frase no idioma ativo.
+**Extração de conceito por arquivo:** filename sem extensão → remove prefixo `I` de interface → remove sufixo arquitetural (`Service`, `Repository`, `Controller`…) → `MapConcept` para frase no idioma ativo. **Fallback final** (`FormatFileLine`): sem comentário nem conceito legível (nome com ponto, ou 3+ palavras com termo desconhecido — nome próprio/namespace), o bullet recai no **próprio nome do arquivo** — nenhum arquivo fica sem linha.
 
 **StatusVerb:** `A`/`C` → Adiciona/Add · `D` → Remove/Remove · `R` → Renomeia/Rename · demais → Atualiza/Update.
 

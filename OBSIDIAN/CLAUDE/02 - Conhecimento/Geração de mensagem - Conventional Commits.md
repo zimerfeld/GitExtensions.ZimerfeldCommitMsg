@@ -71,18 +71,19 @@ Quando não há comentário válido:
 1. Stem com `.` ou não-ASCII → ignorado.
 2. Remove prefixo de interface (`IUserService` → `UserService`).
 3. Remove sufixo arquitetural (maior primeiro): `ServiceTests`, `Service`, `Controller`, `Repository`, `Manager`, `Handler`, `Generator`, `Helper`, `Provider`, `Factory`, `Builder`, `Middleware`, `Validator`, `Mapper`, `Dto`, `ViewModel`, `Config`, `Settings`, `Adapter`, `Client`, `Impl`, …
-4. < 2 chars → rejeitado; fora do dicionário e > 2 palavras PascalCase → rejeitado.
+4. < 2 chars → rejeitado; **`RejectedVocabulary`** (qualquer palavra proibida → rejeita, ex.: `zimerfeld`/`git`/`extensions`); nome com 3+ palavras → rejeitado como namespace, **exceto** se for conceito (`HasConcept`) **ou** todas as palavras forem vocabulário reconhecido (`IsKnownVocabulary`: `KnownVocabulary` ∪ `WordTranslations` ∪ `ConceptPhrases`). Ex.: `New Text Document` passa; `ZimerfeldCommitMsg` não (`zimerfeld` rejeitado).
 5. `MapConcept` → frase pt-BR/EN (`Auth`→autenticação, `User`→gerenciamento de usuários, `Payment`→processamento de pagamento, `CommitMessage`→mensagem de commit, …).
 
 Subject = conceito **dominante** (mais frequente). 
 
 ## Corpo (`BuildBody`)
-Com 2+ arquivos, até 5 bullets `- <StatusVerb> <conceito>`, ordenados por relevância do arquivo, `Distinct`:
+Até 5 bullets `- <StatusVerb> <conceito>`, ordenados por relevância do arquivo, `Distinct` — **ao menos um, mesmo com um único arquivo**:
 ```
 - Adiciona autenticação
 - Adiciona gerenciamento de token
 ```
 `StatusVerb`: `A`/`C` → Adiciona/Add · `D` → Remove/Remove · `R` → Renomeia/Rename · demais → Atualiza/Update.
+Fallback final em `FormatFileLine`: sem comentário nem conceito legível (nome com ponto, ou 3+ palavras com termo desconhecido — nome próprio/namespace), o bullet recai no **próprio nome do arquivo** — nenhum arquivo fica sem linha.
 *(O antigo corpo em prosa "Abrange … nas camadas …" foi removido quando o corpo virou bullets.)*
 
 ## Tradução EN→PT

@@ -1,7 +1,8 @@
 ﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
-    Compila o plugin, incrementa a versao (major.minor.build) e gera o .nupkg.
+    Carimba a nova versao/data nos docs (READMEs + cofre Obsidian), da' bump na
+    versao (major.minor.build) no nuspec/csproj, compila o plugin e gera o .nupkg.
     Executar como Administrador para tambem fazer o deploy em GitExtensions.
 #>
 
@@ -100,17 +101,13 @@ if ($geProcs) {
     Write-Host "GitExtensions nao esta em execucao."
 }
 
-# -- 2. Atualizar nuspec -------------------------------------------------------
-$spec.package.metadata.version = $newVersion
-$spec.Save($nuspec)
-
-# -- 3. Atualizar csproj -------------------------------------------------------
-$csprojContent = Get-Content $csproj -Raw -Encoding UTF8
-$csprojContent = $csprojContent -replace '<Version>[^<]+</Version>', "<Version>$newVersion</Version>"
-[System.IO.File]::WriteAllText($csproj, $csprojContent, [System.Text.Encoding]::UTF8)
-
-# -- 4. Atualizar READMEs ------------------------------------------------------
+# -- 2. Atualizar docs (READMEs + cofre Obsidian) ------------------------------
+# Os documentos sao escritos PRIMEIRO; o bump da fonte da verdade (nuspec/csproj)
+# vem logo em seguida (passos 3 e 4). Assim a versao/data so' chegam ao
+# nuspec/csproj depois que README e cofre Obsidian ja' refletem a nova versao.
 $today = (Get-Date).ToString("yyyy-MM-dd")
+
+# 2a. READMEs (raiz, todas as variantes localizadas)
 $readmeDocs = @(
     "$PSScriptRoot\README.md",
     "$PSScriptRoot\README.pt-BR.md",
@@ -129,6 +126,40 @@ foreach ($readmeDoc in $readmeDocs) {
         Write-Host "$(Split-Path $readmeDoc -Leaf) atualizado para $newVersion ($today)"
     }
 }
+
+# 2b. Cofre Obsidian -- somente as notas que carimbam a versao ATUAL do projeto.
+# Notas de sessao/historico mencionam versoes antigas e NAO entram aqui de proposito.
+$obsidianDocs = @(
+    "$PSScriptRoot\OBSIDIAN\CLAUDE\01 - Projetos\GitExtensions.ZimerfeldCommitMsg.md",
+    "$PSScriptRoot\OBSIDIAN\CLAUDE\02 - Conhecimento\README — Instalação, Uso e Build.md",
+    "$PSScriptRoot\OBSIDIAN\CLAUDE\Sistema\Versionamento.md",
+    "$PSScriptRoot\OBSIDIAN\CLAUDE\Sistema\Visão Geral.md"
+)
+$verBold   = '**' + $newVersion + '**'
+$verTicked = '`'  + $newVersion + '`'
+foreach ($obsDoc in $obsidianDocs) {
+    if (Test-Path $obsDoc) {
+        $content = Get-Content $obsDoc -Raw -Encoding UTF8
+        # Frontmatter YAML
+        $content = $content -replace '(?m)^versao:\s*[^\r\n]+',     "versao: $newVersion"
+        $content = $content -replace '(?m)^atualizado:\s*[^\r\n]+', "atualizado: $today"
+        # Corpo -- tres formatos de "versao atual" usados nas notas
+        $content = $content -replace 'Versão atual:\s*\*\*[^\*\r\n]+\*\*',     "Versão atual: $verBold"
+        $content = $content -replace '\*\*Versão atual:\*\*\s*`[^`\r\n]+`',    "**Versão atual:** $verTicked"
+        $content = $content -replace '(\|\s*Versão atual\s*\|\s*)`[^`\r\n]+`', ('${1}' + $verTicked)
+        [System.IO.File]::WriteAllText($obsDoc, $content, [System.Text.Encoding]::UTF8)
+        Write-Host "Obsidian: $(Split-Path $obsDoc -Leaf) atualizado para $newVersion ($today)"
+    }
+}
+
+# -- 3. Bump da versao no nuspec (fonte da verdade) ----------------------------
+$spec.package.metadata.version = $newVersion
+$spec.Save($nuspec)
+
+# -- 4. Bump da versao no csproj -----------------------------------------------
+$csprojContent = Get-Content $csproj -Raw -Encoding UTF8
+$csprojContent = $csprojContent -replace '<Version>[^<]+</Version>', "<Version>$newVersion</Version>"
+[System.IO.File]::WriteAllText($csproj, $csprojContent, [System.Text.Encoding]::UTF8)
 
 # -- 5. Build ------------------------------------------------------------------
 Write-Host "Compilando..."

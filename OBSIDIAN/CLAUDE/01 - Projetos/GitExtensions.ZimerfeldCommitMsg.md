@@ -1,11 +1,11 @@
----
+﻿---
 tipo: projeto
 criado: 2026-06-01
-atualizado: 2026-06-08
+atualizado: 2026-06-18
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits, i18n]
 status: ativo
 linguagem: C#
-versao: 1.0.40
+versao: 1.0.73
 repo: C:\GitExtensions\ZimerfeldCommitMsg
 ---
 
@@ -52,17 +52,17 @@ C:\GitExtensions\ZimerfeldCommitMsg\
 ## ✨ Funcionalidades principais
 - **Template no diálogo de commit:** opção no dropdown de templates preenche a mensagem (`AddCommitTemplate`)
 - **Menu Plugins → ZimerfeldCommitMsg:** abre o `StartCommitDialog` com a mensagem já preenchida (`Execute`)
-- **Auto-refresh ao (un)stage:** assina `PostRepositoryChanged`; se o `FormCommit` estiver aberto e a caixa estiver vazia (ou contiver a última mensagem que nós geramos), atualiza a mensagem. **Nunca sobrescreve texto digitado pelo usuário**
+- **Auto-preenchimento ao abrir e ao (un)stage:** ao **abrir** o `FormCommit` já com arquivos em stage, preenche automaticamente (detecção do form novo via `Application.Idle`, tratado uma vez por instância com `WeakReference`); e assina `PostRepositoryChanged` para regenerar ao stage/unstage. Só atualiza se a caixa estiver vazia (ou contiver a última mensagem que nós geramos). **Nunca sobrescreve texto digitado pelo usuário**
 - **Multilíngue (PT/EN):** `ChoiceSetting` "Idioma da mensagem / Message language" com rótulos bilíngues (`Automático/Automatic`, `Português/Portuguese`, `Inglês/English`); Auto detecta pelo `CultureInfo.CurrentUICulture`. Toda a saída + diálogos de UI são localizados. Ver [[Suporte Multilíngue PT-EN]]
 - Marshalling seguro pra UI thread via `SynchronizationContext` capturado no `Register()`
 - Tudo dentro de `try/catch` — o plugin **nunca derruba** o GitExtensions
 
 ## 🧠 Lógica de geração (`CommitMessageGenerator`)
-Formato: `<Verbo> <descrição no idioma ativo>` + corpo opcional em bullets. **Sem prefixo `tipo:`** — o tipo CC só escolhe o **verbo** (`feat`+só adições → `Implementa`; `fix` → `Corrige`; etc.); o tipo não é impresso. Subject limitado a 72 chars. Sem scope. Idioma injetado no construtor (`MessageLanguage`) e os mapas específicos vêm do `LanguagePack` (PT/EN). Ver detalhes em [[Geração de mensagem - Conventional Commits]] e [[Suporte Multilíngue PT-EN]].
+Formato: `<Contexto> - <Verbo> <N> <arquivos> (<tipos>)` + corpo em bullets. **Prefixo de contexto (até 5 palavras)** derivado do conceito do **nome do arquivo de maior impacto** (`BuildContextPrefix`) — em **pt-BR** é uma frase de ação nominalizada: `StatusNoun` (`Adição`/`Remoção`/`Atualização`/`Renomeação`) + `de` + conceito traduzido e reordenado (ex.: `New Text Document` deletado → `Remoção de documento de texto`; `UserService` mod → `Atualização de gerenciamento de usuários`); em **inglês** é o conceito humanizado (`OverlayController` → `Overlay`). Garante que o título **nunca** seja genérico (ex.: nunca só `Adiciona 1 arquivo (fix)`). **Sem prefixo `tipo:`** — o tipo CC só escolhe o **verbo** (`feat`+só adições → `Implementa`; `fix` → `Corrige`; etc.); o tipo não é impresso. Subject limitado a 80 chars. Sem scope. Idioma injetado no construtor (`MessageLanguage`) e os mapas específicos vêm do `LanguagePack` (PT/EN). Ver detalhes em [[Geração de mensagem - Conventional Commits]] e [[Suporte Multilíngue PT-EN]].
 - **Estratégia 1 (principal):** extrai comentários adicionados (`+`) do `git diff --cached --no-color`, filtra ruído (separadores, tags XML, código comentado, < 10 chars). O comentário mais impactante vira a descrição; os demais vão no corpo como bullets `- item`
 - **Estratégia 2 (fallback):** `BuildSubject(type, changes)` → verbo do idioma + conceito dominante dos nomes de arquivo (ex: `"Implementa autenticação"` / `"Implement authentication"`)
-- **Corpo em bullets:** até 5 frases de uma linha, uma por arquivo mais significativo, com verbo conforme o status git (`StatusVerb`)
-- **Tradução EN→PT:** só roda quando o idioma de saída é pt-BR; em inglês os comentários passam intactos
+- **Corpo em bullets:** até 5 frases de uma linha, uma por arquivo mais significativo, com verbo conforme o status git (`StatusVerb`); **sempre ao menos um bullet**, mesmo com um único arquivo — sem comentário nem conceito legível, recai no próprio nome do arquivo (`FormatFileLine`)
+- **Tradução EN→PT:** só roda quando o idioma de saída é pt-BR; em inglês os comentários passam intactos. Branches/tipos CC são mascarados por placeholders `N` (sentinelas de controle, ausentes em código) e restaurados no fim — assim números **reais** do texto (ex.: `255`, `200`) nunca são confundidos com o índice, corrigindo o bug que cortava palavras (`assíncrona` → `255ncrona`)
 - **Tipo** detectado por: arquivos novos → `feat`; só modificações → `fix`; só docs → `docs`; testes → `test`; config → `chore`; build → `build`; mix → `refactor`
 
 ## 🛠️ Build / instalação
@@ -77,7 +77,7 @@ tools\install.ps1      # instala o plugin
 tools\uninstall.ps1    # remove (não afeta nada mais do GitExtensions)
 tools\update-dll.ps1   # atualiza só a DLL (dev, sem incrementar versão)
 ```
-> O `build.ps1` incrementa `major.minor.BUILD`, sincroniza versão em nuspec + csproj + `README.md` (carimba versão + data), builda em Release, copia a DLL p/ `Plugins\` (se Admin) e p/ `tools\net9.0-windows\`, e roda `nuget pack` removendo nupkgs antigos. Passo a passo completo em [[README — Instalação, Uso e Build]].
+> O `build.ps1` incrementa `major.minor.BUILD`, carimba versão + data **primeiro nos docs** (READMEs + este cofre Obsidian) e **só então** dá o _bump_ em nuspec + csproj, builda em Release, copia a DLL p/ `Plugins\` (se Admin) e p/ `tools\net9.0-windows\`, e roda `nuget pack` removendo nupkgs antigos. Passo a passo completo em [[README — Instalação, Uso e Build]] e [[Versionamento]].
 
 ## 🔍 inspector (utilitário de dev)
 Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` + reflection para listar tipos/membros públicos de `GitExtensions.Extensibility.dll` e `GitUIPluginInterfaces.dll` — útil pra descobrir a API correta (`IGitPlugin`, `IGitUICommands`, `ICommitMessageManager`, `GitUIEventArgs` etc.) ao evoluir o plugin.
@@ -90,9 +90,9 @@ Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` 
 > `FindCommitTextBox` tenta nomes conhecidos (`Message`, `commitMessageEditor`, `_commitMessage`, `commitMessage`) e cai num fallback heurístico (maior `TextBoxBase` multiline editável). Versões diferentes do GitExtensions mudam esses nomes.
 
 ## 🔢 Versionamento
-- Versão atual: **1.0.40** (csproj + nuspec sincronizados pelo `build.ps1`)
+- Versão atual: **1.0.73** (csproj + nuspec sincronizados pelo `build.ps1`)
 - Esquema: `major.minor.BUILD`, BUILD auto-incrementado a cada build
-- `README.md` carimba versão + data a cada build (FUNCIONALIDADES.md foi removido e unificado no README.md)
+- A cada build, o `build.ps1` carimba versão + data nos **READMEs e neste cofre** (notas Projeto, README espelho, Versionamento, Visão Geral) **antes** do bump no nuspec/csproj
 
 ## 📜 Histórico de sessões
 - [[2026-06-01 - Criação do cofre de neurônios CommitMsg]] — mapeamento inicial do projeto

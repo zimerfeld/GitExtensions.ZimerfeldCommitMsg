@@ -1,7 +1,7 @@
----
+﻿---
 tipo: sistema
 tags: [sistema, overview, plugin, gitextensions, i18n]
-atualizado: 2026-06-05
+atualizado: 2026-06-18
 ---
 
 # Visão Geral
@@ -19,7 +19,7 @@ Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de
 | UI Framework | Windows Forms (herdado do GitExtensions) |
 | Assembly de saída | `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` |
 | Namespace | `GitExtensions.ZimerfeldCommitMsg` |
-| Versão atual | `1.0.40` |
+| Versão atual | `1.0.73` |
 | Idiomas | Português-BR / Inglês (auto pelo SO + override) |
 | Autor | Zimerfeld |
 
@@ -33,8 +33,8 @@ Selecione um dos **três itens por idioma** no dropdown de templates — **"Zime
 ### 2. Menu Plugins
 `Plugins → ZimerfeldCommitMsg` → valida o repositório e abre o `FormCommit` com a mensagem já inserida (`Execute` → `StartCommitDialog`). Exibe `MessageBox` se não houver repo válido ou mudanças staged.
 
-### 3. Auto-refresh por evento
-Sempre que arquivos entram ou saem do stage, o plugin detecta e atualiza o campo de mensagem no `FormCommit` aberto (via `PostRepositoryChanged`) — **sem sobrescrever texto digitado à mão**. Ver [[../Fluxos/Stage Trigger]].
+### 3. Auto-preenchimento (ao abrir e por evento)
+Ao **abrir** o `FormCommit` já com arquivos em stage, o plugin preenche o campo de mensagem automaticamente (detecção do form novo via `Application.Idle`, uma vez por instância). E sempre que arquivos entram ou saem do stage, atualiza o campo (via `PostRepositoryChanged`) — **sem sobrescrever texto digitado à mão**. Ver [[../Fluxos/Stage Trigger]].
 
 ## Tipos Conventional Commits detectados
 

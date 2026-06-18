@@ -6,8 +6,8 @@
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Version:** 1.0.71
-**Updated:** 2026-06-14
+**Version:** 1.0.73
+**Updated:** 2026-06-18
 
 Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatically generates commit messages by analyzing the real content of staged changes. Changes are classified by **Conventional Commits** types (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) to choose the appropriate **verb**, and the resulting message is a **verb-led sentence** followed by a bulleted body — **without** the `type:` prefix. **Multilingual**: generates output in **Brazilian Portuguese or English**, automatically detected from the operating system language, with a **manual override** in the plugin settings.
 
@@ -25,11 +25,11 @@ Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatica
 - **Conventional Commits-guided verb** — classifies changes into types (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) and prefixes the corresponding **verb** (third-person present in pt-BR / imperative in English). The type itself **does not** appear in the message.
 - **Multilingual (Portuguese/English)** — language selected automatically from the OS, with a manual override selector.
 - **Two content strategies**: diff comment-based (primary) and file name-based (fallback).
-- **Bulleted body** — up to 5 one-line sentences, each summarizing the most significant change in a file.
+- **Bulleted body** — up to 5 one-line sentences, each summarizing the most significant change in a file; **always at least one bullet**, even with a single changed file.
 - **English → Portuguese translation** of comments (only when the output is pt-BR); for English output, comments are kept as-is.
 - **Sentence sanitizing** — discards comments with **unbalanced delimiters** (`()`, `[]`, `{}`, quotes `"` `'` `` ` ``, `<>`) or that **end in a dangling connector** (`of`, `to`, `with`…); among the valid candidates it picks the **highest-quality** one (not the longest).
 - **Never empty** — when there are staged files, it always produces at least the summary line (`<verb> N files`).
-- **Three integration modes**: commit dialog template, Plugins menu, and auto-refresh on stage/unstage.
+- **Three integration modes**: commit dialog template, Plugins menu, and auto-fill (on dialog open and on stage/unstage).
 - **Non-destructive** — never overwrites text typed manually by the user.
 
 ---
@@ -85,27 +85,29 @@ The commit window template dropdown includes one item per language — **"Zimerf
 
 Open **Plugins → ZimerfeldCommitMsg**. The commit dialog opens with the message already filled in.
 
-### Auto-refresh on stage/unstage
+### Auto-fill on open and on stage/unstage
 
-While the commit dialog is open, the message is automatically updated whenever files are staged or unstaged. Text typed manually is never overwritten.
+When you **open** the commit dialog with files already staged, the message is filled in automatically (no need to touch the stage). And while the dialog is open, it is updated whenever files are staged or unstaged. Text typed manually is never overwritten.
 
 ---
 
 ## Generated message format
 
 ```text
-<Verb> <description in the active language>
+<Context> - <Verb> <N> <files> (<types>)
 
 - <bullet 1>
 - <bullet 2>
 ```
 
-- **No `type:` prefix** — the first line starts directly with the **verb** selected from the type, such as `Implement`, `Fix`, or `Update`.
+- **Context prefix (up to 5 words)** — the first line starts with a concept derived from the **most impactful file name**, followed by ` - `. In **English** it is the humanized concept (e.g. `OverlayController` → `Overlay`). In **pt-BR** it is a nominalized action phrase: the status action noun (`Adição`/`Remoção`/`Atualização`/`Renomeação`) + `de` + translated, reordered concept (e.g. `New Text Document` deleted → `Remoção de documento de texto`). This guarantees the title is **never** generic (e.g. never just `Add 1 file (fix)`), giving the commit an identity so it can be told apart later. It is omitted only when no file yields a readable concept.
+- **Consolidated summary** — after the context comes the **verb** of the dominant type + the **file count** + the list of **types** involved (e.g. `Implement 4 files (feat, build, docs)`).
+- **No `type:` prefix** — the Conventional Commits type is **not printed**; it only selects the verb, such as `Implement`, `Fix`, or `Update`.
 - **No scope** — avoids redundancy with the project name.
 - **No color highlighting** — uses `git diff --no-color` to avoid ANSI codes.
-- **72-character limit** on the first line, trimming at the last space and adding `…`.
+- **80-character limit** on the first line, trimming at the last space and adding `…`.
 - **Description and verbs in the active language** (Brazilian Portuguese or English).
-- **Optional body** — up to 5 one-line bullets, generated when there are 2+ files or extra comments.
+- **Always-present body** — up to 5 one-line bullets; whenever any file is staged, it produces **at least one** bullet (even with a single file).
 
 ![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotCommitMsg.png)
 
@@ -187,7 +189,8 @@ For each staged file, the file name (without extension) goes through:
 
 3. **Quality filters:**
    - Name with a dot in the stem → rejected (for example, `GitExtensions.ZimerfeldCommitMsg`)
-   - More than 2 PascalCase words without a dictionary entry → rejected (project names)
+   - **Rejected vocabulary** (`RejectedVocabulary`) — if **any** word of the name is in this set, the name is rejected (takes precedence over everything). For proper nouns/namespaces (e.g. `zimerfeld`, `git`, `extensions`). Extend per project.
+   - Name with 3+ words → rejected as a namespace, **except** when it is a dictionary concept **or** all of its words are recognized vocabulary (`KnownVocabulary` + translation dictionary + concepts). Example: `New Text Document` **passes** (new/text/document are known); `ZimerfeldCommitMsg` **does not** (`zimerfeld` is in rejected vocabulary). Extend `KnownVocabulary` to cover more terms.
 
 #### Concept → pt-BR phrase mapping (examples)
 
@@ -225,13 +228,15 @@ The verb is selected by type and, in some cases, by change context:
 
 #### Message body
 
-When there are 2+ files, the body lists up to **5 bullets**, each with a one-line sentence summarizing the most significant change in a file (ordered by file relevance). Each bullet verb follows the git status (added/removed/renamed/modified):
+The body lists up to **5 bullets** — **at least one, even with a single file** — each with a one-line sentence summarizing the most significant change in a file (ordered by file relevance). Each bullet verb follows the git status (added/removed/renamed/modified):
 
 ```text
 - Add authentication
 - Add payment processing
 - Add token management
 ```
+
+> **File-name fallback:** when the name yields no readable concept (dotted names, multi-word names, or namespaces) and there is no diff comment, the bullet falls back to the **file name itself** (e.g., `Remove New Text Document.txt`). This way **no file is left without a line** — there is always a title **and** a body.
 
 ---
 
@@ -298,13 +303,14 @@ Removing the DLL does not affect any other part of GitExtensions.
 Each time `build.ps1` runs, the script:
 
 1. Reads the current version from `.nuspec`
-2. Increments `build` by +1 → `major.minor.build`
-3. Updates `.nuspec`, `.csproj`, and the READMEs with the new version and date
-4. Compiles in Release
-5. Copies the DLL to `C:\Program Files\GitExtensions\Plugins\` _(requires Admin)_
-6. Updates `tools\net9.0-windows\` with the new DLL
-7. Generates `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
-8. Removes `.nupkg` files from previous versions
+2. Computes the new version: increments `build` by +1 → `major.minor.build`
+3. Writes the new version and date to the **docs first**: the READMEs and the Obsidian vault
+4. Only then bumps the version in `.nuspec` and `.csproj`
+5. Compiles in Release
+6. Copies the DLL to `C:\Program Files\GitExtensions\Plugins\` _(requires Admin)_
+7. Updates `tools\net9.0-windows\` with the new DLL
+8. Generates `GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg`
+9. Removes `.nupkg` files from previous versions
 
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg

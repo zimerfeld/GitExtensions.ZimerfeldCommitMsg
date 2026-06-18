@@ -2,8 +2,7 @@
 tipo: arquivo
 tags: [arquivo, build, powershell, versionamento, nupkg]
 arquivo: build.ps1
-linhas: 89
-atualizado: 2026-05-22
+atualizado: 2026-06-16
 ---
 
 # build.ps1
@@ -40,17 +39,21 @@ $build      = [int]$parts[2] + 1
 $newVersion = "$major.$minor.$build"           # ex: "1.0.13"
 ```
 
-### 3. Atualiza .nuspec
+### 3. Escreve nos docs PRIMEIRO (versão + data)
+Antes do _bump_ na fonte da verdade, carimba a nova versão/data nos documentos:
+- **READMEs:** `README.md`, `README.pt-BR.md`, `README.en-US.md` (`**Version/Versão:**`, `**Updated/Atualizado em:**`).
+- **Cofre Obsidian** (4 notas que exibem a versão atual): `01 - Projetos/GitExtensions.ZimerfeldCommitMsg.md`, `02 - Conhecimento/README — Instalação, Uso e Build.md`, `Sistema/Versionamento.md`, `Sistema/Visão Geral.md` — frontmatter `versao:`/`atualizado:` e a linha "Versão atual".
+
+> Notas de **sessão/histórico** não são tocadas de propósito (mencionam versões antigas).
+
+### 4. Bump no .nuspec
 ```powershell
 $spec.package.metadata.version = $newVersion
 $spec.Save($nuspec)
 ```
 
-### 4. Atualiza .csproj
+### 5. Bump no .csproj
 Regex replace: `<Version>[^<]+</Version>` → `<Version>1.0.13</Version>`
-
-### 5. Atualiza FUNCIONALIDADES.md
-Regex replace de `**Versão:** X.Y.Z` e `**Atualizado em:** YYYY-MM-DD`.
 
 ### 6. Build
 ```powershell

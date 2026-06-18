@@ -224,6 +224,79 @@ internal sealed class CommitMessageGenerator
     private static readonly HashSet<string> EnglishWords =
         new(WordTranslations.Keys, StringComparer.OrdinalIgnoreCase);
 
+    // ── Vocabulário comum para reconhecer nomes descritivos ───────────────────
+    // Um nome multi-palavra (3+) é aceito como CONCEITO — e não rejeitado como namespace —
+    // quando TODAS as suas palavras são reconhecidas. Uma palavra é reconhecida se estiver
+    // aqui, no dicionário de tradução (WordTranslations) ou for um conceito de domínio
+    // (ConceptPhrases). Estenda este conjunto para cobrir mais termos: ex., "New Text
+    // Document" passa porque new/text/document estão aqui; "ZimerfeldCommitMsg" não passa
+    // porque "zimerfeld" não é vocabulário conhecido.
+    private static readonly HashSet<string> KnownVocabulary =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        "new", "old", "text", "document", "documents", "draft", "final", "temp",
+        "temporary", "backup", "copy", "sample", "example", "examples", "demo",
+        "main", "info", "page", "pages", "image", "images", "icon", "icons",
+        "readme", "changelog", "license", "todo", "note", "notes", "summary",
+        "detail", "details", "overview", "guide", "manual", "spec", "specs",
+        "version", "release", "change", "changes", "general", "default", "custom",
+        "shared", "common", "base", "core", "misc", "data", "list", "item", "items",
+        "file", "files", "folder", "folders", "form", "forms", "view", "views",
+        "model", "models", "layout", "style", "styles", "script", "scripts",
+        "table", "tables", "row", "rows", "column", "columns", "field", "fields",
+        "button", "buttons", "menu", "header", "footer", "title", "label",
+        "content", "section", "block", "group", "tab", "panel", "dialog", "window",
+    };
+
+    // ── Vocabulário que FORÇA rejeição ────────────────────────────────────────
+    // Se QUALQUER palavra do nome estiver aqui, o nome é rejeitado como conceito
+    // (tem precedência sobre KnownVocabulary). Para nomes próprios/namespaces/tokens
+    // de projeto que nunca devem virar conceito. Estenda conforme o seu projeto.
+    private static readonly HashSet<string> RejectedVocabulary =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        "zimerfeld", "gitextensions", "git", "extensions",
+    };
+
+    // ── Prefixo nominal do título (pt-BR) ─────────────────────────────────────
+    // Qualificadores (adjetivos) descartados do conceito antes de montar a frase:
+    // "New Text Document" → conceito "text document" → "documento de texto".
+    private static readonly HashSet<string> QualifierWords =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        "new", "old", "main", "temp", "temporary", "draft", "final", "default",
+        "custom", "general", "common", "shared", "demo", "backup", "copy", "misc",
+    };
+
+    // Tradução EN→PT de palavras de conceito (substantivos), usada no prefixo nominal
+    // do título em pt-BR. Cobre o vocabulário de KnownVocabulary; estenda conforme precisar.
+    private static readonly Dictionary<string, string> ConceptWordPt =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["text"]="texto", ["document"]="documento", ["documents"]="documentos",
+        ["file"]="arquivo", ["files"]="arquivos", ["folder"]="pasta", ["folders"]="pastas",
+        ["page"]="página", ["pages"]="páginas", ["image"]="imagem", ["images"]="imagens",
+        ["icon"]="ícone", ["icons"]="ícones", ["note"]="nota", ["notes"]="notas",
+        ["summary"]="resumo", ["detail"]="detalhe", ["details"]="detalhes",
+        ["overview"]="visão geral", ["guide"]="guia", ["manual"]="manual",
+        ["spec"]="especificação", ["specs"]="especificações",
+        ["version"]="versão", ["release"]="versão",
+        ["change"]="alteração", ["changes"]="alterações",
+        ["view"]="tela", ["views"]="telas", ["model"]="modelo", ["models"]="modelos",
+        ["layout"]="layout", ["style"]="estilo", ["styles"]="estilos",
+        ["script"]="script", ["scripts"]="scripts",
+        ["table"]="tabela", ["tables"]="tabelas", ["row"]="linha", ["rows"]="linhas",
+        ["column"]="coluna", ["columns"]="colunas", ["field"]="campo", ["fields"]="campos",
+        ["button"]="botão", ["buttons"]="botões", ["menu"]="menu",
+        ["header"]="cabeçalho", ["footer"]="rodapé", ["title"]="título", ["label"]="rótulo",
+        ["content"]="conteúdo", ["section"]="seção", ["block"]="bloco", ["group"]="grupo",
+        ["tab"]="aba", ["panel"]="painel", ["dialog"]="diálogo", ["window"]="janela",
+        ["form"]="formulário", ["forms"]="formulários", ["list"]="lista",
+        ["item"]="item", ["items"]="itens", ["data"]="dados", ["info"]="informação",
+        ["report"]="relatório", ["sample"]="exemplo", ["example"]="exemplo",
+        ["user"]="usuário", ["admin"]="administrador",
+    };
+
     // ── Tokens preservados na tradução (não traduzir) ─────────────────────────
     // Nomes de branch no padrão gitflow (feature/…, release/…, etc.) e os tipos
     // Conventional Commits. Sem esta proteção, a tradução palavra-a-palavra
@@ -278,9 +351,9 @@ internal sealed class CommitMessageGenerator
 
         // Garantia final: havendo mudanças em stage, NUNCA retornar vazio.
         // Se por qualquer caminho de borda o resultado vier em branco, devolve
-        // ao menos a linha-resumo (verbo do tipo dominante + contagem de arquivos).
+        // ao menos a linha-resumo (com prefixo de contexto, igual ao título normal).
         return string.IsNullOrWhiteSpace(message)
-            ? TruncateTitle($"{TypeVerb(types[0], changes)} {changes.Count} {_lang.FilesWord(changes.Count)}")
+            ? BuildConsolidatedTitle(types[0], changes, types)
             : message;
     }
 
@@ -294,8 +367,78 @@ internal sealed class CommitMessageGenerator
         var verb     = TypeVerb(type, changes);
         var fileWord = _lang.FilesWord(changes.Count);
         var typeList = string.Join(", ", types);
-        return TruncateTitle($"{verb} {changes.Count} {fileWord} ({typeList})");
+        var summary  = $"{verb} {changes.Count} {fileWord} ({typeList})";
+
+        // Prefixo de contexto (1-3 palavras) para o título nunca ser genérico
+        // ("Add 1 file (fix)" sem pista do conteúdo). Ex.: "Overlay - Add 10 files (...)".
+        var prefix = BuildContextPrefix(changes);
+        return TruncateTitle(prefix is null ? summary : $"{prefix} - {summary}");
     }
+
+    /// <summary>
+    /// Prefixo de contexto do título: 1 a 3 palavras derivadas do conceito do nome do
+    /// arquivo de MAIOR impacto (mesma ordenação do corpo). Dá identidade ao commit para
+    /// diferenciá-lo depois. Ex.: "OverlayController" → "Overlay". Retorna null quando
+    /// nenhum arquivo rende um conceito legível (nomes com ponto, não-ASCII, namespaces).
+    /// </summary>
+    private string? BuildContextPrefix(List<FileChange> changes)
+    {
+        foreach (var c in changes.OrderByDescending(c => CommentFilePriority(c.Path)))
+        {
+            var raw = ExtractRawConcept(Path.GetFileNameWithoutExtension(c.Path));
+            if (raw is null) continue;
+
+            // pt-BR: prefixo nominal de ação ("Remoção de documento de texto").
+            // en: mantém o conceito humanizado, sem ação (comportamento anterior).
+            string phrase;
+            if (_language == MessageLanguage.PtBr)
+            {
+                var concept = ConceptToPt(raw);
+                if (concept.Length == 0) continue;
+                phrase = $"{_lang.StatusNoun(c.Status)} de {concept}";
+            }
+            else
+            {
+                phrase = MapConcept(raw);
+            }
+
+            var words = phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (words.Length == 0) continue;
+
+            // No máximo 5 palavras, sem terminar em conectivo solto ("de", "da", "the"...).
+            var take = Math.Min(5, words.Length);
+            while (take > 1 && _lang.DanglingTrailingWords.Contains(words[take - 1])) take--;
+
+            var clipped = string.Join(' ', words[..take]);
+            if (clipped.Length == 0) continue;
+            return char.ToUpperInvariant(clipped[0]) + clipped[1..];
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Frase do conceito em pt-BR para o prefixo do título: conceito conhecido usa a frase do
+    /// dicionário; nome de vocabulário tem as palavras traduzidas, qualificadores (new/old/…)
+    /// descartados e a ordem invertida unida por " de " ("text document" → "documento de texto").
+    /// </summary>
+    private string ConceptToPt(string raw)
+    {
+        if (_lang.HasConcept(raw)) return _lang.MapConcept(raw, HumanizeName);
+
+        var words = HumanizeName(raw).Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                     .Where(w => !QualifierWords.Contains(w))
+                                     .ToList();
+        if (words.Count == 0) return MapConcept(raw);
+
+        words.Reverse();
+        return string.Join(" de ", words.Select(TranslateConceptWord));
+    }
+
+    private static string TranslateConceptWord(string word) =>
+        ConceptWordPt.TryGetValue(word, out var pt)                       ? pt
+        : WordTranslations.TryGetValue(word, out var pt2) && pt2.Length > 0 ? pt2
+        : word;
 
     /// <summary>
     /// Lê o título (primeira linha com #) do README.md staged, se houver.
@@ -588,11 +731,11 @@ internal sealed class CommitMessageGenerator
     {
         if (!IsEnglishText(text)) return text;  // já em pt-BR
 
-        // Mascara nomes de branch e tipos CC com placeholders N
+        // Mascara nomes de branch e tipos CC com placeholders \u0001N\u0001
         // (sem letras → as fases de tradução os ignoram). Restaurados no fim.
         var preserved = new List<string>();
         var result = Regex.Replace(text, PreservePattern,
-            m => { preserved.Add(m.Value); return $"{preserved.Count - 1}"; },
+            m => { preserved.Add(m.Value); return $"\u0001{preserved.Count - 1}\u0001"; },
             RegexOptions.IgnoreCase);
 
         // Fase 1 — frases compostas (mais longas primeiro para evitar fragmentação)
@@ -632,7 +775,7 @@ internal sealed class CommitMessageGenerator
 
         // Restaura nomes de branch e tipos CC, intactos
         if (preserved.Count > 0)
-            result = Regex.Replace(result, "(\\d+)",
+            result = Regex.Replace(result, "\u0001(\\d+)\u0001",
                 m => preserved[int.Parse(m.Groups[1].Value)]);
 
         return result;
@@ -730,8 +873,9 @@ internal sealed class CommitMessageGenerator
     /// <summary>
     /// Descreve um arquivo em uma linha. Com comentário: detecta o verbo inicial ou
     /// prefixa o verbo do tipo CC do arquivo. Sem comentário: deriva o conceito do nome,
-    /// prefixado pelo verbo de status (Adiciona/Remove/Renomeia/Atualiza).
-    /// Retorna "" quando não há nada útil a dizer sobre o arquivo.
+    /// prefixado pelo verbo de status (Adiciona/Remove/Renomeia/Atualiza). Quando o nome
+    /// não rende um conceito legível (nomes com ponto, multi-palavra, namespaces), recai
+    /// no próprio nome do arquivo — garantindo SEMPRE ao menos um bullet por arquivo.
     /// </summary>
     private string FormatFileLine(FileChange change, string? desc)
     {
@@ -749,7 +893,12 @@ internal sealed class CommitMessageGenerator
         }
 
         var raw = ExtractRawConcept(Path.GetFileNameWithoutExtension(change.Path));
-        return raw is null ? string.Empty : $"{_lang.StatusVerb(change.Status)} {MapConcept(raw)}";
+        if (raw is not null)
+            return $"{_lang.StatusVerb(change.Status)} {MapConcept(raw)}";
+
+        // Fallback final: nenhum comentário útil e nome sem conceito legível. Para nunca
+        // deixar o arquivo sem linha, descreve-o pelo próprio nome. Ex.: "Remove New Text Document.txt".
+        return $"{_lang.StatusVerb(change.Status)} {Path.GetFileName(change.Path)}";
     }
 
     // ── Concept extraction ─────────────────────────────────────────────────────
@@ -781,15 +930,45 @@ internal sealed class CommitMessageGenerator
 
         if (name.Length < 2) return null;
 
-        // Se não está no dicionário e tem mais de 2 palavras PascalCase,
-        // é provavelmente um nome de projeto/namespace — ignorar
-        if (!_lang.HasConcept(name))
+        // Vocabulário de rejeição: qualquer palavra proibida → não vira conceito
+        // (precede a checagem de vocabulário conhecido).
+        if (IsRejectedVocabulary(name)) return null;
+
+        // Nomes multi-palavra (3+) só são aceitos quando o nome é um conceito conhecido
+        // OU todas as suas palavras são vocabulário reconhecido (nome descritivo). Caso
+        // contrário é provavelmente um namespace/projeto — ignorar.
+        if (!_lang.HasConcept(name) && !IsKnownVocabulary(name))
         {
             var wordCount = Regex.Matches(name, @"[A-Z][a-z]+").Count;
             if (wordCount > 2) return null;
         }
 
         return name;
+    }
+
+    /// <summary>
+    /// true quando TODAS as palavras do nome são reconhecidas (vocabulário comum,
+    /// dicionário de tradução ou conceito de domínio) — sinal de nome DESCRITIVO legível,
+    /// não de namespace. Permite que nomes multi-palavra escapem da rejeição por contagem
+    /// em <see cref="ExtractRawConcept"/>. Nomes com termo desconhecido (ex.: nome próprio
+    /// como "Zimerfeld") continuam rejeitados.
+    /// </summary>
+    private bool IsKnownVocabulary(string name)
+    {
+        var words = HumanizeName(name).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return words.Length > 0 && words.All(IsKnownWord);
+    }
+
+    private bool IsKnownWord(string word) =>
+        KnownVocabulary.Contains(word) ||
+        EnglishWords.Contains(word) ||
+        _lang.HasConcept(word);
+
+    /// <summary>true se ALGUMA palavra do nome está no vocabulário de rejeição.</summary>
+    private static bool IsRejectedVocabulary(string name)
+    {
+        var words = HumanizeName(name).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return words.Any(RejectedVocabulary.Contains);
     }
 
     private string MapConcept(string raw) => _lang.MapConcept(raw, HumanizeName);

@@ -31,6 +31,9 @@ internal abstract class LanguagePack
     // ── Verbo do bullet por status do arquivo (A/C/D/R/…) ───────────────────
     public abstract string StatusVerb(char status);
 
+    // ── Substantivo da ação por status (prefixo nominal do título) ──────────
+    public abstract string StatusNoun(char status);
+
     // ── Verbo inicial da descrição: detecta/normaliza para imperativo ───────
     /// <summary>
     /// Se <paramref name="desc"/> começa com um verbo conhecido, devolve (verbo capitalizado, resto);
@@ -150,6 +153,14 @@ internal sealed class PtBrLanguagePack : LanguagePack
         'D'        => "Remove",
         'R'        => "Renomeia",
         _          => "Atualiza",
+    };
+
+    public override string StatusNoun(char status) => status switch
+    {
+        'A' or 'C' => "Adição",
+        'D'        => "Remoção",
+        'R'        => "Renomeação",
+        _          => "Atualização",
     };
 
     public override (string? Verb, string Remainder) LeadingVerb(string desc)
@@ -330,6 +341,14 @@ internal sealed class EnLanguagePack : LanguagePack
     {
         'A' or 'C' => "Add",
         'D'        => "Remove",
+        'R'        => "Rename",
+        _          => "Update",
+    };
+
+    public override string StatusNoun(char status) => status switch
+    {
+        'A' or 'C' => "Addition",
+        'D'        => "Removal",
         'R'        => "Rename",
         _          => "Update",
     };
