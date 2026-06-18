@@ -64,13 +64,10 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     // WeakReference para não prender o controle; reassina se a instância mudar.
     private WeakReference<TextBoxBase>? _subscribedTextBox;
 
-    // Guarda contra reentrância no ciclo Unregister→Register disparado na abertura da janela.
-    private bool _cycling;
-
-    // Instância de FormCommit para a qual o ciclo Unregister→Register já rodou — garante UMA
+    // Instância de FormCommit para a qual a re-sincronização de abertura já rodou — garante UMA
     // execução por janela aberta, mesmo que o preenchimento ainda esteja tentando (UI montando).
-    // Não é limpa pelo Unregister do próprio ciclo (senão re-cicla); é limpa ao fechar o diálogo.
-    private WeakReference<Form>? _cycledCommitForm;
+    // É limpa ao fechar o diálogo.
+    private WeakReference<Form>? _resyncedCommitForm;
 
     public ZimerfeldCommitMsgPlugin()
     {
@@ -113,12 +110,39 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     /// Em vez disso, registramos cada texto gerado (msg → idioma do item) para depois reconhecer,
     /// pela caixa, QUAL item o usuário clicou — ver <see cref="DetectTemplateSelection"/>.
     /// </summary>
-    private string GenerateForTemplate(string workingDir, MessageLanguage? forced)
+    private string GenerateForTemplate(MessageLanguage? forced)
     {
+        var workingDir = ResolveCommitWorkingDir();
         var msg = new CommitMessageGenerator(workingDir, forced ?? CurrentLanguage()).Generate();
         _lastGeneratedMessage = msg;
         RememberTemplateMessage(msg, forced);
+
+        // REGRA: stage vazio + item do dropdown acionado ⇒ a caixa de mensagem fica LIMPA
+        // (qualquer texto, inclusive digitado pelo usuário). A geração só vem vazia quando NÃO
+        // há nada em stage (com arquivos staged ela nunca é vazia), então msg vazia ⟺ stage
+        // vazio. O host avalia o Func ao ABRIR o dropdown e o resultado vazio é o mesmo para os 3
+        // idiomas — limpar aqui é consistente e não depende do host limpar ao aplicar texto vazio.
+        // Só limpa quando REALMENTE resolvemos o working dir (msg vazia com dir resolvido = stage
+        // vazio); se não conseguimos o dir (workingDir vazio), NÃO limpamos — seria falso-vazio.
+        if (string.IsNullOrEmpty(msg) && !string.IsNullOrEmpty(workingDir))
+            ClearOpenCommitDialog();
+
         return msg;
+    }
+
+    /// <summary>
+    /// Working dir a usar na geração via dropdown: o do PRÓPRIO diálogo de commit aberto
+    /// (<see cref="GetCommitFormWorkingDir"/>), com fallback ao <see cref="_gitUiCommands"/>
+    /// capturado. Mesma fonte de verdade do auto-refresh — evita gerar no repositório errado/
+    /// vazio quando o commands capturado está defasado.
+    /// </summary>
+    private string ResolveCommitWorkingDir()
+    {
+        foreach (Form f in Application.OpenForms)
+            if (f.GetType().Name == "FormCommit")
+                return GetCommitFormWorkingDir(f) ?? _gitUiCommands?.Module.WorkingDir ?? string.Empty;
+
+        return _gitUiCommands?.Module.WorkingDir ?? string.Empty;
     }
 
     /// <summary>
@@ -154,16 +178,8 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         _syncContext   = SynchronizationContext.Current;
         _gitUiCommands = gitUiCommands;
 
-        // Um item de template por idioma (Automático/Português/Inglês) — só preenche
-        // quando o usuário selecionar explicitamente no dropdown.
-        foreach (var (label, lang) in _templateItems)
-        {
-            var forced = lang;   // captura por iteração
-            gitUiCommands.AddCommitTemplate(
-                label,
-                () => GenerateForTemplate(gitUiCommands.Module.WorkingDir, forced),
-                icon: PluginIcon);
-        }
+        // Um item de template por idioma (Automático/Português/Inglês).
+        EnsureCommitTemplates(gitUiCommands);
 
         // Atualiza a mensagem automaticamente sempre que arquivos entram/saem do stage
         gitUiCommands.PostRepositoryChanged += OnPostRepositoryChanged;
@@ -189,6 +205,24 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         _handledWorkingDir    = null;
         _gitUiCommands        = null;
         base.Unregister(gitUiCommands);
+    }
+
+    /// <summary>
+    /// Garante que os 3 itens de template do dropdown (um por idioma) estão registrados.
+    /// <c>AddCommitTemplate</c> é IDEMPOTENTE — o host só adiciona se o nome ainda não existe no
+    /// storage estático — então chamar repetidamente é seguro (sem duplicar, sem remover).
+    /// Chamado no <c>Register</c> e também a cada abertura da janela de commit
+    /// (<see cref="ResyncForCommitDialog"/>): assim QUALQUER plugin que abra o FormCommit do
+    /// GitExtensions (inclusive o ZimerfeldTree) terá o dropdown funcional, mesmo que a re-regist
+    /// assíncrona do host (ao trocar de repositório) ainda não tenha recolocado os templates.
+    /// </summary>
+    private void EnsureCommitTemplates(IGitUICommands commands)
+    {
+        foreach (var (label, lang) in _templateItems)
+        {
+            var forced = lang;   // captura por iteração
+            commands.AddCommitTemplate(label, () => GenerateForTemplate(forced), icon: PluginIcon);
+        }
     }
 
     // Plugins menu → abre o diálogo de commit com a mensagem já preenchida
@@ -304,6 +338,35 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     }
 
     /// <summary>
+    /// Limpa a caixa de mensagem do FormCommit aberto — QUALQUER texto, inclusive digitado pelo
+    /// usuário. Usado quando um item do dropdown é acionado com o stage VAZIO (REGRA): não há o
+    /// que gerar, então a área de mensagem deve ficar limpa. Marca <see cref="_lastGeneratedMessage"/>
+    /// como vazio para o auto-refresh tratar a caixa como nossa. Nunca derruba o GitExtensions.
+    /// </summary>
+    private void ClearOpenCommitDialog()
+    {
+        try
+        {
+            Form? commitForm = null;
+            foreach (Form f in Application.OpenForms)
+            {
+                if (f.GetType().Name == "FormCommit") { commitForm = f; break; }
+            }
+            if (commitForm is null) return;
+
+            var tb = FindCommitTextBox(commitForm);
+            if (tb is null) return;
+
+            _lastGeneratedMessage = string.Empty;
+            if (tb.TextLength == 0) return;   // já vazia
+
+            tb.Text = string.Empty;
+            ResetTextColors(tb);
+        }
+        catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
+    }
+
+    /// <summary>
     /// Idle da UI: preenche o diálogo de commit que abriu já com arquivos em stage (sem evento
     /// de "diálogo aberto" na API). O Idle dispara com altíssima frequência, então só roda o
     /// gerador quando há algo NOVO a tratar — um FormCommit recém-aberto OU uma troca de working
@@ -326,7 +389,7 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             {
                 _handledCommitForm    = null;
                 _handledWorkingDir    = null;
-                _cycledCommitForm     = null;
+                _resyncedCommitForm   = null;
                 _sessionLanguage      = null;
                 _lastGeneratedMessage = string.Empty;
                 _templateMessages.Clear();
@@ -348,17 +411,16 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             if (sameForm && sameDir) return;
 
             // REGRA: toda ABERTURA da janela de commit (seja pelo GitExtensions, pelo menu Plugins
-            // → ZimerfeldCommitMsg, ou por outro plugin como o ZimerfeldTree) executa um ciclo
-            // completo Unregister→Register do próprio plugin, re-vinculando templates, eventos e
-            // estado ao contexto atual. Qualquer origem abre um FormCommit, detectado aqui. Roda
-            // UMA vez por janela (marca a instância antes de ciclar — o Unregister do ciclo não
-            // limpa essa marca), mesmo que o preenchimento ainda tente nos próximos Idle.
-            bool alreadyCycled = _cycledCommitForm is not null &&
-                _cycledCommitForm.TryGetTarget(out var cycled) && ReferenceEquals(cycled, commitForm);
-            if (!alreadyCycled)
+            // → ZimerfeldCommitMsg, ou por outro plugin como o ZimerfeldTree) re-sincroniza o
+            // plugin ao contexto atual. Versão CIRÚRGICA: GARANTE os templates do dropdown
+            // (idempotente), re-vincula settings + PostRepositoryChanged e reinicia o estado de
+            // sessão. Qualquer origem abre um FormCommit, detectado aqui; roda UMA vez por janela.
+            bool alreadyResynced = _resyncedCommitForm is not null &&
+                _resyncedCommitForm.TryGetTarget(out var done) && ReferenceEquals(done, commitForm);
+            if (!alreadyResynced)
             {
-                _cycledCommitForm = new WeakReference<Form>(commitForm);
-                CycleRegistration();
+                _resyncedCommitForm = new WeakReference<Form>(commitForm);
+                ResyncForCommitDialog(commitForm);
             }
 
             // Só marca como tratado quando o form/caixa já existem (true); se a UI ainda está
@@ -373,27 +435,47 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     }
 
     /// <summary>
-    /// Executa um ciclo completo <c>Unregister</c>→<c>Register</c> do próprio plugin sobre o
-    /// <see cref="_gitUiCommands"/> atual — re-vinculando templates do dropdown, assinaturas de
-    /// evento (PostRepositoryChanged, Application.Idle) e o estado de sessão ao contexto vigente.
-    /// Disparado na abertura da janela de commit. <c>Unregister</c> zera <see cref="_gitUiCommands"/>,
-    /// então salvamos a referência antes e a repassamos ao <c>Register</c>. O guard
-    /// <see cref="_cycling"/> evita reentrância (Register reassina <c>Application.Idle</c>, de onde
-    /// este método é chamado). Tudo em try/catch — nunca derruba o GitExtensions.
+    /// Re-sincronização CIRÚRGICA na abertura da janela de commit (substitui o antigo ciclo
+    /// completo <c>Unregister</c>→<c>Register</c>). Re-vincula só o que pode ter mudado, SEM
+    /// remover nada e SEM tocar no <c>Application.Idle</c>:
+    /// <list type="bullet">
+    ///   <item><b>GARANTE os templates do dropdown</b> (<see cref="EnsureCommitTemplates"/>,
+    ///   idempotente) — assim QUALQUER plugin que abra o FormCommit (inclusive o ZimerfeldTree)
+    ///   tem o dropdown funcional, mesmo que a re-registração assíncrona do host ainda não tenha
+    ///   recolocado os templates após uma troca de repositório;</item>
+    ///   <item>re-aponta a fonte de settings para o módulo atual;</item>
+    ///   <item>garante uma assinatura de <c>PostRepositoryChanged</c> no commands atual;</item>
+    ///   <item>reinicia o estado de sessão (idioma fixado, mapa de mensagens, última msg).</item>
+    /// </list>
+    /// Resolve o <c>IGitUICommands</c> do <see cref="_gitUiCommands"/> capturado ou, em fallback,
+    /// do PRÓPRIO FormCommit aberto (sua propriedade <c>UICommands</c>) — assim funciona mesmo se
+    /// o commands capturado estiver defasado/nulo. Tudo em try/catch — nunca derruba o host.
     /// </summary>
-    private void CycleRegistration()
+    private void ResyncForCommitDialog(Form commitForm)
     {
-        var commands = _gitUiCommands;
-        if (commands is null || _cycling) return;
+        var commands = _gitUiCommands ?? GetCommitFormUICommands(commitForm);
+        if (commands is null) return;
 
-        _cycling = true;
         try
         {
-            Unregister(commands);
-            Register(commands);
+            // Garante os 3 itens do dropdown (idempotente) — o ponto central da REGRA "qualquer
+            // plugin que abra a janela de commit deve ter o dropdown gerando texto".
+            EnsureCommitTemplates(commands);
+
+            // Settings → módulo atual (o que o base.Register faz); se falhar, não quebra nada.
+            try { SettingsContainer?.SetSettingsSource(commands.Module.GetEffectiveSettings()); }
+            catch { /* best-effort */ }
+
+            // PostRepositoryChanged: exatamente uma assinatura no commands atual (idempotente).
+            commands.PostRepositoryChanged -= OnPostRepositoryChanged;
+            commands.PostRepositoryChanged += OnPostRepositoryChanged;
+
+            // Estado de sessão da janela nova.
+            _sessionLanguage      = null;
+            _templateMessages.Clear();
+            _lastGeneratedMessage = string.Empty;
         }
         catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
-        finally { _cycling = false; }
     }
 
     // ── Detecção da escolha do dropdown ─────────────────────────────────────────
@@ -475,12 +557,26 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     {
         try
         {
-            var module = commitForm.GetType().GetProperty("Module")?.GetValue(commitForm);
-            var wd = module?.GetType().GetProperty("WorkingDir")?.GetValue(module) as string;
-            return string.IsNullOrEmpty(wd) ? null : wd;
+            // 1) GitModuleForm.Module.WorkingDir
+            if (ReadWorkingDir(GetProp(commitForm, "Module")) is { Length: > 0 } a) return a;
+            // 2) GitModuleForm.UICommands.Module.WorkingDir (fallback)
+            if (ReadWorkingDir(GetProp(GetProp(commitForm, "UICommands"), "Module")) is { Length: > 0 } b) return b;
         }
+        catch { /* versão diferente do host */ }
+        return null;
+    }
+
+    /// <summary>IGitUICommands do PRÓPRIO FormCommit (propriedade <c>UICommands</c>), por reflexão.</summary>
+    private static IGitUICommands? GetCommitFormUICommands(Form commitForm)
+    {
+        try { return GetProp(commitForm, "UICommands") as IGitUICommands; }
         catch { return null; }
     }
+
+    private static object? GetProp(object? obj, string name) =>
+        obj?.GetType().GetProperty(name)?.GetValue(obj);
+
+    private static string? ReadWorkingDir(object? module) => GetProp(module, "WorkingDir") as string;
 
     /// <summary>
     /// Localiza a caixa de texto da mensagem de commit no FormCommit.

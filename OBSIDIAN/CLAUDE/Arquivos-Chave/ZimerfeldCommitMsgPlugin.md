@@ -38,8 +38,7 @@ O atributo `[Export]` é o ponto de descoberta pelo MEF do GitExtensions.
 | `_sessionLanguage` | `MessageLanguage?` | Idioma fixado pela escolha de um item do dropdown (prioridade sobre setting/SO); setado por `DetectTemplateSelection`, reiniciado ao fechar o diálogo |
 | `_templateMessages` | `Dictionary<string, MessageLanguage?>` | Mensagens geradas para os itens do dropdown na abertura do menu, mapeadas ao idioma do item — base da detecção da escolha |
 | `_subscribedTextBox` | `WeakReference<TextBoxBase>?` | Caixa cujo `TextChanged` já assinamos (para detectar a escolha do dropdown) |
-| `_cycling` | `bool` | Guard de reentrância do ciclo `Unregister`→`Register` (`CycleRegistration`) |
-| `_cycledCommitForm` | `WeakReference<Form>?` | Instância de `FormCommit` para a qual o ciclo já rodou (1× por janela); não limpa pelo `Unregister` do ciclo |
+| `_resyncedCommitForm` | `WeakReference<Form>?` | Instância de `FormCommit` para a qual a re-sincronização de abertura já rodou (1× por janela); limpa ao fechar |
 
 ### `LoadIcon()` → `Image?`
 Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via `Assembly.GetManifestResourceStream`, retorna uma `Bitmap` independente do stream. Falha silenciosa (`null`) se o recurso não existir. Atribuído a `Icon` no construtor quando não-nulo.
@@ -89,10 +88,23 @@ Faz o nó **ZimerfeldCommitMsg** aparecer em Configurações → Plugins (após 
 - `DetectTemplateSelection(TextBoxBase)` — se `tb.Text` == uma das `_templateMessages`, fixa `_sessionLanguage` no idioma daquele item e marca o texto como nosso. Só observa (não escreve) → sem loop de `TextChanged`
 - `RememberTemplateMessage(msg, forced)` — registra `msg → idioma` na abertura do dropdown
 
-### `CycleRegistration()` — REGRA: Unregister→Register a cada abertura
+### `ResyncForCommitDialog(Form commitForm)` — REGRA: re-sync CIRÚRGICA a cada abertura
 - Disparado pelo `OnAppIdle` quando um `FormCommit` **novo** é detectado (qualquer origem: GitExtensions, menu Plugins, ZimerfeldTree)
-- Salva o `_gitUiCommands` (o `Unregister` o zera), chama `Unregister(commands)` e `Register(commands)` — re-vincula templates, eventos e estado
-- Roda **1× por janela** via `_cycledCommitForm`; guard `_cycling` contra reentrância (o `Register` reassina `Application.Idle`)
+- Resolve commands de `_gitUiCommands` **ou** do próprio FormCommit (`GetCommitFormUICommands`) → funciona com captura defasada/nula
+- **GARANTE os templates** (`EnsureCommitTemplates`, idempotente) — ponto central da regra "qualquer plugin que abra a janela de commit deve ter o dropdown gerando texto" (cobre o gap da re-registração assíncrona do host)
+- Re-aponta settings; re-assina `PostRepositoryChanged` (idempotente); reinicia `_sessionLanguage`/`_templateMessages`/`_lastGeneratedMessage`
+- **Não** remove nada nem mexe no `Application.Idle`. Roda **1× por janela** via `_resyncedCommitForm`
+
+### `EnsureCommitTemplates(IGitUICommands)`
+Adiciona os 3 itens do dropdown (`() => GenerateForTemplate(forced)`). Idempotente: `AddCommitTemplate` só adiciona se o nome não existe no storage **estático**. Chamado no `Register` e no `ResyncForCommitDialog`.
+
+### `GenerateForTemplate(MessageLanguage? forced)` — Func do dropdown
+- Resolve o working dir via `ResolveCommitWorkingDir()` (do FormCommit aberto, fallback `_gitUiCommands`), gera, registra `msg → idioma` e retorna
+- `ResolveCommitWorkingDir()` usa a mesma fonte de verdade do auto-refresh — evita gerar no repo errado/vazio
+- **REGRA stage vazio:** se `msg` for vazia (⟺ nada em stage), chama `ClearOpenCommitDialog()` → limpa QUALQUER texto da caixa. Como o host avalia o Func na abertura do dropdown, a limpeza acontece ao abrir o menu com stage vazio
+
+### `ClearOpenCommitDialog()`
+Acha o `FormCommit` aberto + caixa e zera o texto (inclusive digitado pelo usuário); marca `_lastGeneratedMessage = ""`. No-op se já vazia. Tudo em try/catch.
 
 ### `GetCommitFormWorkingDir(Form)` ← helper estático
 Lê `GitModuleForm.Module.WorkingDir` por reflexão — working dir do repo do diálogo (fonte de verdade).
