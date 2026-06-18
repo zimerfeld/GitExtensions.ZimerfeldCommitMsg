@@ -38,6 +38,8 @@ O atributo `[Export]` é o ponto de descoberta pelo MEF do GitExtensions.
 | `_sessionLanguage` | `MessageLanguage?` | Idioma fixado pela escolha de um item do dropdown (prioridade sobre setting/SO); setado por `DetectTemplateSelection`, reiniciado ao fechar o diálogo |
 | `_templateMessages` | `Dictionary<string, MessageLanguage?>` | Mensagens geradas para os itens do dropdown na abertura do menu, mapeadas ao idioma do item — base da detecção da escolha |
 | `_subscribedTextBox` | `WeakReference<TextBoxBase>?` | Caixa cujo `TextChanged` já assinamos (para detectar a escolha do dropdown) |
+| `_cycling` | `bool` | Guard de reentrância do ciclo `Unregister`→`Register` (`CycleRegistration`) |
+| `_cycledCommitForm` | `WeakReference<Form>?` | Instância de `FormCommit` para a qual o ciclo já rodou (1× por janela); não limpa pelo `Unregister` do ciclo |
 
 ### `LoadIcon()` → `Image?`
 Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via `Assembly.GetManifestResourceStream`, retorna uma `Bitmap` independente do stream. Falha silenciosa (`null`) se o recurso não existir. Atribuído a `Icon` no construtor quando não-nulo.
@@ -73,8 +75,9 @@ Faz o nó **ZimerfeldCommitMsg** aparecer em Configurações → Plugins (após 
 - Extrai `workingDir` de `e.GitModule`
 - Marechala para UI thread via `_syncContext.Post()`
 
-### `RefreshOpenCommitDialog(string workingDir)`
+### `RefreshOpenCommitDialog(string fallbackWorkingDir)`
 - Itera `Application.OpenForms` buscando `FormCommit`
+- **Working dir = `GetCommitFormWorkingDir(commitForm)`** (reflexão de `GitModuleForm.Module.WorkingDir`), fallback ao parâmetro — fonte de verdade do repo do diálogo, imune a defasagem do `_gitUiCommands` ao trocar de repo/branch
 - `FindCommitTextBox()` → localiza o campo de mensagem
 - `EnsureTextChangedHook(tb)` → assina o `TextChanged` (detecção de escolha do dropdown)
 - Compara `tb.Text` com `_lastGeneratedMessage` antes de sobrescrever
@@ -85,6 +88,14 @@ Faz o nó **ZimerfeldCommitMsg** aparecer em Configurações → Plugins (após 
 - `OnCommitTextChanged(...)` → `DetectTemplateSelection(tb)`
 - `DetectTemplateSelection(TextBoxBase)` — se `tb.Text` == uma das `_templateMessages`, fixa `_sessionLanguage` no idioma daquele item e marca o texto como nosso. Só observa (não escreve) → sem loop de `TextChanged`
 - `RememberTemplateMessage(msg, forced)` — registra `msg → idioma` na abertura do dropdown
+
+### `CycleRegistration()` — REGRA: Unregister→Register a cada abertura
+- Disparado pelo `OnAppIdle` quando um `FormCommit` **novo** é detectado (qualquer origem: GitExtensions, menu Plugins, ZimerfeldTree)
+- Salva o `_gitUiCommands` (o `Unregister` o zera), chama `Unregister(commands)` e `Register(commands)` — re-vincula templates, eventos e estado
+- Roda **1× por janela** via `_cycledCommitForm`; guard `_cycling` contra reentrância (o `Register` reassina `Application.Idle`)
+
+### `GetCommitFormWorkingDir(Form)` ← helper estático
+Lê `GitModuleForm.Module.WorkingDir` por reflexão — working dir do repo do diálogo (fonte de verdade).
 
 ### `FindCommitTextBox(Form)` ← helper estático
 Tenta nomes: `"Message"`, `"commitMessageEditor"`, `"_commitMessage"`, `"commitMessage"`.

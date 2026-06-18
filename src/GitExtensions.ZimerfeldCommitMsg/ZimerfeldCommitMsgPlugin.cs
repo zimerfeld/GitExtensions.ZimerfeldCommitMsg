@@ -64,6 +64,14 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     // WeakReference para não prender o controle; reassina se a instância mudar.
     private WeakReference<TextBoxBase>? _subscribedTextBox;
 
+    // Guarda contra reentrância no ciclo Unregister→Register disparado na abertura da janela.
+    private bool _cycling;
+
+    // Instância de FormCommit para a qual o ciclo Unregister→Register já rodou — garante UMA
+    // execução por janela aberta, mesmo que o preenchimento ainda esteja tentando (UI montando).
+    // Não é limpa pelo Unregister do próprio ciclo (senão re-cicla); é limpa ao fechar o diálogo.
+    private WeakReference<Form>? _cycledCommitForm;
+
     public ZimerfeldCommitMsgPlugin()
     {
         Name = "ZimerfeldCommitMsg";
@@ -233,7 +241,7 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     /// por conter texto do usuário/mensagem vazia); <c>false</c> quando ainda não há diálogo ou
     /// a caixa não foi localizada (UI ainda montando) — sinaliza ao Idle para tentar de novo.
     /// </summary>
-    private bool RefreshOpenCommitDialog(string workingDir)
+    private bool RefreshOpenCommitDialog(string fallbackWorkingDir)
     {
         try
         {
@@ -244,6 +252,13 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
                 if (f.GetType().Name == "FormCommit") { commitForm = f; break; }
             }
             if (commitForm == null) return false;
+
+            // Working dir do PRÓPRIO diálogo (fonte de verdade) — imune a defasagem do
+            // IGitUICommands capturado no Register ao trocar de repositório/branch. Sem isso,
+            // após trocar de repo a geração podia rodar no working dir ANTIGO (stage diferente),
+            // produzindo mensagem errada ou vazia — o "parou de funcionar" relatado.
+            var workingDir = GetCommitFormWorkingDir(commitForm) ?? fallbackWorkingDir;
+            if (string.IsNullOrEmpty(workingDir)) return false;
 
             var tb = FindCommitTextBox(commitForm);
             if (tb == null) return false;
@@ -309,15 +324,20 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             // reinicia o idioma da sessão — a fixação por dropdown vale só enquanto o diálogo vive.
             if (commitForm is null)
             {
-                _handledCommitForm = null;
-                _handledWorkingDir = null;
-                _sessionLanguage   = null;
+                _handledCommitForm    = null;
+                _handledWorkingDir    = null;
+                _cycledCommitForm     = null;
+                _sessionLanguage      = null;
+                _lastGeneratedMessage = string.Empty;
                 _templateMessages.Clear();
                 _subscribedTextBox = null;
                 return;
             }
 
-            var workingDir = _gitUiCommands?.Module.WorkingDir;
+            // Working dir do PRÓPRIO diálogo (fonte de verdade); só recai no IGitUICommands
+            // capturado se a reflexão falhar. Assim a troca de repositório é detectada de forma
+            // confiável pelo gate abaixo, mesmo que o commands capturado esteja defasado.
+            var workingDir = GetCommitFormWorkingDir(commitForm) ?? _gitUiCommands?.Module.WorkingDir;
             if (string.IsNullOrEmpty(workingDir)) return;
 
             // Pula só quando NADA mudou: mesma instância de form E mesmo working dir. Trocar de
@@ -326,6 +346,20 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
                 _handledCommitForm.TryGetTarget(out var prev) && ReferenceEquals(prev, commitForm);
             bool sameDir = string.Equals(_handledWorkingDir, workingDir, StringComparison.OrdinalIgnoreCase);
             if (sameForm && sameDir) return;
+
+            // REGRA: toda ABERTURA da janela de commit (seja pelo GitExtensions, pelo menu Plugins
+            // → ZimerfeldCommitMsg, ou por outro plugin como o ZimerfeldTree) executa um ciclo
+            // completo Unregister→Register do próprio plugin, re-vinculando templates, eventos e
+            // estado ao contexto atual. Qualquer origem abre um FormCommit, detectado aqui. Roda
+            // UMA vez por janela (marca a instância antes de ciclar — o Unregister do ciclo não
+            // limpa essa marca), mesmo que o preenchimento ainda tente nos próximos Idle.
+            bool alreadyCycled = _cycledCommitForm is not null &&
+                _cycledCommitForm.TryGetTarget(out var cycled) && ReferenceEquals(cycled, commitForm);
+            if (!alreadyCycled)
+            {
+                _cycledCommitForm = new WeakReference<Form>(commitForm);
+                CycleRegistration();
+            }
 
             // Só marca como tratado quando o form/caixa já existem (true); se a UI ainda está
             // montando (false), deixa para o próximo Idle tentar de novo.
@@ -336,6 +370,30 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             }
         }
         catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
+    }
+
+    /// <summary>
+    /// Executa um ciclo completo <c>Unregister</c>→<c>Register</c> do próprio plugin sobre o
+    /// <see cref="_gitUiCommands"/> atual — re-vinculando templates do dropdown, assinaturas de
+    /// evento (PostRepositoryChanged, Application.Idle) e o estado de sessão ao contexto vigente.
+    /// Disparado na abertura da janela de commit. <c>Unregister</c> zera <see cref="_gitUiCommands"/>,
+    /// então salvamos a referência antes e a repassamos ao <c>Register</c>. O guard
+    /// <see cref="_cycling"/> evita reentrância (Register reassina <c>Application.Idle</c>, de onde
+    /// este método é chamado). Tudo em try/catch — nunca derruba o GitExtensions.
+    /// </summary>
+    private void CycleRegistration()
+    {
+        var commands = _gitUiCommands;
+        if (commands is null || _cycling) return;
+
+        _cycling = true;
+        try
+        {
+            Unregister(commands);
+            Register(commands);
+        }
+        catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
+        finally { _cycling = false; }
     }
 
     // ── Detecção da escolha do dropdown ─────────────────────────────────────────
@@ -405,6 +463,24 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     }
 
     // ── UI helpers ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Working dir do repositório do PRÓPRIO diálogo de commit, lido por reflexão de
+    /// <c>GitModuleForm.Module.WorkingDir</c> (o <c>FormCommit</c> herda de <c>GitModuleForm</c>).
+    /// É a fonte de verdade sobre qual repositório o diálogo está commitando — imune a defasagem
+    /// do <see cref="_gitUiCommands"/> capturado no <c>Register</c> ao trocar de repositório.
+    /// Retorna <c>null</c> se a reflexão não encontrar as propriedades (versão diferente do host).
+    /// </summary>
+    private static string? GetCommitFormWorkingDir(Form commitForm)
+    {
+        try
+        {
+            var module = commitForm.GetType().GetProperty("Module")?.GetValue(commitForm);
+            var wd = module?.GetType().GetProperty("WorkingDir")?.GetValue(module) as string;
+            return string.IsNullOrEmpty(wd) ? null : wd;
+        }
+        catch { return null; }
+    }
 
     /// <summary>
     /// Localiza a caixa de texto da mensagem de commit no FormCommit.
