@@ -60,7 +60,9 @@ Classe abstrata + `PtBrLanguagePack` + `EnLanguagePack`. Expõe:
 
 1. **Dropdown de templates da tela de commit** — três itens planos, um por idioma:
    `Zimerfeld Commit Msg — Automático/Automatic | — Português/Portuguese | — Inglês/English`.
-   Escolher um **fixa** o idioma (`_sessionLanguage`) para o auto-refresh manter o mesmo.
+   Escolher um **fixa** o idioma (`_sessionLanguage`) para o auto-refresh manter o mesmo. Como o
+   host gera os 3 itens ao **abrir** o menu (e não dá callback de clique), a escolha é detectada
+   pelo `TextChanged` da caixa — ver [[../Fluxos/Template Dropdown (Auto-resumo)]].
 
    ![[Anexos/ScreenshotDropDown.png]]
 2. **`ChoiceSetting` em Configurações → Plugins → ZimerfeldCommitMsg** — define o **padrão**

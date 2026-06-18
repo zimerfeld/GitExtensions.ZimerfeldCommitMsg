@@ -6,7 +6,7 @@
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Version:** 1.0.76
+**Version:** 1.0.78
 **Updated:** 2026-06-18
 
 Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatically generates commit messages by analyzing the real content of staged changes. Changes are classified by **Conventional Commits** types (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) to choose the appropriate **verb**, and the resulting message is a **verb-led sentence** followed by a bulleted body — **without** the `type:` prefix. **Multilingual**: generates output in **Brazilian Portuguese or English**, automatically detected from the operating system language, with a **manual override** in the plugin settings.
@@ -60,7 +60,7 @@ Zimerfeld Commit Msg — Inglês/English
 | `Português/Portuguese` | Forces Brazilian Portuguese output.                                                                                   |
 | `Inglês/English`       | Forces English output.                                                                                                |
 
-> Choosing a language item in the dropdown also **pins** that language for auto-refresh while the dialog is open. The override takes precedence over the OS language; automatic detection uses `CultureInfo.CurrentUICulture`.
+> Choosing an item in the **dropdown** pins that language for **auto-refresh** while the dialog is open (it takes precedence over the setting/OS). The Settings selector defines the default used when no dropdown item has been chosen (and by the Plugins menu). Automatic detection uses `CultureInfo.CurrentUICulture`.
 >
 > **Note:** the **ZimerfeldCommitMsg** node only appears in the **Settings → Plugins** tree after the DLL with the selector (≥ 1.0.36) is installed and GitExtensions is restarted.
 
@@ -80,6 +80,8 @@ Zimerfeld Commit Msg — Inglês/English
 ### Template in the commit dialog
 
 The commit window template dropdown includes one item per language — **"Zimerfeld Commit Msg — Automático/Automatic"**, **"— Português/Portuguese"**, and **"— Inglês/English"**. Select one and the message is generated in that language and automatically filled into the text field.
+
+> **Opening** the dropdown generates all three languages on the spot (fresh messages from the current stage); **clicking** an item **replaces** the field content with that language's message — including manually typed text. (This differs from auto-refresh, which preserves user text.)
 
 ### Plugins menu
 

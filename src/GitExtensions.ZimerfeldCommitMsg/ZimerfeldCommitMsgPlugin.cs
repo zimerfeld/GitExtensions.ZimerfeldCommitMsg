@@ -48,9 +48,21 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     // instância (acima) bloquearia o repreenchimento e a caixa ficaria vazia/desatualizada.
     private string? _handledWorkingDir;
 
-    // Idioma escolhido explicitamente num item do dropdown (null = seguir o setting/SO).
+    // Idioma fixado pela escolha de um item do dropdown (null = seguir o setting/SO).
     // Faz o auto-refresh manter o idioma que o usuário acabou de escolher.
     private MessageLanguage? _sessionLanguage;
+
+    // Mensagens que GERAMOS para os itens do dropdown na última abertura do menu, mapeadas ao
+    // idioma do item (null = Automático). A API de template do host NÃO dá callback de clique:
+    // ele invoca nosso Func de TODOS os itens ao ABRIR o dropdown e, no clique, só aplica o texto
+    // já materializado. Então detectamos a escolha observando a caixa virar exatamente um destes
+    // textos (via TextChanged) — aí fixamos _sessionLanguage no idioma correspondente.
+    private readonly Dictionary<string, MessageLanguage?> _templateMessages =
+        new(StringComparer.Ordinal);
+
+    // Caixa de mensagem na qual já assinamos o TextChanged (para detectar a escolha do dropdown).
+    // WeakReference para não prender o controle; reassina se a instância mudar.
+    private WeakReference<TextBoxBase>? _subscribedTextBox;
 
     public ZimerfeldCommitMsgPlugin()
     {
@@ -77,20 +89,42 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     }
 
     /// <summary>
-    /// Idioma efetivo: a escolha explícita num item do dropdown tem prioridade sobre o setting/SO.
+    /// Idioma efetivo: a escolha de um item do dropdown (<see cref="_sessionLanguage"/>) tem
+    /// prioridade sobre o setting/SO. Usado pelo auto-refresh para regenerar sempre no idioma
+    /// que o usuário escolheu no menu.
     /// </summary>
     private MessageLanguage EffectiveLanguage() => _sessionLanguage ?? CurrentLanguage();
 
     /// <summary>
-    /// Gera a mensagem para um item do dropdown e fixa o idioma escolhido (<paramref name="forced"/>)
-    /// para que o auto-refresh subsequente mantenha o mesmo idioma.
+    /// Gera a mensagem para um item do dropdown, no idioma do item (<paramref name="forced"/>).
+    ///
+    /// IMPORTANTE: o host (CommitTemplateManager.RegisteredTemplates) invoca este Func ao ABRIR
+    /// o dropdown — uma vez para CADA item de idioma, em sequência — e guarda o texto já
+    /// materializado; o clique só aplica esse texto via ReplaceMessage, SEM rechamar o Func.
+    /// Por isso NÃO fixamos o idioma aqui (rodaria para todos os itens, fixando sempre o último).
+    /// Em vez disso, registramos cada texto gerado (msg → idioma do item) para depois reconhecer,
+    /// pela caixa, QUAL item o usuário clicou — ver <see cref="DetectTemplateSelection"/>.
     /// </summary>
     private string GenerateForTemplate(string workingDir, MessageLanguage? forced)
     {
-        _sessionLanguage = forced;
         var msg = new CommitMessageGenerator(workingDir, forced ?? CurrentLanguage()).Generate();
         _lastGeneratedMessage = msg;
+        RememberTemplateMessage(msg, forced);
         return msg;
+    }
+
+    /// <summary>
+    /// Registra um texto gerado para um item do dropdown, mapeado ao idioma do item, para que a
+    /// escolha possa ser reconhecida depois pela caixa de mensagem. Mensagens idênticas (ex.: o
+    /// item "Automático" coincide com "Português" num SO pt-BR) colapsam na mesma chave — o que é
+    /// inofensivo: ambos resolvem para o mesmo idioma efetivo. Limpa o mapa se crescer além do
+    /// esperado (defensivo; em uso normal são ≤ 3 entradas).
+    /// </summary>
+    private void RememberTemplateMessage(string msg, MessageLanguage? forced)
+    {
+        if (string.IsNullOrEmpty(msg)) return;
+        if (_templateMessages.Count > 12) _templateMessages.Clear();
+        _templateMessages[NormalizeNewlines(msg)] = forced;
     }
 
     private static Image? LoadIcon()
@@ -137,6 +171,11 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         Application.Idle -= OnAppIdle;
         foreach (var (label, _) in _templateItems)
             gitUiCommands.RemoveCommitTemplate(label);
+        if (_subscribedTextBox is not null && _subscribedTextBox.TryGetTarget(out var tb))
+            try { tb.TextChanged -= OnCommitTextChanged; } catch { /* controle pode ter morrido */ }
+        _subscribedTextBox    = null;
+        _templateMessages.Clear();
+        _sessionLanguage      = null;
         _lastGeneratedMessage = string.Empty;
         _handledCommitForm    = null;
         _handledWorkingDir    = null;
@@ -209,6 +248,10 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             var tb = FindCommitTextBox(commitForm);
             if (tb == null) return false;
 
+            // Assina o TextChanged desta caixa (uma vez) para reconhecer a escolha de um item do
+            // dropdown — a API de template do host não expõe o clique.
+            EnsureTextChangedHook(tb);
+
             // Não sobrescreve texto digitado manualmente pelo usuário: só atualiza se a caixa
             // estiver vazia ou contiver a última mensagem gerada por nós. A comparação normaliza
             // as quebras de linha — a caixa do host pode devolver \r\n enquanto geramos com \n;
@@ -262,8 +305,17 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
                 if (f.GetType().Name == "FormCommit") { commitForm = f; break; }
             }
 
-            // Sem diálogo aberto: limpa os marcadores para que a próxima abertura seja tratada.
-            if (commitForm is null) { _handledCommitForm = null; _handledWorkingDir = null; return; }
+            // Sem diálogo aberto: limpa os marcadores para que a próxima abertura seja tratada e
+            // reinicia o idioma da sessão — a fixação por dropdown vale só enquanto o diálogo vive.
+            if (commitForm is null)
+            {
+                _handledCommitForm = null;
+                _handledWorkingDir = null;
+                _sessionLanguage   = null;
+                _templateMessages.Clear();
+                _subscribedTextBox = null;
+                return;
+            }
 
             var workingDir = _gitUiCommands?.Module.WorkingDir;
             if (string.IsNullOrEmpty(workingDir)) return;
@@ -284,6 +336,47 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
             }
         }
         catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
+    }
+
+    // ── Detecção da escolha do dropdown ─────────────────────────────────────────
+
+    /// <summary>
+    /// Assina (uma única vez por instância) o <c>TextChanged</c> da caixa de mensagem para
+    /// reconhecer quando o usuário aplica um item do dropdown. Se a instância mudou (novo
+    /// FormCommit), desfaz a assinatura anterior antes de assinar a nova.
+    /// </summary>
+    private void EnsureTextChangedHook(TextBoxBase tb)
+    {
+        if (_subscribedTextBox is not null && _subscribedTextBox.TryGetTarget(out var prev))
+        {
+            if (ReferenceEquals(prev, tb)) return;   // já assinada
+            try { prev.TextChanged -= OnCommitTextChanged; } catch { /* controle pode ter morrido */ }
+        }
+        tb.TextChanged += OnCommitTextChanged;
+        _subscribedTextBox = new WeakReference<TextBoxBase>(tb);
+    }
+
+    private void OnCommitTextChanged(object? sender, EventArgs e)
+    {
+        if (sender is TextBoxBase tb) DetectTemplateSelection(tb);
+    }
+
+    /// <summary>
+    /// Se a caixa passou a conter exatamente uma das mensagens que geramos para os itens do
+    /// dropdown, o usuário escolheu aquele item: fixa <see cref="_sessionLanguage"/> no idioma
+    /// correspondente e marca o texto como NOSSO (para o auto-refresh regenerar nesse idioma a
+    /// cada stage/unstage, em vez de tratá-lo como texto do usuário). Não escreve na caixa — só
+    /// observa —, então não há risco de loop com o próprio <c>TextChanged</c>.
+    /// </summary>
+    private void DetectTemplateSelection(TextBoxBase tb)
+    {
+        if (_templateMessages.Count == 0) return;
+        var current = NormalizeNewlines(tb.Text);
+        if (current.Length == 0) return;
+        if (!_templateMessages.TryGetValue(current, out var forced)) return;
+
+        _sessionLanguage      = forced;
+        _lastGeneratedMessage = tb.Text;
     }
 
     /// <summary>

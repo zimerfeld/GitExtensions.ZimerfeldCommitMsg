@@ -4,7 +4,7 @@ criado: 2026-06-08
 atualizado: 2026-06-18
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.76
+versao: 1.0.78
 ---
 
 # README — Instalação, Uso e Build
@@ -61,7 +61,7 @@ Zimerfeld Commit Msg — Inglês/English
 | `- Adiciona gerenciamento de token` | `- Add token management` |
 
 ## 🔌 Modos de integração
-- **Template no diálogo de commit:** um item por idioma no dropdown (`— Automático/Automatic`, `— Português/Portuguese`, `— Inglês/English`); selecione e a mensagem é gerada nesse idioma e preenchida pelo GitExtensions.
+- **Template no diálogo de commit:** um item por idioma no dropdown (`— Automático/Automatic`, `— Português/Portuguese`, `— Inglês/English`). Ao **abrir** o menu, o host gera os 3 idiomas na hora (frescos do stage); ao **clicar**, a caixa recebe a mensagem daquele idioma e o plugin detecta a escolha (via `TextChanged`) para **fixar** o idioma do auto-refresh. Ver [[../Fluxos/Template Dropdown (Auto-resumo)]].
 - **Menu Plugins:** `Plugins → ZimerfeldCommitMsg` valida o repositório (`IsValidGitWorkingDir`) e abre `StartCommitDialog` com a mensagem já preenchida.
 - **Auto-preenchimento ao abrir e ao stage/unstage:** ao **abrir** o diálogo já com arquivos em stage, preenche automaticamente (detecção do `FormCommit` novo via `Application.Idle`, tratado uma vez por instância com `WeakReference`); e enquanto o diálogo estiver aberto, `PostRepositoryChanged` regenera a mensagem quando arquivos entram/saem do stage. Só sobrescreve se a caixa estiver vazia ou contiver `_lastGeneratedMessage`. Ver [[Stage Trigger]].
 

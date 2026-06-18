@@ -35,7 +35,9 @@ O atributo `[Export]` é o ponto de descoberta pelo MEF do GitExtensions.
 | `PluginIcon` | `static Image?` | Ícone do plugin (menu Plugins + dropdown), via `LoadIcon()` |
 | `_syncContext` | `SynchronizationContext?` | Capturado no `Register()` para marshalling UI |
 | `_lastGeneratedMessage` | `string` | Última mensagem gerada — protege texto manual do usuário |
-| `_sessionLanguage` | `MessageLanguage?` | Idioma fixado pelo item de dropdown escolhido (prioridade sobre setting/SO) |
+| `_sessionLanguage` | `MessageLanguage?` | Idioma fixado pela escolha de um item do dropdown (prioridade sobre setting/SO); setado por `DetectTemplateSelection`, reiniciado ao fechar o diálogo |
+| `_templateMessages` | `Dictionary<string, MessageLanguage?>` | Mensagens geradas para os itens do dropdown na abertura do menu, mapeadas ao idioma do item — base da detecção da escolha |
+| `_subscribedTextBox` | `WeakReference<TextBoxBase>?` | Caixa cujo `TextChanged` já assinamos (para detectar a escolha do dropdown) |
 
 ### `LoadIcon()` → `Image?`
 Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via `Assembly.GetManifestResourceStream`, retorna uma `Bitmap` independente do stream. Falha silenciosa (`null`) se o recurso não existir. Atribuído a `Icon` no construtor quando não-nulo.
@@ -47,7 +49,7 @@ Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via
 ### `Register(IGitUICommands)`
 - Chama `base.Register()`
 - Captura `SynchronizationContext.Current` (UI thread)
-- Para cada um dos 3 `_templateItems`: `AddCommitTemplate(label, () => GenerateForTemplate(workingDir, forced), icon)` — factory **lazy** que fixa `_sessionLanguage` e instancia `CommitMessageGenerator(workingDir, idioma)`; ver [[../Fluxos/Template Dropdown (Auto-resumo)]]
+- Para cada um dos 3 `_templateItems`: `AddCommitTemplate(label, () => GenerateForTemplate(workingDir, forced), icon)` — a factory instancia `CommitMessageGenerator(workingDir, idioma)` e registra `msg → idioma` (`RememberTemplateMessage`). ⚠️ O host invoca a factory dos 3 itens ao **ABRIR** o dropdown (não no clique), então a fixação de idioma **não** é feita aqui: é detectada pelo `TextChanged` da caixa (`DetectTemplateSelection`). Ver [[../Fluxos/Template Dropdown (Auto-resumo)]]
 - Captura `_gitUiCommands` (fonte do working dir para o Idle)
 - Assina `PostRepositoryChanged += OnPostRepositoryChanged` (auto-refresh ao stage/unstage)
 - Assina `Application.Idle += OnAppIdle` — detecta o `FormCommit` aberto já com arquivos em stage e preenche uma vez por instância (`WeakReference` em `_handledCommitForm`); `RefreshOpenCommitDialog` retorna `bool` (false = UI ainda montando → tenta no próximo Idle). Ambas as assinaturas são desfeitas no `Unregister`
@@ -56,8 +58,9 @@ Lê o recurso embutido `GitExtensions.ZimerfeldCommitMsg.Resources.icon.png` via
 Faz o nó **ZimerfeldCommitMsg** aparecer em Configurações → Plugins (após instalar a DLL ≥ 1.0.36 e reiniciar). `CurrentLanguage()` lê o valor e resolve "Automático" pelo SO; `EffectiveLanguage()` = `_sessionLanguage ?? CurrentLanguage()`.
 
 ### `Unregister(IGitUICommands)`
-- Remove o handler do evento
+- Remove o handler do evento (`PostRepositoryChanged`, `Application.Idle`)
 - `RemoveCommitTemplate(label)` para cada um dos 3 itens
+- Desassina o `TextChanged` da caixa (`_subscribedTextBox`) e limpa `_templateMessages` / `_sessionLanguage`
 - Limpa `_lastGeneratedMessage`
 
 ### `Execute(GitUIEventArgs)` ← menu Plugins
@@ -73,8 +76,15 @@ Faz o nó **ZimerfeldCommitMsg** aparecer em Configurações → Plugins (após 
 ### `RefreshOpenCommitDialog(string workingDir)`
 - Itera `Application.OpenForms` buscando `FormCommit`
 - `FindCommitTextBox()` → localiza o campo de mensagem
+- `EnsureTextChangedHook(tb)` → assina o `TextChanged` (detecção de escolha do dropdown)
 - Compara `tb.Text` com `_lastGeneratedMessage` antes de sobrescrever
-- Chama `CommitMessageGenerator.Generate()` e atualiza o campo
+- Chama `CommitMessageGenerator.Generate()` no idioma `EffectiveLanguage()` e atualiza o campo
+
+### Detecção da escolha do dropdown (pinning de idioma)
+- `EnsureTextChangedHook(TextBoxBase)` — assina `OnCommitTextChanged` uma vez por instância de caixa (reassina se mudar)
+- `OnCommitTextChanged(...)` → `DetectTemplateSelection(tb)`
+- `DetectTemplateSelection(TextBoxBase)` — se `tb.Text` == uma das `_templateMessages`, fixa `_sessionLanguage` no idioma daquele item e marca o texto como nosso. Só observa (não escreve) → sem loop de `TextChanged`
+- `RememberTemplateMessage(msg, forced)` — registra `msg → idioma` na abertura do dropdown
 
 ### `FindCommitTextBox(Form)` ← helper estático
 Tenta nomes: `"Message"`, `"commitMessageEditor"`, `"_commitMessage"`, `"commitMessage"`.
