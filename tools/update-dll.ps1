@@ -1,30 +1,33 @@
 # Copia o DLL mais recente da pasta de build para os plugins do GitExtensions (requer Admin).
-# Se a DLL de bin\Release estiver ausente ou mais antiga que fontes/recursos, executa build.ps1 -Force.
+# Se a DLL de bin\Release estiver ausente ou mais antiga que fontes/recursos, compila direto
+# (dotnet build) -- SEM bump de versao, SEM atualizar docs (READMEs/Obsidian) e SEM gerar .nupkg.
+# Esse pipeline completo e' responsabilidade do build.ps1; update-dll so' atualiza a DLL implantada.
 
 param([string]$Config = "Release")
 
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $projectRoot = Join-Path $repoRoot "src\GitExtensions.ZimerfeldCommitMsg"
 $dll = Join-Path $projectRoot "bin\$Config\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll"
-$buildScript = Join-Path $repoRoot "build.ps1"
+$csproj = Join-Path $projectRoot "GitExtensions.ZimerfeldCommitMsg.csproj"
 
 $inputs = Get-ChildItem $projectRoot -Recurse -File -Include *.cs,*.csproj,*.resx,*.png |
           Where-Object { $_.FullName -notmatch '\\(bin|obj)\\' }
 $newestInput = ($inputs | Measure-Object -Property LastWriteTimeUtc -Maximum).Maximum
 
+# Compila o plugin diretamente: nao toca em versao nem em documentacao.
+function Invoke-PluginBuild {
+    Write-Host "Executando build...ignorando verificacao incremental." -ForegroundColor Yellow
+    & dotnet build $csproj -c $Config --no-incremental --nologo -v minimal
+    if ($LASTEXITCODE -ne 0) { Write-Warning "Build falhou."; exit 1 }
+}
+
 if (-not (Test-Path $dll)) {
-    Write-Warning "DLL nao encontrada em bin\$Config. Executando build forcado..."
-    & $buildScript -Force
-    $buildSucceeded = $?
-    $buildExitCode = Get-Variable -Name LASTEXITCODE -ValueOnly -ErrorAction SilentlyContinue
-    if ((-not $buildSucceeded) -or ($buildExitCode -is [int] -and $buildExitCode -ne 0)) { exit 1 }
+    Write-Warning "DLL nao encontrada em bin\$Config."
+    Invoke-PluginBuild
 }
 elseif ($newestInput -and ((Get-Item $dll).LastWriteTimeUtc -lt $newestInput)) {
     Write-Warning "DLL em bin\$Config esta mais antiga que as fontes/recursos em tools\net9.0-windows."
-    & $buildScript -Force
-    $buildSucceeded = $?
-    $buildExitCode = Get-Variable -Name LASTEXITCODE -ValueOnly -ErrorAction SilentlyContinue
-    if ((-not $buildSucceeded) -or ($buildExitCode -is [int] -and $buildExitCode -ne 0)) { exit 1 }
+    Invoke-PluginBuild
 }
 
 if (-not (Test-Path $dll)) {
