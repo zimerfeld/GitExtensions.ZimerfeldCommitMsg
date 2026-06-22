@@ -1,7 +1,7 @@
 ﻿---
 tipo: projeto
 criado: 2026-06-01
-atualizado: 2026-06-18
+atualizado: 2026-06-21
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits, i18n]
 status: ativo
 linguagem: C#
@@ -13,6 +13,13 @@ repo: C:\GitExtensions\ZimerfeldCommitMsg
 
 ## 🎯 Objetivo
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que **gera automaticamente** uma mensagem de commit resumindo as mudanças nos arquivos **staged**, no formato **Conventional Commits v1.0.0** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`). **Multilíngue**: gera em **português-BR ou inglês**, detectado pelo idioma do SO, com **override manual** nas configurações. Ver [[Suporte Multilíngue PT-EN]].
+
+## 💜 Financiamento / Patrocínio
+Canais de doação configurados para o repo (botão **Sponsor** + badges no topo dos READMEs):
+- **GitHub Sponsors:** `@zimerfeld` → https://github.com/sponsors/zimerfeld
+- **Ko-fi:** `C0D621FCGD` → https://ko-fi.com/C0D621FCGD
+- **`.github/FUNDING.yml`:** declara `github: zimerfeld` **e** `ko_fi: C0D621FCGD` (antes o Ko-fi estava comentado — corrigido para o botão nativo Sponsor listar ambos).
+- **Prova social no README:** badges de versão e **downloads do NuGet** (`shields.io/nuget/v` e `/dt`) + frase curta de "por que doar" (manutenção no tempo livre + compatibilidade com novas versões do GitExtensions).
 
 ## 📂 Estrutura do repositório
 ```
