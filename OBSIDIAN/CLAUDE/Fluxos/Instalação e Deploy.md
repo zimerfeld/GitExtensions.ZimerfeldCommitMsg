@@ -40,15 +40,15 @@ Cópia para nupkg:
 
 Se não encontrar pasta de plugins → aviso, sem erro. Se não tiver Admin → erro explícito com instruções.
 
-![[ScreenShots/ScreenshotInstall.png]]
+![[screenshots/screenshotInstall.png]]
 
 ### uninstall.ps1 / update-dll.ps1
 
 `uninstall.ps1` remove a DLL do diretório de plugins; `update-dll.ps1` recopia a DLL sem mexer na versão (deploy rápido em desenvolvimento).
 
-![[ScreenShots/ScreenshotUninstall.png]]
+![[screenshots/screenshotUninstall.png]]
 
-![[ScreenShots/ScreenshotUpdate.png]]
+![[screenshots/screenshotUpdate.png]]
 
 ## Fluxo via NuGet PMC
 
@@ -60,7 +60,7 @@ O `.nuspec` descreve o pacote. O `build.ps1` chama `nuget pack` apontando para o
 
 Versões antigas do `.nupkg` são deletadas automaticamente.
 
-![[ScreenShots/ScreenshotBuild.png]]
+![[screenshots/screenshotBuild.png]]
 
 ## Após instalação
 

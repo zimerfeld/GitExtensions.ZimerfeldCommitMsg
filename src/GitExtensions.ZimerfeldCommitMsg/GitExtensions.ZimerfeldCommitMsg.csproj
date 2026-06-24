@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <NeutralLanguage>pt-BR</NeutralLanguage>
-    <Version>1.0.84</Version>
+    <Version>1.0.85</Version>
     <Authors>Zimerfeld</Authors>
     <Description>GitExtensions plugin that summarizes staged changes into a single commit message sentence</Description>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
