@@ -1,7 +1,7 @@
 ﻿---
 tipo: sistema
 tags: [build, versão, nupkg, deploy]
-atualizado: 2026-06-22
+atualizado: 2026-06-24
 ---
 
 # Versionamento e Build
@@ -10,7 +10,7 @@ atualizado: 2026-06-22
 
 `major.minor.build` — somente o `build` é incrementado automaticamente pelo `build.ps1`. Major e minor são alterados manualmente.
 
-**Versão atual:** `1.0.84` *(fonte da verdade: `.nuspec` / `.csproj`)*
+**Versão atual:** `1.0.85` *(fonte da verdade: `.nuspec` / `.csproj`)*
 
 > [!note] Recursos `.resx` embutidos (sem satellite assemblies)
 > As strings de UI vivem em `Resources/Strings.resx` (EN neutro) e `Resources/StringsPtBr.resx` (PT),
@@ -39,6 +39,8 @@ build.ps1
 > **Ordem proposital:** os docs (READMEs + cofre) são carimbados **antes** do _bump_ no
 > `.nuspec`/`.csproj`. O _pack_ (passo 9) roda **depois** de todos os carimbos, então o `.nupkg`
 > continua sendo o artefato mais recente — o que mantém a detecção de mudanças por timestamp correta.
+
+<!-- -->
 
 > Requer `nuget` CLI e permissão de **Administrador** para o deploy. Sem Admin, o passo 7 é pulado com aviso.
 

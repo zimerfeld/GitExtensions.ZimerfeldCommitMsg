@@ -1,10 +1,10 @@
 ﻿---
 tipo: conhecimento
 criado: 2026-06-08
-atualizado: 2026-06-22
+atualizado: 2026-06-24
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.84
+versao: 1.0.85
 ---
 
 # README — Instalação, Uso e Build
@@ -77,7 +77,7 @@ Zimerfeld Commit Msg — Inglês/English
 - **Limite de 72 caracteres** na primeira linha (`TruncateTitle` corta no último espaço + `…`).
 - **Corpo sempre presente** — até 5 bullets de uma linha; havendo qualquer arquivo em stage, gera **ao menos um** bullet (mesmo com um único arquivo).
 
-![[ScreenShots/ScreenshotCommitMsg.png]]
+![[screenshots/screenshotCommitMsg.png]]
 
 ### Tipos detectados (definem o verbo)
 Cada arquivo staged recebe um tipo (`DetermineAllTypes`). O verbo da primeira linha vem do tipo de **maior prioridade** (ordem: `feat` → `fix` → `refactor` → `perf` → `test` → `build` → `ci` → `chore` → `docs` → `style`). **Só o verbo é impresso.**
@@ -188,7 +188,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
-![[ScreenShots/ScreenshotInstall.png]]
+![[screenshots/screenshotInstall.png]]
 
 **Opção B — Manual:** copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para `C:\Program Files\GitExtensions\Plugins\` e reinicie o GitExtensions.
 
@@ -198,7 +198,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\uninstall.ps1
 ```
 
-![[ScreenShots/ScreenshotUninstall.png]]
+![[screenshots/screenshotUninstall.png]]
 
 A remoção da DLL não afeta nenhuma outra parte do GitExtensions.
 
@@ -222,7 +222,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg
 .\build.ps1
 ```
 
-![[ScreenShots/ScreenshotBuild.png]]
+![[screenshots/screenshotBuild.png]]
 
 **Deploy rápido (sem incrementar versão):**
 ```powershell
@@ -230,7 +230,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\update-dll.ps1
 ```
 
-![[ScreenShots/ScreenshotUpdate.png]]
+![[screenshots/screenshotUpdate.png]]
 
 Ver [[Versionamento]] e [[Instalação e Deploy]].
 

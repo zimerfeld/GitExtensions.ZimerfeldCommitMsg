@@ -8,12 +8,12 @@ This plugin is built and maintained in my free time. If it saves you time on eve
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Version:** 1.0.84
-**Updated:** 2026-06-22
+**Version:** 1.0.85
+**Updated:** 2026-06-24
 
 Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatically generates commit messages by analyzing the real content of staged changes. Changes are classified by **Conventional Commits** types (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) to choose the appropriate **verb**, and the resulting message is a **verb-led sentence** followed by a bulleted body — **without** the `type:` prefix. **Multilingual**: generates output in **Brazilian Portuguese or English**, automatically detected from the operating system language, with a **manual override** in the plugin settings.
 
-![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUsage.png)
+![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotUsage.png)
 
 [English](README.en-US.md) | [Português-BR](README.pt-BR.md)
 
@@ -52,7 +52,7 @@ Zimerfeld Commit Msg — Português/Portuguese
 Zimerfeld Commit Msg — Inglês/English
 ```
 
-![Commit template dropdown with the three language items](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUsage.png)
+![Commit template dropdown with the three language items](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotUsage.png)
 
 **2. In Settings → Plugins → ZimerfeldCommitMsg** — the **"Idioma da mensagem / Message language"** selector defines the **default** used by the Plugins menu and auto-refresh.
 
@@ -113,7 +113,7 @@ When you **open** the commit dialog with files already staged, the message is fi
 - **Description and verbs in the active language** (Brazilian Portuguese or English).
 - **Always-present body** — up to 5 one-line bullets; whenever any file is staged, it produces **at least one** bullet (even with a single file).
 
-![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotCommitMsg.png)
+![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotCommitMsg.png)
 
 ### Detected types (define the verb)
 
@@ -275,7 +275,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
 ```
 
-![install.ps1 output confirming plugin installation](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotInstall.png)
+![install.ps1 output confirming plugin installation](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotInstall.png)
 
 ### Option B — Manual
 
@@ -296,7 +296,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\uninstall.ps1
 ```
 
-![uninstall.ps1 output confirming plugin removal](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUninstall.png)
+![uninstall.ps1 output confirming plugin removal](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotUninstall.png)
 
 Removing the DLL does not affect any other part of GitExtensions.
 
@@ -321,7 +321,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg
 .\build.ps1
 ```
 
-![build.ps1 output with version increment and packaging](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotBuild.png)
+![build.ps1 output with version increment and packaging](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotBuild.png)
 
 ### Fast deploy (without incrementing version)
 
@@ -332,7 +332,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\update-dll.ps1
 ```
 
-![update-dll.ps1 output updating only the DLL](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenshotUpdate.png)
+![update-dll.ps1 output updating only the DLL](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotUpdate.png)
 
 ---
 
