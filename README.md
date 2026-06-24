@@ -4,21 +4,21 @@
 
 [![NuGet version](https://img.shields.io/nuget/v/GitExtensions.ZimerfeldCommitMsg?style=for-the-badge&logo=nuget&label=NuGet)](https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/) &nbsp; [![NuGet downloads](https://img.shields.io/nuget/dt/GitExtensions.ZimerfeldCommitMsg?style=for-the-badge&logo=nuget&label=Downloads)](https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/)
 
-🇬🇧 This plugin is built and maintained in my free time. If it saves you time on every commit, a sponsorship helps keep it updated for new GitExtensions versions. 💜
+![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/screenshotGB.png) This plugin is built and maintained in my free time. If it saves you time on every commit, a sponsorship helps keep it updated for new GitExtensions versions. 💜
 
-🇧🇷 Este plugin é construído e mantido no meu tempo livre. Se ele te poupa tempo a cada commit, um patrocínio ajuda a mantê-lo atualizado para as novas versões do GitExtensions. 💜
+![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/screenshotBR.png) Este plugin é construído e mantido no meu tempo livre. Se ele te poupa tempo a cada commit, um patrocínio ajuda a mantê-lo atualizado para as novas versões do GitExtensions. 💜
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-🇬🇧 **Version:** 1.0.84
+![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/screenshotGB.png) **Version:** 1.0.84
 **Updated:** 2026-06-22
 
-🇧🇷 **Versão:** 1.0.84
+![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/screenshotBR.png) **Versão:** 1.0.84
 **Atualizado em:** 2026-06-22
 
-🇬🇧 GitExtensions plugin that automatically generates commit messages from staged changes, with output in Brazilian Portuguese or English.
+![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/screenshotGB.png) GitExtensions plugin that automatically generates commit messages from staged changes, with output in Brazilian Portuguese or English.
 
-🇧🇷 Plugin para GitExtensions que gera mensagens de commit automaticamente a partir das alterações em stage, com saída em português do Brasil ou inglês.
+![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/screenshotBR.png) Plugin para GitExtensions que gera mensagens de commit automaticamente a partir das alterações em stage, com saída em português do Brasil ou inglês.
 
 ![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/ScreenShotREADME.png)
 
@@ -34,9 +34,9 @@
 
 ## NuGet
 
-🇬🇧 This README is intentionally short so it works both on GitHub and NuGet. Use the language links above for the full documentation.
+![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/screenshotGB.png) This README is intentionally short so it works both on GitHub and NuGet. Use the language links above for the full documentation.
 
-🇧🇷 Este README é propositalmente curto para funcionar tanto no GitHub quanto no NuGet. Use os links de idioma acima para acessar a documentação completa.
+![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/ScreenShots/screenshotBR.png) Este README é propositalmente curto para funcionar tanto no GitHub quanto no NuGet. Use os links de idioma acima para acessar a documentação completa.
 
 ## License / Licença
 
