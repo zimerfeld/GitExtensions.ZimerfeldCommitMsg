@@ -308,9 +308,6 @@ internal sealed class CommitMessageGenerator
     private static readonly string[] TestPathSegments =
         ["test", "tests", "spec", "specs", "__tests__", "unittest", "unittests"];
 
-    private static readonly HashSet<string> SkippableRoots =
-        new(StringComparer.OrdinalIgnoreCase) { "src", "app", "lib", "source", "main", ".", "" };
-
     public CommitMessageGenerator(string workingDir, MessageLanguage language)
     {
         _workingDir = workingDir;
@@ -535,7 +532,7 @@ internal sealed class CommitMessageGenerator
             IsCleanSentence(readmeTitle))
             best = readmeTitle;
 
-        return best is null ? null : ExtractMainClause(best);
+        return best;
     }
 
     /// <summary>
@@ -686,14 +683,6 @@ internal sealed class CommitMessageGenerator
         if (text.Contains("  ", StringComparison.Ordinal)) score -= 5;
         return score;
     }
-
-    /// <summary>
-    /// Retorna o comentário completo, preservando a frase inteira.
-    /// O corte da "cláusula principal" no primeiro conector de propósito
-    /// (" para ", " pois "…) foi desativado porque encurtava as frases e as
-    /// deixava sem sentido (ex.: "filtrar stems com ponto" perdia o propósito).
-    /// </summary>
-    private string ExtractMainClause(string comment) => comment;
 
     /// <summary>
     /// Normaliza um comentário para uso como descrição: 1ª letra minúscula,

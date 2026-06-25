@@ -162,6 +162,12 @@ $csprojContent = $csprojContent -replace '<Version>[^<]+</Version>', "<Version>$
 [System.IO.File]::WriteAllText($csproj, $csprojContent, [System.Text.Encoding]::UTF8)
 
 # -- 5. Build ------------------------------------------------------------------
+# Garante que o dotnet esta no PATH antes de compilar -- erro limpo em vez de
+# "termo nao reconhecido" cru do PowerShell.
+if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
+    Write-Error "dotnet.exe nao encontrado no PATH. Instale o .NET 9 SDK e tente novamente."
+    exit 1
+}
 Write-Host "Compilando..."
 $buildArgs = @("build", $csproj, "-c", "Release", "--nologo", "-v", "minimal")
 if ($Force) {
