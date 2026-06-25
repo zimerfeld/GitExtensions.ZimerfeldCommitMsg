@@ -1,7 +1,7 @@
 ---
 tipo: sistema
 tags: [dependências, assemblies, gitextensions]
-atualizado: 2026-05-22
+atualizado: 2026-06-25
 ---
 
 # Dependências
@@ -12,9 +12,11 @@ Todas referenciadas com `<Private>false</Private>` — **não** copiadas para o 
 
 | Assembly | Caminho | Uso |
 |---|---|---|
-| `GitExtensions.Extensibility.dll` | `C:\Program Files\GitExtensions\` | `IGitPlugin`, `GitPluginBase`, `IGitUICommands`, `GitUIEventArgs`, `IGitModule` |
+| `GitExtensions.Extensibility.dll` | `refs/` (versionado no repo) | `IGitPlugin`, `GitPluginBase`, `IGitUICommands`, `GitUIEventArgs`, `IGitModule` |
 | `GitUIPluginInterfaces.dll` | `C:\Program Files\GitExtensions\` | interfaces de UI legadas |
-| `System.ComponentModel.Composition.dll` | `C:\Program Files\GitExtensions\` | MEF — `[Export(typeof(IGitPlugin))]` |
+| `System.ComponentModel.Composition.dll` | `refs/` (versionado no repo) | MEF — `[Export(typeof(IGitPlugin))]` |
+
+> **Build determinístico (qualquer máquina Windows):** os assemblies de referência `GitExtensions.Extensibility.dll` (x64 `6.0.5.18375`) e `System.ComponentModel.Composition.dll` ficam **versionados em `refs/`** (apontados por `$(GitExtensionsRefPath)` no `.csproj`), **não** baixados em prebuild. Garante compilação reprodutível e **offline**, sempre contra a API **x64** do GitExtensions. O mecanismo anterior (pacote `GitExtensions.Extensibility` → `Download-GitExtensions.ps1`) escolhia o primeiro asset `portable` do release e podia trazer um build **arm64** (`6.0.5.75`) incompatível com o host x64 — origem do erro `Method not found: …AddCommitTemplate(…)`. Ver `refs/README.md`.
 
 ## Interfaces-chave implementadas
 

@@ -179,7 +179,11 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         _gitUiCommands = gitUiCommands;
 
         // Um item de template por idioma (Automático/Português/Inglês).
-        EnsureCommitTemplates(gitUiCommands);
+        // Protegido: se o host expõe uma assinatura incompatível de AddCommitTemplate
+        // (skew entre a versão de GitExtensions usada no build e a instalada), o plugin
+        // segue sem o dropdown em vez de derrubar o GitExtensions com "Method not found".
+        try { EnsureCommitTemplates(gitUiCommands); }
+        catch { /* nunca deixar o plugin derrubar o GitExtensions */ }
 
         // Atualiza a mensagem automaticamente sempre que arquivos entram/saem do stage
         gitUiCommands.PostRepositoryChanged += OnPostRepositoryChanged;
