@@ -520,12 +520,6 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     }
 
     /// <summary>
-    /// Remove qualquer efeito de cor/realce do texto da caixa de commit, voltando à cor
-    /// padrão do controle. Aplica-se ao RichTextBox usado pelo GitExtensions; outros tipos
-    /// de caixa não têm formatação por trecho e são ignorados. O host pode repintar numa
-    /// edição posterior — aqui só garantimos a mensagem que acabamos de gerar sem cor.
-    /// </summary>
-    /// <summary>
     /// Normaliza quebras de linha para <c>\n</c> e remove espaços nas pontas. Usado para comparar
     /// a NOSSA mensagem (gerada com <c>\n</c>) com o que a caixa do host devolve, que pode vir com
     /// <c>\r\n</c>. Sem essa normalização a comparação acusaria diferença e a mensagem que nós
@@ -534,6 +528,12 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
     private static string NormalizeNewlines(string s) =>
         s.Replace("\r\n", "\n").Replace('\r', '\n').Trim();
 
+    /// <summary>
+    /// Remove qualquer efeito de cor/realce do texto da caixa de commit, voltando à cor
+    /// padrão do controle. Aplica-se ao RichTextBox usado pelo GitExtensions; outros tipos
+    /// de caixa não têm formatação por trecho e são ignorados. O host pode repintar numa
+    /// edição posterior — aqui só garantimos a mensagem que acabamos de gerar sem cor.
+    /// </summary>
     private static void ResetTextColors(TextBoxBase tb)
     {
         if (tb is not RichTextBox rtb) return;

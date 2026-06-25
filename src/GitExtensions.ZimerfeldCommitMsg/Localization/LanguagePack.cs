@@ -41,16 +41,10 @@ internal abstract class LanguagePack
     /// </summary>
     public abstract (string? Verb, string Remainder) LeadingVerb(string desc);
 
-    // ── Conectores que introduzem justificativa (corta a cláusula principal) ─
-    public abstract IReadOnlyList<string> MainClauseConnectors { get; }
-
     // ── Palavras de ligação que, no FIM da frase, indicam corte sem fechamento ─
     // (preposições, artigos, conjunções soltas). Usado pelo saneador de frases
     // para descartar comentários truncados como "filtra itens com" ou "mapeia para".
     public abstract IReadOnlySet<string> DanglingTrailingWords { get; }
-
-    // ── Frase de fallback por categoria de arquivo ──────────────────────────
-    public abstract string FallbackPhrase(string category);
 
     // ── Substantivo "arquivo(s)" flexionado pela contagem (linha-log) ────────
     public abstract string FilesWord(int count);
@@ -180,12 +174,6 @@ internal sealed class PtBrLanguagePack : LanguagePack
         return (null, desc);
     }
 
-    public override IReadOnlyList<string> MainClauseConnectors { get; } =
-    [
-        " para ", " pois ", " porque ", " já que ", " a fim de ",
-        " quando ", " caso ", " evitando ", " — ", " - ",
-    ];
-
     public override IReadOnlySet<string> DanglingTrailingWords { get; } =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -195,16 +183,6 @@ internal sealed class PtBrLanguagePack : LanguagePack
             "um", "uma", "entre", "sobre", "sob", "ante", "após", "até",
             "desde", "durante", "como", "quando", "se", "mas", "porém", "então",
         };
-
-    public override string FallbackPhrase(string category) => category switch
-    {
-        "docs"   => "documentação",
-        "config" => "configuração",
-        "build"  => "configuração de build",
-        "test"   => "testes unitários",
-        "web"    => "componentes web",
-        _        => "código-fonte",
-    };
 
     public override string FilesWord(int count) => count == 1 ? "arquivo" : "arquivos";
 
@@ -368,12 +346,6 @@ internal sealed class EnLanguagePack : LanguagePack
         return (null, desc);
     }
 
-    public override IReadOnlyList<string> MainClauseConnectors { get; } =
-    [
-        " to ", " because ", " in order to ", " so that ",
-        " when ", " if ", " avoiding ", " — ", " - ",
-    ];
-
     public override IReadOnlySet<string> DanglingTrailingWords { get; } =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -382,16 +354,6 @@ internal sealed class EnLanguagePack : LanguagePack
             "when", "if", "but", "so", "than", "then", "over", "under",
             "between", "about", "onto", "via",
         };
-
-    public override string FallbackPhrase(string category) => category switch
-    {
-        "docs"   => "documentation",
-        "config" => "configuration",
-        "build"  => "build configuration",
-        "test"   => "unit tests",
-        "web"    => "web components",
-        _        => "source code",
-    };
 
     public override string FilesWord(int count) => count == 1 ? "file" : "files";
 
