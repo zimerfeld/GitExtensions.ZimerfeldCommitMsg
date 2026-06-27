@@ -1,10 +1,10 @@
 ﻿---
 tipo: conhecimento
 criado: 2026-06-08
-atualizado: 2026-06-25
+atualizado: 2026-06-27
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.87
+versao: 1.0.89
 ---
 
 # README — Instalação, Uso e Build
@@ -241,7 +241,7 @@ Ver [[Versionamento]] e [[Instalação e Deploy]].
 Ajude a manter este projeto sempre atualizado via **GitHub Sponsors**: [github.com/sponsors/zimerfeld](https://github.com/sponsors/zimerfeld), ou via **Ko-fi**: [ko-fi.com/C0D621FCGD](https://ko-fi.com/C0D621FCGD). No topo do `README.md`, lado a lado e com as mesmas dimensões (altura de 28px), ficam o badge **Sponsor** (shields.io, `style=for-the-badge`) e o botão oficial **"Buy me a coffee"** do Ko-fi (`<img src="https://storage.ko-fi.com/cdn/kofi2.png" height="28">` clicável para a URL do Ko-fi); o `.github/FUNDING.yml` aponta para o GitHub Sponsors, e o README empacotado leva o link clicável para a página do pacote no nuget.org.
 
 ## 📄 Licença
-[MIT](LICENSE.txt)
+[CC BY-NC-ND 4.0](LICENSE.txt)
 
 ## 🔗 Relacionado
 - [[GitExtensions.ZimerfeldCommitMsg]]

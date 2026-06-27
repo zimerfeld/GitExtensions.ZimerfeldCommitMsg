@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>GitExtensions.ZimerfeldCommitMsg</id>
-    <version>1.0.87</version>
+    <version>1.0.89</version>
     <authors>Zimerfeld</authors>
     <description>Plugin for GitExtensions that automatically generates commit messages by analyzing the actual content of staged changes. Changes are classified by Conventional Commits type (feat/fix/docs/test/chore/build/refactor) to pick the appropriate verb; the resulting message is a verb-led subject (no literal "type:" prefix) plus a bulleted body. Output is in Brazilian Portuguese or English — selected automatically from the operating system language, with a manual override in the plugin settings. Supports two strategies: comment-based (extracts meaningful comments added to the diff) and filename-based (derives semantic concepts from file names). The message is refreshed automatically whenever files are staged or unstaged while the commit dialog is open.
 
@@ -10,7 +10,7 @@ Plugin para o GitExtensions que gera mensagens de commit automaticamente analisa
     <tags>gitextensions plugin commit-message conventional-commits</tags>
     <readme>README.md</readme>
     <icon>images\icon-128.png</icon>
-    <license type="expression">MIT</license>
+    <license type="file">LICENSE.txt</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
   </metadata>
   <files>
