@@ -1,7 +1,7 @@
 ﻿---
 tipo: sistema
 tags: [sistema, overview, plugin, gitextensions, i18n]
-atualizado: 2026-06-27
+atualizado: 2026-06-30
 ---
 
 # Visão Geral
@@ -19,7 +19,7 @@ Plugin para **GitExtensions** (Windows) que gera automaticamente uma mensagem de
 | UI Framework | Windows Forms (herdado do GitExtensions) |
 | Assembly de saída | `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` |
 | Namespace | `GitExtensions.ZimerfeldCommitMsg` |
-| Versão atual | `1.0.89` |
+| Versão atual | `1.0.90` |
 | Idiomas | Português-BR / Inglês (auto pelo SO + override) |
 | Autor | Zimerfeld |
 

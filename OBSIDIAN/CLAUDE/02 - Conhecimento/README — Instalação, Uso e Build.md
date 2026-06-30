@@ -1,10 +1,10 @@
 ﻿---
 tipo: conhecimento
 criado: 2026-06-08
-atualizado: 2026-06-27
+atualizado: 2026-06-30
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.89
+versao: 1.0.90
 ---
 
 # README — Instalação, Uso e Build
