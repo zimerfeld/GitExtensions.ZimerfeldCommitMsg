@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>GitExtensions.ZimerfeldCommitMsg</id>
-    <version>1.0.90</version>
+    <version>1.0.92</version>
     <authors>Zimerfeld</authors>
     <description>Plugin for GitExtensions that automatically generates commit messages by analyzing the actual content of staged changes. Changes are classified by Conventional Commits type (feat/fix/docs/test/chore/build/refactor) to pick the appropriate verb; the resulting message is a verb-led subject (no literal "type:" prefix) plus a bulleted body. Output is in Brazilian Portuguese or English — selected automatically from the operating system language, with a manual override in the plugin settings. Supports two strategies: comment-based (extracts meaningful comments added to the diff) and filename-based (derives semantic concepts from file names). The message is refreshed automatically whenever files are staged or unstaged while the commit dialog is open.
 
@@ -13,14 +13,22 @@ Plugin para o GitExtensions que gera mensagens de commit automaticamente analisa
     <license type="file">LICENSE.txt</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <!-- ── GitExtensions plugin marker ───────────────────────────────────
-         O Plugin Manager do GitExtensions filtra o feed do nuget.org por pacotes que
-         DEPENDEM de GitExtensions.Extensibility — sem isto o pacote é publicado mas
-         nunca aparece no gerenciador de plugins interno. A versão é o MÍNIMO de
-         GitExtensions (Extensibility) exigido. Nenhuma Extensibility 6.x é publicada no
-         nuget, então 1.0.0.129 (a maior versão publicada <= o GitExtensions 6.0.5
-         instalado) mantém compatibilidade com o 6.x. Alinhado ao ZimerfeldTree. -->
+         O Plugin Manager do GitExtensions (gitextensions.pluginmanager) filtra o feed do
+         nuget.org por pacotes que (a) têm a tag "GitExtensions", (b) trazem uma DLL em um
+         moniker de framework aceito (net5.0..net10.0, "any" ou netstandard2.0 — a DLL em
+         lib\ raiz é o grupo "any") e (c) DEPENDEM de GitExtensions.Extensibility com um range
+         de versão que INCLUA a versão que o manager anuncia para o host em execução.
+         O manager v3.x (GitExtensions 6.x) anuncia 0.4.0, então o range PRECISA conter 0.4.0
+         → [0.4.0, 0.5.0), igual aos demais plugins GE6 que funcionam (AITools, BundleBackuper,
+         Gerrit, SolutionRunner…).
+         ATENÇÃO: um "1.0.0.129" puro significa ">= 1.0.0.129", que NÃO inclui 0.4.0, então o
+         pacote era silenciosamente filtrado para FORA do Plugin Manager (aquele valor estava
+         errado — o filtro casa com a versão anunciada pelo manager, NÃO com o runtime 6.0.5
+         instalado).
+         Para o GitExtensions 7 (manager v7.x anuncia 7.0.0), suba para [7.0.0, 8.0.0).
+         Alinhado ao ZimerfeldTree. -->
     <dependencies>
-      <dependency id="GitExtensions.Extensibility" version="1.0.0.129" />
+      <dependency id="GitExtensions.Extensibility" version="[0.4.0, 0.5.0)" />
     </dependencies>
   </metadata>
   <files>
