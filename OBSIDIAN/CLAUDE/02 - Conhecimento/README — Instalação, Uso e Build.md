@@ -4,7 +4,7 @@ criado: 2026-06-08
 atualizado: 2026-07-01
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.90
+versao: 1.0.92
 ---
 
 # README — Instalação, Uso e Build
