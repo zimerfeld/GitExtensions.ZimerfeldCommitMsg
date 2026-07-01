@@ -1,10 +1,10 @@
 ﻿---
 tipo: conhecimento
 criado: 2026-06-08
-atualizado: 2026-06-27
+atualizado: 2026-07-01
 tags: [conhecimento, readme, instalacao, build, uso, conventional-commits, i18n]
 fonte: README.md
-versao: 1.0.89
+versao: 1.0.90
 ---
 
 # README — Instalação, Uso e Build
@@ -182,7 +182,9 @@ Usada quando nenhum comentário válido é encontrado. Para cada arquivo staged,
 - Permissão de **Administrador** para instalar/desinstalar.
 
 ## 📦 Instalação
-**Opção A — PowerShell (recomendado), como Administrador:**
+**Opção A — Gerenciador de Plugins do GitExtensions (recomendado):** em **Plugins → Plugin Manager**, procure `GitExtensions.ZimerfeldCommitMsg` no feed do nuget.org e instale; reinicie o GitExtensions. Não requer PowerShell nem Administrador. Habilitado ao empacotar a DLL em `lib\` raiz (grupo "any", extraível pelo Plugin Manager) + `<dependency id="GitExtensions.Extensibility">` (marcador que faz o pacote aparecer no gerenciador interno) — alinhado ao [[GitExtensions.ZimerfeldTree]].
+
+**Opção B — PowerShell, como Administrador:**
 ```powershell
 cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 .\install.ps1
@@ -190,7 +192,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 
 ![[screenshots/screenshotInstall.png]]
 
-**Opção B — Manual:** copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para `C:\Program Files\GitExtensions\Plugins\` e reinicie o GitExtensions.
+**Opção C — Manual:** copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para `C:\Program Files\GitExtensions\Plugins\` e reinicie o GitExtensions.
 
 ## 🗑️ Desinstalação
 ```powershell

@@ -8,8 +8,8 @@ Este plugin é construído e mantido no meu tempo livre. Se ele te poupa tempo a
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Versão:** 1.0.89
-**Atualizado em:** 2026-06-27
+**Versão:** 1.0.90
+**Atualizado em:** 2026-07-01
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
@@ -266,7 +266,13 @@ O corpo lista até **5 bullets** — **ao menos um, mesmo com um único arquivo*
 
 ## Instalação
 
-### Opção A — Via PowerShell (recomendado)
+### Opção A — Gerenciador de Plugins do GitExtensions (recomendado)
+
+No próprio GitExtensions, vá em **Plugins → Plugin Manager**, procure por
+**GitExtensions.ZimerfeldCommitMsg** no feed do nuget.org e clique em instalar.
+Reinicie o GitExtensions. Não requer PowerShell nem permissão de Administrador.
+
+### Opção B — Via PowerShell
 
 Execute o PowerShell **como Administrador**:
 
@@ -277,7 +283,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 
 ![Saída do install.ps1 confirmando a instalação do plugin](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotInstall.png)
 
-### Opção B — Manual
+### Opção C — Manual
 
 Copie `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` para:
 

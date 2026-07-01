@@ -8,8 +8,8 @@ This plugin is built and maintained in my free time. If it saves you time on eve
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Version:** 1.0.89
-**Updated:** 2026-06-27
+**Version:** 1.0.90
+**Updated:** 2026-07-01
 
 Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatically generates commit messages by analyzing the real content of staged changes. Changes are classified by **Conventional Commits** types (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) to choose the appropriate **verb**, and the resulting message is a **verb-led sentence** followed by a bulleted body — **without** the `type:` prefix. **Multilingual**: generates output in **Brazilian Portuguese or English**, automatically detected from the operating system language, with a **manual override** in the plugin settings.
 
@@ -266,7 +266,13 @@ The body lists up to **5 bullets** — **at least one, even with a single file**
 
 ## Installation
 
-### Option A — Via PowerShell (recommended)
+### Option A — GitExtensions Plugin Manager (recommended)
+
+Inside GitExtensions, go to **Plugins → Plugin Manager**, search for
+**GitExtensions.ZimerfeldCommitMsg** in the nuget.org feed and click install.
+Restart GitExtensions. No PowerShell or Administrator permission required.
+
+### Option B — Via PowerShell
 
 Run PowerShell **as Administrator**:
 
@@ -277,7 +283,7 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 
 ![install.ps1 output confirming plugin installation](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotInstall.png)
 
-### Option B — Manual
+### Option C — Manual
 
 Copy `GitExtensions.Plugins.ZimerfeldCommitMsg.dll` to:
 

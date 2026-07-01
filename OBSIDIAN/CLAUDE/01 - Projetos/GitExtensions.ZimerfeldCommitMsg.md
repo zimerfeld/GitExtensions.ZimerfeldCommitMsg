@@ -1,11 +1,11 @@
 ﻿---
 tipo: projeto
 criado: 2026-06-01
-atualizado: 2026-06-27
+atualizado: 2026-07-01
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits, i18n]
 status: ativo
 linguagem: C#
-versao: 1.0.89
+versao: 1.0.90
 repo: C:\GitExtensions\ZimerfeldCommitMsg
 ---
 
@@ -100,7 +100,7 @@ Projeto console separado (`inspector\Program.cs`) que usa `MetadataLoadContext` 
 > `FindCommitTextBox` tenta nomes conhecidos (`Message`, `commitMessageEditor`, `_commitMessage`, `commitMessage`) e cai num fallback heurístico (maior `TextBoxBase` multiline editável). Versões diferentes do GitExtensions mudam esses nomes.
 
 ## 🔢 Versionamento
-- Versão atual: **1.0.89** (csproj + nuspec sincronizados pelo `build.ps1`)
+- Versão atual: **1.0.90** (csproj + nuspec sincronizados pelo `build.ps1`)
 - Esquema: `major.minor.BUILD`, BUILD auto-incrementado a cada build
 - A cada build, o `build.ps1` carimba versão + data nos **READMEs e neste cofre** (notas Projeto, README espelho, Versionamento, Visão Geral) **antes** do bump no nuspec/csproj
 
