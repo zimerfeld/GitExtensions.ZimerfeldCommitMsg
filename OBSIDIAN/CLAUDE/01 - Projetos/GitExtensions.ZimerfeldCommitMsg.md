@@ -1,7 +1,7 @@
 ﻿---
 tipo: projeto
 criado: 2026-06-01
-atualizado: 2026-06-30
+atualizado: 2026-07-01
 tags: [projeto, csharp, gitextensions, plugin, winforms, conventional-commits, i18n]
 status: ativo
 linguagem: C#

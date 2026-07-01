@@ -12,10 +12,28 @@ Plugin para o GitExtensions que gera mensagens de commit automaticamente analisa
     <icon>images\icon-128.png</icon>
     <license type="file">LICENSE.txt</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!-- ── GitExtensions plugin marker ───────────────────────────────────
+         O Plugin Manager do GitExtensions filtra o feed do nuget.org por pacotes que
+         DEPENDEM de GitExtensions.Extensibility — sem isto o pacote é publicado mas
+         nunca aparece no gerenciador de plugins interno. A versão é o MÍNIMO de
+         GitExtensions (Extensibility) exigido. Nenhuma Extensibility 6.x é publicada no
+         nuget, então 1.0.0.129 (a maior versão publicada <= o GitExtensions 6.0.5
+         instalado) mantém compatibilidade com o 6.x. Alinhado ao ZimerfeldTree. -->
+    <dependencies>
+      <dependency id="GitExtensions.Extensibility" version="1.0.0.129" />
+    </dependencies>
   </metadata>
   <files>
-    <!-- Plugin DLL -->
-    <file src="bin\Release\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll" target="tools\net9.0-windows\" />
+    <!-- Plugin DLL em lib\ RAIZ (sem subpasta de framework) — OBRIGATÓRIO e intencional.
+         O Plugin Manager do GitExtensions só extrai um grupo lib cujo framework está na sua
+         lista de monikers { net5.0..net10.0, any, netstandard2.0 }. Uma DLL em lib\ raiz é o
+         grupo "any" → casa. Uma subpasta lib\net9.0-windows\ NÃO está na lista → a DLL não
+         seria extraída e o plugin falharia ao instalar. Isso também faz o nuget.org exibir
+         compatibilidade ampla (inclusive .NET Framework). O aviso NU5101 do pack é filtrado
+         no build.ps1 de propósito. Alinhado ao ZimerfeldTree. -->
+    <file src="..\..\tools\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll" target="lib\" />
+    <!-- Mesma DLL sob tools\ para a instalação legada via Package Manager Console (install.ps1) -->
+    <file src="..\..\tools\net9.0-windows\GitExtensions.Plugins.ZimerfeldCommitMsg.dll" target="tools\net9.0-windows\" />
     <!-- Install / Uninstall scripts -->
     <file src="..\..\tools\install.ps1" target="tools\" />
     <file src="..\..\tools\uninstall.ps1" target="tools\" />

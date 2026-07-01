@@ -1,7 +1,7 @@
 ﻿---
 tipo: sistema
 tags: [build, versão, nupkg, deploy]
-atualizado: 2026-06-30
+atualizado: 2026-07-01
 ---
 
 # Versionamento e Build

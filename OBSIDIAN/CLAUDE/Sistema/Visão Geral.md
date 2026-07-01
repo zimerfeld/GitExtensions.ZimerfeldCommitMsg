@@ -1,7 +1,7 @@
 ﻿---
 tipo: sistema
 tags: [sistema, overview, plugin, gitextensions, i18n]
-atualizado: 2026-06-30
+atualizado: 2026-07-01
 ---
 
 # Visão Geral
