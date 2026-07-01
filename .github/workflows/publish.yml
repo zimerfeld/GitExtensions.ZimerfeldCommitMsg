@@ -1,0 +1,64 @@
+name: Publish to NuGet
+
+# Publicação via Trusted Publishing (OIDC) — sem API key armazenada.
+# A política correspondente no nuget.org: workflow "publish.yml", environment "production",
+# repo owner "zimerfeld", repositório "GitExtensions.Zimerfeld*".
+#
+# Dispara ao publicar um GitHub Release, ou manualmente (Actions → Run workflow).
+# Empacota a versão que estiver no .nuspec e faz push com --skip-duplicate
+# (não falha se a versão já existir no nuget.org).
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: windows-latest        # net9.0-windows + WinForms exigem o Windows Desktop SDK
+    environment: production        # DEVE casar com o "Environment" da política do nuget.org
+    permissions:
+      id-token: write              # necessário para o OIDC do Trusted Publishing
+      contents: read
+
+    env:
+      PROJECT: src/GitExtensions.ZimerfeldCommitMsg/GitExtensions.ZimerfeldCommitMsg.csproj
+      NUSPEC: src/GitExtensions.ZimerfeldCommitMsg/GitExtensions.ZimerfeldCommitMsg.nuspec
+      DLL: src/GitExtensions.ZimerfeldCommitMsg/bin/Release/net9.0-windows/GitExtensions.Plugins.ZimerfeldCommitMsg.dll
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Build (Release)
+        run: dotnet build $env:PROJECT -c Release --nologo -v minimal
+
+      - name: Copy DLL to tools\ (referenciada pelo .nuspec)
+        shell: pwsh
+        run: |
+          $target = "tools/net9.0-windows"
+          New-Item -ItemType Directory -Force $target | Out-Null
+          Copy-Item $env:DLL $target -Force
+
+      - name: Pack
+        # NU5101 (DLL em lib\ raiz) é intencional — ver comentário no .nuspec.
+        run: nuget pack $env:NUSPEC -OutputDirectory .
+
+      - name: NuGet login (Trusted Publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: zimerfeld           # conta dona do pacote no nuget.org (Package Owner)
+
+      - name: Push to nuget.org
+        run: >
+          dotnet nuget push *.nupkg
+          --api-key ${{ steps.login.outputs.NUGET_API_KEY }}
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
