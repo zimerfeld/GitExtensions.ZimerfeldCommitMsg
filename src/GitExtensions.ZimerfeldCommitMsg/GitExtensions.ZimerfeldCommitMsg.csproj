@@ -26,6 +26,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Expõe os tipos internal ao projeto de testes (funções puras do gerador). -->
+    <InternalsVisibleTo Include="GitExtensions.ZimerfeldCommitMsg.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Resources\icon.png" />
     <!-- Strings de UI embutidas no assembly principal (sem satellite assemblies, para
          preservar o deploy de DLL única). LogicalName fixo → nome de recurso determinístico,

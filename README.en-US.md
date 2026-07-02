@@ -26,7 +26,8 @@ Plugin for **[GitExtensions](https://gitextensions.github.io/)** that automatica
 - **Automatic generation** of the commit message from the real staged diff content, not only from file names.
 - **Conventional Commits-guided verb** — classifies changes into types (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) and prefixes the corresponding **verb** (third-person present in pt-BR / imperative in English). The type itself **does not** appear in the message.
 - **Multilingual (Portuguese/English)** — language selected automatically from the OS, with a manual override selector.
-- **Two content strategies**: diff comment-based (primary) and file name-based (fallback).
+- **Two content strategies**: diff comment-based (primary) and file name-based (fallback). Comment extraction recognizes many syntaxes — `//`, `///`, C-style blocks `/* */` `/** */`, JSDoc `* `, HTML `<!-- -->`, SQL/Lua `--`, VB `'`, and `#`.
+- **Per-repository vocabulary** — an optional `.zimerfeldcommitmsg.json` file extends the known/rejected vocabulary and concept phrases without recompiling.
 - **Bulleted body** — up to 5 one-line sentences, each summarizing the most significant change in a file; **always at least one bullet**, even with a single changed file.
 - **English → Portuguese translation** of comments (only when the output is pt-BR); for English output, comments are kept as-is.
 - **Sentence sanitizing** — discards comments with **unbalanced delimiters** (`()`, `[]`, `{}`, quotes `"` `'` `` ` ``, `<>`) or that **end in a dangling connector** (`of`, `to`, `with`…); among the valid candidates it picks the **highest-quality** one (not the longest).
@@ -139,10 +140,15 @@ Runs `git diff --cached --no-color` and collects **comment** lines that were **a
 
 #### Recognized patterns
 
-| Syntax                  | Languages                            |
-| ----------------------- | ------------------------------------ |
-| `// text` or `/// text` | C#, Java, JavaScript, TypeScript, Go |
-| `# text`                | Python, Shell, YAML, Ruby            |
+| Syntax                             | Languages                            |
+| ---------------------------------- | ------------------------------------ |
+| `// text` or `/// text`            | C#, Java, JavaScript, TypeScript, Go |
+| `/* text */`, `/** text */`        | C-style block (C#, Java, JS, C/C++…) |
+| `* text`                           | JSDoc/Javadoc block continuation     |
+| `<!-- text -->`                    | HTML, XML                            |
+| `-- text`                          | SQL, Lua, Haskell, Ada               |
+| `' text`                           | VB, VBScript                         |
+| `# text`                           | Python, Shell, YAML, Ruby            |
 
 #### Rejected comments
 
@@ -195,6 +201,25 @@ For each staged file, the file name (without extension) goes through:
    - Name with a dot in the stem → rejected (for example, `GitExtensions.ZimerfeldCommitMsg`)
    - **Rejected vocabulary** (`RejectedVocabulary`) — if **any** word of the name is in this set, the name is rejected (takes precedence over everything). For proper nouns/namespaces (e.g. `zimerfeld`, `git`, `extensions`). Extend per project.
    - Name with 3+ words → rejected as a namespace, **except** when it is a dictionary concept **or** all of its words are recognized vocabulary (`KnownVocabulary` + translation dictionary + concepts). Example: `New Text Document` **passes** (new/text/document are known); `ZimerfeldCommitMsg` **does not** (`zimerfeld` is in rejected vocabulary). Extend `KnownVocabulary` to cover more terms.
+
+#### Per-repository vocabulary (`.zimerfeldcommitmsg.json`)
+
+You can extend the concept extraction **without recompiling** by dropping an optional
+`.zimerfeldcommitmsg.json` file in the repository root:
+
+```json
+{
+  "knownVocabulary":    ["widget", "gadget"],
+  "rejectedVocabulary": ["acme", "contoso"],
+  "concepts":           { "widget": "component", "gadget": "accessory" }
+}
+```
+
+- **`knownVocabulary`** — extra words accepted as part of a descriptive name (added to the built-in `KnownVocabulary`; applies to both languages).
+- **`rejectedVocabulary`** — words that force the name to be rejected as a concept (project proper nouns/namespaces; added to the built-in `RejectedVocabulary`).
+- **`concepts`** — concept-word → pt-BR phrase used in the title's nominal prefix (takes precedence over the built-in dictionary).
+
+A missing or malformed file is silently ignored — it never breaks generation.
 
 #### Concept → pt-BR phrase mapping (examples)
 

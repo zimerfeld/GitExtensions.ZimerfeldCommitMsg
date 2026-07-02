@@ -19,6 +19,9 @@ internal sealed class CommitMessageGenerator
     private readonly MessageLanguage _language;
     private readonly LanguagePack _lang;
 
+    // Vocabulário extra por repositório (.zimerfeldcommitmsg.json), somado aos defaults.
+    private readonly RepoVocabularyConfig _vocab;
+
     // ── Extension → semantic category ─────────────────────────────────────────
 
     private static readonly Dictionary<string, string> ExtCategory = new(StringComparer.OrdinalIgnoreCase)
@@ -218,6 +221,74 @@ internal sealed class CommitMessageGenerator
         ["required"]      = "obrigatório",["optional"]    = "opcional",
         ["created"]       = "criado",    ["nested"]       = "aninhado",
         ["merged"]        = "mesclado",  ["loaded"]       = "carregado",
+        // Verbos adicionais (3ª pessoa / infinitivo)
+        ["ensures"]       = "garante",   ["ensure"]       = "garantir",
+        ["prevents"]      = "previne",   ["prevent"]      = "prevenir",
+        ["allows"]        = "permite",   ["allow"]        = "permitir",
+        ["supports"]      = "suporta",   ["support"]      = "suportar",
+        ["requires"]      = "requer",    ["require"]      = "requerer",
+        ["computes"]      = "computa",   ["compute"]      = "computar",
+        ["stores"]        = "armazena",  ["store"]        = "armazenar",
+        ["fetches"]       = "busca",     ["fetch"]        = "buscar",
+        ["applies"]       = "aplica",    ["apply"]        = "aplicar",
+        ["toggles"]       = "alterna",   ["toggle"]       = "alternar",
+        ["enables"]       = "habilita",  ["enable"]       = "habilitar",
+        ["disables"]      = "desabilita",["disable"]      = "desabilitar",
+        ["registers"]     = "registra",  ["register"]     = "registrar",
+        ["invokes"]       = "invoca",    ["invoke"]       = "invocar",
+        ["clears"]        = "limpa",     ["clear"]        = "limpar",
+        ["resets"]        = "reinicia",  ["reset"]        = "reiniciar",
+        ["tracks"]        = "rastreia",  ["track"]        = "rastrear",
+        ["detects"]       = "detecta",   ["detect"]       = "detectar",
+        ["ignores"]       = "ignora",    ["ignore"]       = "ignorar",
+        ["skips"]         = "pula",      ["skip"]         = "pular",
+        ["keeps"]         = "mantém",    ["keep"]         = "manter",
+        ["avoids"]        = "evita",     ["avoid"]        = "evitar",
+        ["replaces"]      = "substitui", ["replace"]      = "substituir",
+        ["merges"]        = "mescla",    ["merge"]        = "mesclar",
+        ["appends"]       = "anexa",     ["append"]       = "anexar",
+        ["inserts"]       = "insere",    ["insert"]       = "inserir",
+        ["deletes"]       = "exclui",    ["delete"]       = "excluir",
+        ["copies"]        = "copia",     ["copy"]         = "copiar",
+        ["renames"]       = "renomeia",  ["rename"]       = "renomear",
+        ["moves"]         = "move",      ["move"]         = "mover",
+        ["disposes"]      = "descarta",  ["dispose"]      = "descartar",
+        ["overrides"]     = "sobrescreve",["override"]    = "sobrescrever",
+        ["implements"]    = "implementa",["implement"]    = "implementar",
+        ["compares"]      = "compara",   ["compare"]      = "comparar",
+        ["selects"]       = "seleciona", ["select"]       = "selecionar",
+        ["serializes"]    = "serializa", ["serialize"]    = "serializar",
+        ["deserializes"]  = "desserializa",["deserialize"]= "desserializar",
+        ["encodes"]       = "codifica",  ["encode"]       = "codificar",
+        ["decodes"]       = "decodifica",["decode"]       = "decodificar",
+        ["formats"]       = "formata",   ["counts"]       = "conta",
+        // Conectores / advérbios adicionais
+        ["before"]        = "antes de",  ["after"]        = "depois de",
+        ["during"]        = "durante",   ["instead"]      = "em vez",
+        ["otherwise"]     = "caso contrário",["because"]  = "porque",
+        ["if"]            = "se",        ["else"]         = "senão",
+        ["while"]         = "enquanto",  ["until"]        = "até",
+        ["also"]          = "também",    ["only"]         = "apenas",
+        ["using"]         = "usando",    ["once"]         = "uma vez",
+        ["always"]        = "sempre",    ["never"]        = "nunca",
+        ["still"]         = "ainda",
+        // Substantivos técnicos adicionais. NÃO incluir loanwords ambíguos que também são
+        // palavras pt-BR ou escritos verbatim em comentários pt (token, cache, buffer, array,
+        // via, data=date, config) — inflariam a detecção de inglês e mutilariam frases pt-BR.
+        ["request"]       = "requisição",["requests"]     = "requisições",
+        ["response"]      = "resposta",  ["responses"]    = "respostas",
+        ["queue"]         = "fila",      ["stack"]        = "pilha",
+        ["object"]        = "objeto",    ["class"]        = "classe",
+        ["method"]        = "método",    ["function"]     = "função",
+        ["variable"]      = "variável",  ["parameter"]    = "parâmetro",
+        ["parameters"]    = "parâmetros",["argument"]     = "argumento",
+        ["arguments"]     = "argumentos",["line"]         = "linha",
+        ["lines"]         = "linhas",    ["field"]        = "campo",
+        ["fields"]        = "campos",    ["record"]       = "registro",
+        ["records"]       = "registros", ["service"]      = "serviço",
+        ["services"]      = "serviços",  ["module"]       = "módulo",
+        ["component"]     = "componente",["components"]   = "componentes",
+        ["user"]          = "usuário",   ["users"]        = "usuários",
     };
 
     // Palavras inglesas conhecidas — usadas para detectar idioma do comentário
@@ -313,6 +384,7 @@ internal sealed class CommitMessageGenerator
         _workingDir = workingDir;
         _language   = language;
         _lang       = LanguagePack.For(language);
+        _vocab      = RepoVocabularyConfig.Load(workingDir);
     }
 
     // ── Public API ─────────────────────────────────────────────────────────────
@@ -432,8 +504,9 @@ internal sealed class CommitMessageGenerator
         return string.Join(" de ", words.Select(TranslateConceptWord));
     }
 
-    private static string TranslateConceptWord(string word) =>
-        ConceptWordPt.TryGetValue(word, out var pt)                       ? pt
+    private string TranslateConceptWord(string word) =>
+        _vocab.ConceptPt.TryGetValue(word, out var extra)                  ? extra
+        : ConceptWordPt.TryGetValue(word, out var pt)                       ? pt
         : WordTranslations.TryGetValue(word, out var pt2) && pt2.Length > 0 ? pt2
         : word;
 
@@ -560,14 +633,67 @@ internal sealed class CommitMessageGenerator
         };
     }
 
-    /// <summary>Tenta extrair texto de comentário de uma linha de código.</summary>
-    private static string? ExtractCommentText(string content, bool isMdFile = false)
+    /// <summary>
+    /// Tenta extrair texto de comentário de uma linha de código. Reconhece as sintaxes:
+    /// <list type="bullet">
+    /// <item><c>// texto</c> / <c>/// texto</c> — C#, Java, JS, TS, Go, Rust, C/C++…</item>
+    /// <item><c>/* texto */</c>, <c>/** texto */</c>, <c>/*! texto */</c> — bloco C-style em uma linha</item>
+    /// <item><c>* texto</c> — continuação de bloco JSDoc/Javadoc (fora de .md, onde <c>*</c> é bullet)</item>
+    /// <item><c>&lt;!-- texto --&gt;</c> — HTML/XML</item>
+    /// <item><c>-- texto</c> — SQL, Lua, Haskell, Ada</item>
+    /// <item><c>' texto</c> — VB/VBScript (fora de .md)</item>
+    /// <item><c># texto</c> — Python, Shell, YAML, Ruby (em .md é heading, ignorado)</item>
+    /// </list>
+    /// </summary>
+    internal static string? ExtractCommentText(string content, bool isMdFile = false)
     {
         string? raw = null;
 
         // C# linha única: // ou ///
         var m = Regex.Match(content, @"^\/\/\/?\s+(.+)");
         if (m.Success) raw = m.Groups[1].Value;
+
+        // Bloco C-style fechado numa linha: /* texto */  •  /** texto */  •  /*! texto */
+        if (raw is null)
+        {
+            m = Regex.Match(content, @"^\/\*+!?\s*(.+?)\s*\*+\/\s*$");
+            if (m.Success) raw = m.Groups[1].Value;
+        }
+
+        // Abertura de bloco sem fechamento na mesma linha: /* texto  •  /** texto
+        if (raw is null)
+        {
+            m = Regex.Match(content, @"^\/\*+!?\s+(.+)");
+            if (m.Success) raw = m.Groups[1].Value;
+        }
+
+        // Continuação de bloco JSDoc/Javadoc: * texto (em .md "* " é item de lista — ignorar)
+        if (raw is null && !isMdFile)
+        {
+            m = Regex.Match(content, @"^\*\s+([A-Za-zÀ-ú].+)");
+            if (m.Success) raw = m.Groups[1].Value;
+        }
+
+        // HTML / XML: <!-- texto -->  (aceita também sem o fechamento na linha)
+        if (raw is null)
+        {
+            m = Regex.Match(content, @"^<!--+\s*(.+?)\s*(?:--+>)?\s*$");
+            if (m.Success) raw = m.Groups[1].Value;
+        }
+
+        // SQL / Lua / Haskell / Ada: -- texto (o espaço + letra evita separadores "----")
+        if (raw is null)
+        {
+            m = Regex.Match(content, @"^--\s+([A-Za-zÀ-ú].+)");
+            if (m.Success) raw = m.Groups[1].Value;
+        }
+
+        // VB / VBScript: ' texto (em .md não se aplica)
+        if (raw is null && !isMdFile)
+        {
+            m = Regex.Match(content, @"^'\s+([A-Za-zÀ-ú].+)");
+            if (m.Success) raw = m.Groups[1].Value;
+        }
 
         // Python / shell / YAML: # texto
         // Em arquivos .md o padrão "# Texto" é heading Markdown, não comentário — ignorar
@@ -584,9 +710,14 @@ internal sealed class CommitMessageGenerator
     /// Valida e limpa o texto extraído de um comentário.
     /// Retorna null para separadores visuais, código comentado e tags XML.
     /// </summary>
-    private static string? CleanCommentText(string raw)
+    internal static string? CleanCommentText(string raw)
     {
-        var text = raw.Trim().TrimEnd('.', ':', ';');
+        var text = raw.Trim();
+
+        // Resíduos de fechamento que possam ter escapado da extração (ex.: "/* x */ y")
+        if (text.EndsWith("*/", StringComparison.Ordinal))  text = text[..^2].TrimEnd();
+        if (text.EndsWith("-->", StringComparison.Ordinal)) text = text[..^3].TrimEnd();
+        text = text.TrimEnd('.', ':', ';').Trim();
 
         if (text.Length < 10)  return null;   // muito curto
         if (!text.Contains(' ')) return null;  // sem espaço = provavelmente não é frase
@@ -617,7 +748,7 @@ internal sealed class CommitMessageGenerator
     /// empilhados) para não confundir comparações em prosa; as aspas simples entre letras
     /// (apóstrofes de contração: "don't", "it's") são ignoradas, contando só as de delimitação.
     /// </summary>
-    private static bool DelimitersBalanced(string text)
+    internal static bool DelimitersBalanced(string text)
     {
         int paren = 0, bracket = 0, brace = 0;
         foreach (var ch in text)
@@ -657,7 +788,7 @@ internal sealed class CommitMessageGenerator
     /// delimitadores balanceados E não termina em palavra de ligação solta
     /// (preposição/artigo/conjunção), que denuncia um comentário cortado.
     /// </summary>
-    private bool IsCleanSentence(string text)
+    internal bool IsCleanSentence(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return false;
         if (!DelimitersBalanced(text))       return false;
@@ -674,7 +805,7 @@ internal sealed class CommitMessageGenerator
     /// resíduo de código (=, ;) e espaços duplos. Substitui o critério antigo de
     /// "pega o mais comprido", que tendia a escolher justamente o mais truncado.
     /// </summary>
-    private int ScoreCandidate(string text)
+    internal int ScoreCandidate(string text)
     {
         int len = text.Length;
         int score = len is >= 20 and <= 72 ? 25 : -Math.Abs(46 - len) / 3;
@@ -700,7 +831,7 @@ internal sealed class CommitMessageGenerator
     /// Detecta se um texto está predominantemente em inglês.
     /// Critério: ≥25 % das palavras (minúsculas, ≥3 letras) estão no dicionário de tradução.
     /// </summary>
-    private static bool IsEnglishText(string text)
+    internal static bool IsEnglishText(string text)
     {
         var words = Regex.Matches(text.ToLowerInvariant(), @"\b[a-z]{3,}\b")
                          .Select(m => m.Value)
@@ -716,7 +847,7 @@ internal sealed class CommitMessageGenerator
     /// (feature/…, release/…, etc.) e os tipos Conventional Commits.
     /// Retorna null quando a tradução é insuficiente (fallback pt-BR será usado).
     /// </summary>
-    private static string? TranslateToPortuguese(string text)
+    internal static string? TranslateToPortuguese(string text)
     {
         if (!IsEnglishText(text)) return text;  // já em pt-BR
 
@@ -892,7 +1023,7 @@ internal sealed class CommitMessageGenerator
 
     // ── Concept extraction ─────────────────────────────────────────────────────
 
-    private string? ExtractRawConcept(string filename)
+    internal string? ExtractRawConcept(string filename)
     {
         // Stems com ponto são nomes de assembly/projeto (ex: GitExtensions.ZimerfeldCommitMsg) — ignorar
         if (filename.Contains('.')) return null;
@@ -950,14 +1081,17 @@ internal sealed class CommitMessageGenerator
 
     private bool IsKnownWord(string word) =>
         KnownVocabulary.Contains(word) ||
+        _vocab.Known.Contains(word) ||
         EnglishWords.Contains(word) ||
         _lang.HasConcept(word);
 
-    /// <summary>true se ALGUMA palavra do nome está no vocabulário de rejeição.</summary>
-    private static bool IsRejectedVocabulary(string name)
+    /// <summary>
+    /// true se ALGUMA palavra do nome está no vocabulário de rejeição (embutido ou do repo).
+    /// </summary>
+    private bool IsRejectedVocabulary(string name)
     {
         var words = HumanizeName(name).Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        return words.Any(RejectedVocabulary.Contains);
+        return words.Any(w => RejectedVocabulary.Contains(w) || _vocab.Rejected.Contains(w));
     }
 
     private string MapConcept(string raw) => _lang.MapConcept(raw, HumanizeName);
@@ -992,7 +1126,7 @@ internal sealed class CommitMessageGenerator
     /// PascalCase → palavras humanizadas. Acrônimos em MAIÚSCULAS são preservados.
     /// Ex: "UserAuthService" → "user auth service"; "HTMLParser" → "HTML parser".
     /// </summary>
-    private static string HumanizeName(string name)
+    internal static string HumanizeName(string name)
     {
         var spaced = Regex.Replace(name, @"([a-z])([A-Z])", "$1 $2")
                           .Replace('-', ' ')
@@ -1004,7 +1138,7 @@ internal sealed class CommitMessageGenerator
     }
 
     // Garante que o título do commit respeita o limite de 80 chars
-    private static string TruncateTitle(string title, int maxLen = 80)
+    internal static string TruncateTitle(string title, int maxLen = 80)
     {
         if (title.Length <= maxLen) return title;
         var cut = title.LastIndexOf(' ', maxLen - 2);
