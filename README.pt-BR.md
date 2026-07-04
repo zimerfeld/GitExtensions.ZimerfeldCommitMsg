@@ -8,7 +8,7 @@ Este plugin é construído e mantido no meu tempo livre. Se ele te poupa tempo a
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Versão:** 1.0.94
+**Versão:** 1.0.95
 **Atualizado em:** 2026-07-04
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
@@ -367,11 +367,15 @@ cd C:\GitExtensions\ZimerfeldCommitMsg\tools
 
 ---
 
-## Plugins relacionados
+## Plugins integrados
 
-### [GitExtensions.ZimerfeldTree](https://www.nuget.org/packages/GitExtensions.ZimerfeldTree/)
+### [GitExtensions.ZimerfeldTree](https://github.com/zimerfeld/GitExtensions.ZimerfeldTree)
 
 Plugin para GitExtensions que exibe branches hierarquicamente em uma janela de árvore persistente e não-modal. Branches separados por `/` são mostrados como nós de pasta aninhados sob três seções fixas — LOCAL, REMOTES e tags. Por **zimerfeld**.
+
+### [GitExtensions.ZimerfeldLFS](https://github.com/zimerfeld/GitExtensions.ZimerfeldLFS)
+
+Plugin para GitExtensions que integra o **Git LFS** (Large File Storage) ao fluxo de trabalho, facilitando o versionamento de arquivos grandes. Por **zimerfeld**.
 
 ---
 
