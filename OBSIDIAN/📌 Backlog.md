@@ -1,0 +1,39 @@
+﻿---
+tipo: backlog
+projeto: GitExtensions.ZimerfeldCommitMsg
+lang: pt-BR
+atualizado: 2026-07-04
+---
+
+# 📌 Backlog
+
+> 🇺🇸 Read this page in English → [[📌 Backlog (EN)]]
+
+> [!tip] Comece por aqui
+> Ponto de retomada do projeto. Ao voltar em outra sessão, leia a [[🏠 Home]] e este backlog.
+
+## 📍 Estado atual
+- **Versão:** `1.0.94` (`major.minor.BUILD`, build auto-incrementado pelo `build.ps1`).
+- **Testes:** suíte **xUnit** em `tests\GitExtensions.ZimerfeldCommitMsg.Tests\` — extração de comentários, derivação de conceitos, `.zimerfeldcommitmsg.json`, tradução EN→PT.
+- **Cofre:** reestruturado para o padrão **"Cofre de Neurônios v2"** (emoji + frontmatter §3 + pares EN + `sortspec` por prioridade).
+
+## ✅ Próximos passos
+
+### 🔧 Manutenção do build (derivado de [[🛠️ build.ps1]])
+- [ ] **Atualizar a seção 2b do `build.ps1`** para os novos caminhos do cofre v2 — as 4 notas carimbadas mudaram de pasta/nome:
+  - `💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg.md`
+  - `📚 Conhecimento\📖 README — Instalação, Uso e Build.md`
+  - `🧩 Sistemas\🏷️ Versionamento.md`
+  - `🧩 Sistemas\🔭 Visão Geral.md`
+- [ ] Considerar carimbar também os **pares `(EN)`** dessas notas na seção 2b.
+
+### 🧪 Qualidade
+- [ ] Manter a suíte xUnit verde a cada mudança; adicionar casos conforme novas sintaxes de comentário/tradução surgirem.
+
+## 🧊 Ideias / mais tarde
+- [ ] (nada pendente registrado — capturar em [[📥 Inbox]] quando surgir)
+
+## 🔗 Ligações
+- [[🏠 Home]]
+- [[🔑 Fatos-Chave]]
+- [[🛠️ build.ps1]]
