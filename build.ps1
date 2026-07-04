@@ -130,10 +130,10 @@ foreach ($readmeDoc in $readmeDocs) {
 # 2b. Cofre Obsidian -- somente as notas que carimbam a versao ATUAL do projeto.
 # Notas de sessao/historico mencionam versoes antigas e NAO entram aqui de proposito.
 $obsidianDocs = @(
-    "$PSScriptRoot\OBSIDIAN\CLAUDE\01 - Projetos\GitExtensions.ZimerfeldCommitMsg.md",
-    "$PSScriptRoot\OBSIDIAN\CLAUDE\02 - Conhecimento\README — Instalação, Uso e Build.md",
-    "$PSScriptRoot\OBSIDIAN\CLAUDE\Sistema\Versionamento.md",
-    "$PSScriptRoot\OBSIDIAN\CLAUDE\Sistema\Visão Geral.md"
+    "$PSScriptRoot\OBSIDIAN\01 - Projetos\GitExtensions.ZimerfeldCommitMsg.md",
+    "$PSScriptRoot\OBSIDIAN\02 - Conhecimento\README — Instalação, Uso e Build.md",
+    "$PSScriptRoot\OBSIDIAN\Sistema\Versionamento.md",
+    "$PSScriptRoot\OBSIDIAN\Sistema\Visão Geral.md"
 )
 $verBold   = '**' + $newVersion + '**'
 $verTicked = '`'  + $newVersion + '`'
