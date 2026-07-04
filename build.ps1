@@ -127,26 +127,37 @@ foreach ($readmeDoc in $readmeDocs) {
     }
 }
 
-# 2b. Cofre Obsidian -- somente as notas que carimbam a versao ATUAL do projeto.
-# Notas de sessao/historico mencionam versoes antigas e NAO entram aqui de proposito.
+# 2b. Cofre Obsidian -- somente as 12 notas que carimbam a versao ATUAL do projeto
+# (PT + variantes EN): Projeto, README espelho, Visao Geral, Versionamento, Home e
+# Backlog. Notas de sessao/historico mencionam versoes antigas e NAO entram de proposito.
+$vault = "$PSScriptRoot\OBSIDIAN"
 $obsidianDocs = @(
-    "$PSScriptRoot\OBSIDIAN\🚀 Projetos\GitExtensions.ZimerfeldCommitMsg.md",
-    "$PSScriptRoot\OBSIDIAN\📚 Conhecimento\README — Instalação, Uso e Build.md",
-    "$PSScriptRoot\OBSIDIAN\🏛 Sistema\Versionamento.md",
-    "$PSScriptRoot\OBSIDIAN\🏛 Sistema\Visão Geral.md"
+    "$vault\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg.md",
+    "$vault\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg (EN).md",
+    "$vault\📚 Conhecimento\📖 README — Instalação, Uso e Build.md",
+    "$vault\📚 Conhecimento\📖 README — Instalação, Uso e Build (EN).md",
+    "$vault\🧩 Sistemas\🔭 Visão Geral.md",
+    "$vault\🧩 Sistemas\🔭 Visão Geral (EN).md",
+    "$vault\🧩 Sistemas\🏷️ Versionamento.md",
+    "$vault\🧩 Sistemas\🏷️ Versionamento (EN).md",
+    "$vault\🏠 Home.md",
+    "$vault\🏠 Home (EN).md",
+    "$vault\📌 Backlog.md",
+    "$vault\📌 Backlog (EN).md"
 )
-$verBold   = '**' + $newVersion + '**'
-$verTicked = '`'  + $newVersion + '`'
+$verBold = '**' + $newVersion + '**'
 foreach ($obsDoc in $obsidianDocs) {
     if (Test-Path $obsDoc) {
         $content = Get-Content $obsDoc -Raw -Encoding UTF8
-        # Frontmatter YAML
-        $content = $content -replace '(?m)^versao:\s*[^\r\n]+',     "versao: $newVersion"
-        $content = $content -replace '(?m)^atualizado:\s*[^\r\n]+', "atualizado: $today"
-        # Corpo -- tres formatos de "versao atual" usados nas notas
-        $content = $content -replace 'Versão atual:\s*\*\*[^\*\r\n]+\*\*',     "Versão atual: $verBold"
-        $content = $content -replace '\*\*Versão atual:\*\*\s*`[^`\r\n]+`',    "**Versão atual:** $verTicked"
-        $content = $content -replace '(\|\s*Versão atual\s*\|\s*)`[^`\r\n]+`', ('${1}' + $verTicked)
+        # Frontmatter YAML -- versao / atualizado
+        $content = $content -replace '(?m)^versao:\s+[\d\.]+',               "versao: $newVersion"
+        $content = $content -replace '(?m)^atualizado:\s+\d{4}-\d{2}-\d{2}', "atualizado: $today"
+        # Corpo -- "Versao atual: **X**" / "Current version: **X**" (negrito, PT e EN)
+        $content = $content -replace '(Vers[ãa]o atual|Current version):\s*\*\*[\d\.]+\*\*',        ('${1}: ' + $verBold)
+        # Corpo -- "**Versao atual:** `X`" / "**Current version:** `X`" (rotulo + crase)
+        $content = $content -replace '(\*\*(?:Vers[ãa]o atual|Current version):\*\*\s*`)[\d\.]+(`)', ('${1}' + $newVersion + '${2}')
+        # Corpo -- "| Versao atual | `X` |" (tabela, crase)
+        $content = $content -replace '(\|\s*Vers[ãa]o atual\s*\|\s*`)[\d\.]+(`)',                    ('${1}' + $newVersion + '${2}')
         [System.IO.File]::WriteAllText($obsDoc, $content, [System.Text.Encoding]::UTF8)
         Write-Host "Obsidian: $(Split-Path $obsDoc -Leaf) atualizado para $newVersion ($today)"
     }
