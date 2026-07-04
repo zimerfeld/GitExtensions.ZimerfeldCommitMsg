@@ -10,11 +10,11 @@
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotGB.png) **Version:** 1.0.92
-**Updated:** 2026-07-01
+![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotGB.png) **Version:** 1.0.94
+**Updated:** 2026-07-04
 
-![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotBR.png) **Versão:** 1.0.92
-**Atualizado em:** 2026-07-01
+![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotBR.png) **Versão:** 1.0.94
+**Atualizado em:** 2026-07-04
 
 ![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotGB.png) GitExtensions plugin that automatically generates commit messages from staged changes, with output in Brazilian Portuguese or English.
 

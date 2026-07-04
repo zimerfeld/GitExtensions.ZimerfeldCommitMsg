@@ -8,8 +8,8 @@ Este plugin é construído e mantido no meu tempo livre. Se ele te poupa tempo a
 
 [![GitHub Sponsor](https://img.shields.io/badge/Sponsor-zimerfeld-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/zimerfeld) &nbsp;&nbsp;&nbsp;&nbsp; [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-FF5E2B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/C0D621FCGD)
 
-**Versão:** 1.0.92
-**Atualizado em:** 2026-07-01
+**Versão:** 1.0.94
+**Atualizado em:** 2026-07-04
 
 Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
@@ -26,7 +26,8 @@ Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera autom
 - **Geração automática** da mensagem de commit a partir do conteúdo real do diff staged (não apenas dos nomes de arquivo).
 - **Verbo guiado por Conventional Commits** — classifica as mudanças nos tipos (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) e prefixa o **verbo** correspondente (3ª pessoa do presente em pt-BR / imperativo em inglês). O tipo em si **não** aparece na mensagem.
 - **Multilíngue (Português/Inglês)** — idioma escolhido automaticamente pelo SO, com seletor manual de override.
-- **Duas estratégias de conteúdo**: baseada em comentários do diff (principal) e baseada em nomes de arquivo (fallback).
+- **Duas estratégias de conteúdo**: baseada em comentários do diff (principal) e baseada em nomes de arquivo (fallback). A extração reconhece várias sintaxes de comentário — `//`, `///`, blocos C-style `/* */` `/** */`, JSDoc `* `, HTML `<!-- -->`, SQL/Lua `--`, VB `'` e `#`.
+- **Vocabulário por repositório** — um arquivo opcional `.zimerfeldcommitmsg.json` estende o vocabulário conhecido/rejeitado e as frases de conceito sem recompilar.
 - **Corpo em bullets** — até 5 frases de uma linha, cada uma resumindo a mudança mais significativa de um arquivo; **sempre ao menos um bullet**, mesmo com um único arquivo alterado.
 - **Tradução inglês → português** dos comentários (apenas quando a saída é pt-BR); em inglês, os comentários passam intactos.
 - **Saneamento das frases** — descarta comentários com **delimitadores desbalanceados** (`()`, `[]`, `{}`, aspas `"` `'` `` ` ``, `<>`) ou que **terminem em palavra de ligação solta** (`de`, `para`, `que`…); entre os candidatos válidos, escolhe o de **melhor qualidade** (não o mais longo).
@@ -139,10 +140,15 @@ Executa `git diff --cached --no-color` e coleta as linhas de **comentário** que
 
 #### Padrões reconhecidos
 
-| Sintaxe                   | Linguagens                           |
-| ------------------------- | ------------------------------------ |
-| `// texto` ou `/// texto` | C#, Java, JavaScript, TypeScript, Go |
-| `# texto`                 | Python, Shell, YAML, Ruby            |
+| Sintaxe                       | Linguagens                           |
+| ----------------------------- | ------------------------------------ |
+| `// texto` ou `/// texto`      | C#, Java, JavaScript, TypeScript, Go |
+| `/* texto */`, `/** texto */`  | Bloco C-style (C#, Java, JS, C/C++…) |
+| `* texto`                      | Continuação de bloco JSDoc/Javadoc   |
+| `<!-- texto -->`               | HTML, XML                            |
+| `-- texto`                     | SQL, Lua, Haskell, Ada               |
+| `' texto`                      | VB, VBScript                         |
+| `# texto`                      | Python, Shell, YAML, Ruby            |
 
 #### Comentários rejeitados
 
@@ -195,6 +201,25 @@ Para cada arquivo staged, o nome (sem extensão) passa por:
    - Nome com ponto no stem → rejeitado (ex: `GitExtensions.ZimerfeldCommitMsg`)
    - **Vocabulário de rejeição** (`RejectedVocabulary`) — se **qualquer** palavra do nome estiver nesse conjunto, o nome é rejeitado (precede tudo). Para nomes próprios/namespaces (ex.: `zimerfeld`, `git`, `extensions`). Estenda conforme o projeto.
    - Nome com 3+ palavras → rejeitado como namespace, **exceto** quando é um conceito do dicionário **ou** todas as suas palavras são vocabulário reconhecido (`KnownVocabulary` + dicionário de tradução + conceitos). Ex.: `New Text Document` **passa** (new/text/document conhecidos); `ZimerfeldCommitMsg` **não passa** (`zimerfeld` no vocabulário de rejeição). Estenda `KnownVocabulary` para cobrir mais termos.
+
+#### Vocabulário por repositório (`.zimerfeldcommitmsg.json`)
+
+É possível estender a extração de conceitos **sem recompilar**, colocando um arquivo
+opcional `.zimerfeldcommitmsg.json` na raiz do repositório:
+
+```json
+{
+  "knownVocabulary":    ["widget", "gadget"],
+  "rejectedVocabulary": ["acme", "contoso"],
+  "concepts":           { "widget": "componente", "gadget": "acessório" }
+}
+```
+
+- **`knownVocabulary`** — palavras extras aceitas como parte de um nome descritivo (somadas ao `KnownVocabulary` embutido; vale para os dois idiomas).
+- **`rejectedVocabulary`** — palavras que forçam a rejeição do nome como conceito (nomes próprios/namespaces do projeto; somadas ao `RejectedVocabulary` embutido).
+- **`concepts`** — tradução palavra-de-conceito → frase pt-BR usada no prefixo nominal do título (tem prioridade sobre o dicionário embutido).
+
+Arquivo ausente ou malformado é ignorado silenciosamente — nunca quebra a geração.
 
 #### Mapeamento de conceito → frase em pt-BR (exemplos)
 

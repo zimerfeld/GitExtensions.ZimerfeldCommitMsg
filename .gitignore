@@ -21,6 +21,9 @@ gitextensions.shared/
 # Arquivos de backup gerados pelo build.ps1
 *.bak
 
+# Cofre Obsidian: mora fora do repo (~/OBSIDIAN/CLAUDE); a cópia in-repo é legada
+OBSIDIAN/
+
 # OS
 Thumbs.db
 .DS_Store

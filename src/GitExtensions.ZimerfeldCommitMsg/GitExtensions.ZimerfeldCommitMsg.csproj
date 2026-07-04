@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <NeutralLanguage>pt-BR</NeutralLanguage>
-    <Version>1.0.92</Version>
+    <Version>1.0.94</Version>
     <Authors>Zimerfeld</Authors>
     <Description>GitExtensions plugin that summarizes staged changes into a single commit message sentence</Description>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
@@ -24,6 +24,11 @@
          um build arm64 (6.0.5.75) incompatível com o x64 instalado (6.0.5.18375). Ver refs/README.md. -->
     <GitExtensionsRefPath>$(MSBuildProjectDirectory)\..\..\refs</GitExtensionsRefPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Expõe os tipos internal ao projeto de testes (funções puras do gerador). -->
+    <InternalsVisibleTo Include="GitExtensions.ZimerfeldCommitMsg.Tests" />
+  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\icon.png" />
