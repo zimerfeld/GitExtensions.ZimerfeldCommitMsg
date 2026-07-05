@@ -36,10 +36,10 @@ Script de **build + versionamento + deploy + empacotamento** do plugin.
 
 ### 🧠 Cofre Obsidian (seção 2b)
 Somente as notas que espelham a versão **atual**:
-- `OBSIDIAN\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg.md`
-- `OBSIDIAN\📚 Conhecimento\📖 README — Instalação, Uso e Build.md`
-- `OBSIDIAN\🧩 Sistemas\🏷️ Versionamento.md`
-- `OBSIDIAN\🧩 Sistemas\🔭 Visão Geral.md`
+- `ZimerfeldCommitMsg\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg.md`
+- `ZimerfeldCommitMsg\📚 Conhecimento\📖 README — Instalação, Uso e Build.md`
+- `ZimerfeldCommitMsg\🧩 Sistemas\🏷️ Versionamento.md`
+- `ZimerfeldCommitMsg\🧩 Sistemas\🔭 Visão Geral.md`
 
 Substitui `versao: …` no frontmatter e as ocorrências de `**X.Y.Z**` / `` `X.Y.Z` `` da versão anterior.
 

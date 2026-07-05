@@ -37,7 +37,7 @@ C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg\
 ├─ refs\                                        # DLLs do host versionadas (build determinístico)
 ├─ tools\                                       # install/uninstall/update-dll .ps1, nuget.exe, generate-icon.ps1
 │   └─ net9.0-windows\                          # saída do build (DLL) usada pelo nupkg
-├─ OBSIDIAN\                                    # 🧠 este cofre de memória
+├─ ZimerfeldCommitMsg\                          # 🧠 este cofre de memória
 ├─ build.ps1                                    # incrementa versão + build + deploy + nupkg
 ├─ README.md / README.pt-BR.md / README.en-US.md  # espelhado em [[📖 README — Instalação, Uso e Build]]
 └─ GitExtensions.ZimerfeldCommitMsg.X.Y.Z.nupkg

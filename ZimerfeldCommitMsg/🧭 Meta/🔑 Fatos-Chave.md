@@ -20,7 +20,7 @@ tags: [fatos-chave, referencia, meta]
 - Ver [[👤 Renato]] para preferências detalhadas
 
 ## 📁 Caminhos importantes
-- Cofre de memória (este): `C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg\OBSIDIAN`
+- Cofre de memória (este): `C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg\ZimerfeldCommitMsg`
 - Raiz do projeto: `C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg`
 - `C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg` **é** o repositório do projeto [[📦 GitExtensions.ZimerfeldCommitMsg]] (C#, plugin GitExtensions que gera mensagens de commit)
 - GitExtensions instalado em: `C:\Program Files\GitExtensions\`

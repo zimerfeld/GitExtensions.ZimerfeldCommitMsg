@@ -20,7 +20,7 @@ tags: [fatos-chave, referencia, meta]
 - See [[👤 Renato (EN)|Renato]] for detailed preferences
 
 ## 📁 Important paths
-- Memory vault (this one): `C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg\OBSIDIAN`
+- Memory vault (this one): `C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg\ZimerfeldCommitMsg`
 - Project root: `C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg`
 - `C:\GitExtensions\GitExtensions.ZimerfeldCommitMsg` **is** the repository of the [[📦 GitExtensions.ZimerfeldCommitMsg (EN)|GitExtensions.ZimerfeldCommitMsg]] project (C#, GitExtensions plugin that generates commit messages)
 - GitExtensions installed at: `C:\Program Files\GitExtensions\`

@@ -2,7 +2,7 @@
 tipo: moc
 projeto: GitExtensions.ZimerfeldCommitMsg
 lang: pt-BR
-atualizado: 2026-07-04
+atualizado: 2026-07-05
 ---
 
 # 🏠 GitExtensions.ZimerfeldCommitMsg — Cofre de Neurônios
@@ -17,7 +17,7 @@ atualizado: 2026-07-04
 - **Problema que resolve:** escrever boas mensagens de commit é chato e inconsistente. O plugin lê o que **de fato** mudou (comentários adicionados no diff + nomes de arquivo), classifica por Conventional Commits e materializa um subject + corpo prontos — em pt-BR ou inglês.
 - **Diferenciais:** analisa o **conteúdo do diff**, não só nomes de arquivo; **verbo guiado por Conventional Commits** sem poluir a mensagem com `tipo:`; **duas estratégias** (comentários + nomes de arquivo); **vocabulário por repositório** (`.zimerfeldcommitmsg.json`) sem recompilar; **auto-refresh** ao stage/unstage; **não destrutivo**; **i18n** (Automático / PT-BR / EN).
 - **Stack:** C# / WinForms `Library`, alvo **net9.0-windows**, empacotado como **nupkg**; build e versionamento via `build.ps1`.
-- **Estado atual:** versão **`1.0.94`** — funcional, com **suíte de testes xUnit**.
+- **Estado atual:** versão **`1.0.97`** — funcional, com **suíte de testes xUnit**.
 - **Público-alvo:** desenvolvedores e times que usam GitExtensions no Windows e querem mensagens de commit consistentes com pouco esforço.
 - **Ângulo de negócio/portfólio:** produto **open source** sob o owner `zimerfeld`, ao lado dos irmãos `GitExtensions.ZimerfeldLFS` e `GitExtensions.ZimerfeldTree`.
 
@@ -69,6 +69,11 @@ atualizado: 2026-07-04
 - [[🧭 Como usar este cofre]] — protocolo de leitura/escrita do Claude
 - [[👤 Renato]] — preferências e contexto · [[🦀 RTK]] — proxy CLI de economia de tokens · [[📥 Inbox]]
 
+## 🧱 Templates
+- [[⚖️ Template - Decisão (ADR)]] — modelo para novas Decisões (ADRs)
+- [[💼 Template - Negócio]] — modelo para notas de Negócio
+- [[📚 Template - Conhecimento]] — modelo para notas de Conhecimento
+
 ## 📂 Estrutura de Pastas do Repo
 ```
 GitExtensions.ZimerfeldCommitMsg/
@@ -85,7 +90,7 @@ GitExtensions.ZimerfeldCommitMsg/
 │   ├── install.ps1 / uninstall.ps1 / update-dll.ps1
 │   ├── net9.0-windows/                ← DLL para o nupkg
 │   └── generate-icon.ps1
-├── OBSIDIAN/                          ← 🧠 este cofre de memória
+├── ZimerfeldCommitMsg/                ← 🧠 este cofre de memória
 ├── build.ps1                          ← incrementa versão + build + deploy + nupkg
 └── README.md / README.pt-BR.md / README.en-US.md
 ```
