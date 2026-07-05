@@ -36,10 +36,10 @@ The plugin's **build + versioning + deploy + packaging** script.
 
 ### 🧠 Obsidian vault (section 2b)
 Only the notes that mirror the **current** version:
-- `OBSIDIAN\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg.md`
-- `OBSIDIAN\📚 Conhecimento\📖 README — Instalação, Uso e Build.md`
-- `OBSIDIAN\🧩 Sistemas\🏷️ Versionamento.md`
-- `OBSIDIAN\🧩 Sistemas\🔭 Visão Geral.md`
+- `ZimerfeldCommitMsg\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg.md`
+- `ZimerfeldCommitMsg\📚 Conhecimento\📖 README — Instalação, Uso e Build.md`
+- `ZimerfeldCommitMsg\🧩 Sistemas\🏷️ Versionamento.md`
+- `ZimerfeldCommitMsg\🧩 Sistemas\🔭 Visão Geral.md`
 
 Replaces `versao: …` in the frontmatter and the `**X.Y.Z**` / `` `X.Y.Z` `` occurrences of the previous version.
 

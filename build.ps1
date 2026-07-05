@@ -130,7 +130,7 @@ foreach ($readmeDoc in $readmeDocs) {
 # 2b. Cofre Obsidian -- somente as 12 notas que carimbam a versao ATUAL do projeto
 # (PT + variantes EN): Projeto, README espelho, Visao Geral, Versionamento, Home e
 # Backlog. Notas de sessao/historico mencionam versoes antigas e NAO entram de proposito.
-$vault = "$PSScriptRoot\OBSIDIAN"
+$vault = "$PSScriptRoot\ZimerfeldCommitMsg"
 $obsidianDocs = @(
     "$vault\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg.md",
     "$vault\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg (EN).md",

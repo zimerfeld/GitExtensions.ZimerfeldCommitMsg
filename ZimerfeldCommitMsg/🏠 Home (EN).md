@@ -2,7 +2,7 @@
 tipo: moc
 projeto: GitExtensions.ZimerfeldCommitMsg
 lang: en-US
-atualizado: 2026-07-04
+atualizado: 2026-07-05
 ---
 
 # 🏠 GitExtensions.ZimerfeldCommitMsg — Cofre de Neurônios
@@ -17,7 +17,7 @@ atualizado: 2026-07-04
 - **Problem it solves:** writing good commit messages is tedious and inconsistent. The plugin reads what **actually** changed (comments added in the diff + file names), classifies by Conventional Commits and materializes a ready subject + body — in pt-BR or English.
 - **Differentiators:** analyzes the **diff content**, not just file names; **verb guided by Conventional Commits** without polluting the message with `type:`; **two strategies** (comments + file names); **per-repository vocabulary** (`.zimerfeldcommitmsg.json`) without recompiling; **auto-refresh** on stage/unstage; **non-destructive**; **i18n** (Automatic / PT-BR / EN).
 - **Stack:** C# / WinForms `Library`, targeting **net9.0-windows**, packaged as a **nupkg**; build and versioning via `build.ps1`.
-- **Current state:** version **`1.0.94`** — functional, with an **xUnit test suite**.
+- **Current state:** version **`1.0.97`** — functional, with an **xUnit test suite**.
 - **Target audience:** developers and teams using GitExtensions on Windows who want consistent commit messages with little effort.
 - **Business/portfolio angle:** **open source** product under the owner `zimerfeld`, alongside the siblings `GitExtensions.ZimerfeldLFS` and `GitExtensions.ZimerfeldTree`.
 
@@ -69,6 +69,11 @@ atualizado: 2026-07-04
 - [[🧭 Como usar este cofre (EN)|How to use this vault]] — Claude's read/write protocol
 - [[👤 Renato (EN)|Renato]] — preferences and context · [[🦀 RTK (EN)|RTK]] — token-saving CLI proxy · [[📥 Inbox (EN)|Inbox]]
 
+## 🧱 Templates
+- [[⚖️ Template - Decisão (ADR)|Decision (ADR) template]] — template for new Decisions (ADRs)
+- [[💼 Template - Negócio|Business template]] — template for Business notes
+- [[📚 Template - Conhecimento|Knowledge template]] — template for Knowledge notes
+
 ## 📂 Repo Folder Structure
 ```
 GitExtensions.ZimerfeldCommitMsg/
@@ -85,7 +90,7 @@ GitExtensions.ZimerfeldCommitMsg/
 │   ├── install.ps1 / uninstall.ps1 / update-dll.ps1
 │   ├── net9.0-windows/                ← DLL for the nupkg
 │   └── generate-icon.ps1
-├── OBSIDIAN/                          ← 🧠 this memory vault
+├── ZimerfeldCommitMsg/                ← 🧠 this memory vault
 ├── build.ps1                          ← bumps version + build + deploy + nupkg
 └── README.md / README.pt-BR.md / README.en-US.md
 ```
