@@ -381,4 +381,4 @@ Plugin para GitExtensions que integra o **Git LFS** (Large File Storage) ao flux
 
 ## Licença
 
-[CC BY-NC-ND 4.0](LICENSE.txt)
+Copyright © 2026 Renato Zimerfeld — **CC BY-NC-ND 4.0** (veja [`LICENSE.txt`](LICENSE.txt)).
