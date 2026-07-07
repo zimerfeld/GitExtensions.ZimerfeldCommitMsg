@@ -2,7 +2,7 @@
 tipo: backlog
 projeto: GitExtensions.ZimerfeldCommitMsg
 lang: en-US
-atualizado: 2026-07-04
+atualizado: 2026-07-07
 ---
 
 # 📌 Backlog
@@ -32,6 +32,9 @@ atualizado: 2026-07-04
 
 ## 🧊 Ideas / later
 - [ ] (nothing pending recorded — capture in [[📥 Inbox (EN)|Inbox]] when it comes up)
+
+## ✅ Recently done
+- [x] **Landing-page fix — PT title/subtitle line break** — 2026-07-07: the landing page (`index.html`, served at **commitmsg.zimerfeld.com** via GitHub Pages) shares an i18n template with the rule `html[data-lang="pt"] .lang-pt{display:inline}`, which forced **every** Portuguese element to `inline` — including `h2`/`h3` — making the title/subtitle collapse into the following text when the site opens in PT (EN was fine, since `h2`/`h3` are `block` by default). **1-line CSS fix:** `html[data-lang="pt"] h2.lang-pt,html[data-lang="pt"] h3.lang-pt{display:block}` — restores the break only on PT titles/subtitles, with no effect on EN. Shipped via GitFlow as a **hotfix** (`hotfix/pt-heading-break` → `main`, with a back-merge into `develop`, which was behind `main`) + tag **`202607071915pt-heading-break`**; `CNAME` preserved; deploy verified live.
 
 ## 🔗 Links
 - [[🏠 Home (EN)|Home]]
