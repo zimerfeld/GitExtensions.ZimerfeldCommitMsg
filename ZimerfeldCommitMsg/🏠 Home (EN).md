@@ -7,8 +7,6 @@ atualizado: 2026-07-05
 
 # 🏠 GitExtensions.ZimerfeldCommitMsg — Cofre de Neurônios
 
-> 🇧🇷 Leia esta página em português → [[🏠 Home]]
-
 > [!abstract] 🧠 What this vault is
 > Claude's persistent memory for the **GitExtensions.ZimerfeldCommitMsg** project — a MEF plugin for GitExtensions that generates commit messages automatically from the staged diff. This vault is maintained every session: bilingual-paired notes (PT/EN), standardized frontmatter and priority ordering.
 

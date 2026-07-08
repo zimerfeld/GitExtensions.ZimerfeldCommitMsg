@@ -8,8 +8,6 @@ tags: [inbox, captura-rapida, meta]
 
 # 📥 Inbox
 
-> 🇺🇸 Read this page in English → [[📥 Inbox (EN)]]
-
 > [!note] Captura rápida
 > Anotações soltas que ainda não foram organizadas nas pastas certas. Processe periodicamente movendo o conteúdo para as áreas apropriadas e esvazie esta lista.
 

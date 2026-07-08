@@ -9,8 +9,6 @@ status: aceita
 
 # 🔀 ADR — Two strategies: diff comments + file names
 
-> 🇧🇷 Leia esta página em português → [[🔀 Duas estratégias - comentários e nomes de arquivo]]
-
 ## 🎯 Context
 To describe **what** changed, the generator needs a content source. Simple generators use only file names, which produces generic messages ("update Service"). On the other hand, not every diff carries useful comments.
 

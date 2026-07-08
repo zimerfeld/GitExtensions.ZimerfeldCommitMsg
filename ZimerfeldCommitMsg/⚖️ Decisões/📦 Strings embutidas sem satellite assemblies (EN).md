@@ -9,8 +9,6 @@ status: aceita
 
 # 📦 ADR — Embedded UI strings (no satellite assemblies)
 
-> 🇧🇷 Leia esta página em português → [[📦 Strings embutidas sem satellite assemblies]]
-
 ## 🎯 Context
 The plugin ships as a **single DLL** (packed into the nupkg's root `lib\`). The UI strings must be localized (pt-BR / English). The standard .NET mechanism for localized `.resx` files generates **satellite assemblies** (`pt-BR\*.resources.dll`), which would break the single-file deploy.
 

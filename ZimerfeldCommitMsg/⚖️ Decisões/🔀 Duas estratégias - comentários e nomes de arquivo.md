@@ -9,8 +9,6 @@ status: aceita
 
 # 🔀 ADR — Duas estratégias: comentários do diff + nomes de arquivo
 
-> 🇺🇸 Read this page in English → [[🔀 Duas estratégias - comentários e nomes de arquivo (EN)]]
-
 ## 🎯 Contexto
 Para descrever o **que** mudou, o gerador precisa de uma fonte de conteúdo. Geradores simples usam só nomes de arquivo, o que produz mensagens genéricas ("update Service"). Por outro lado, nem todo diff traz comentários úteis.
 

@@ -9,8 +9,6 @@ arquivo: src/GitExtensions.ZimerfeldCommitMsg/Localization/
 
 # 🌐 Localization/ (MessageLanguage, LanguagePack, Strings)
 
-> 🇺🇸 Read this page in English → [[🌐 Localization (EN)]]
-
 Pasta de localização — dois eixos: **idioma da mensagem gerada** e **strings de UI**.
 
 **Caminho:** `src/GitExtensions.ZimerfeldCommitMsg/Localization/`

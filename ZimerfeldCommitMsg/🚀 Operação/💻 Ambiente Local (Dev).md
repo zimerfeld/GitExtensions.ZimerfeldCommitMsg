@@ -8,8 +8,6 @@ tags: [operação, dev, build, install, powershell]
 
 # 💻 Ambiente Local (Dev)
 
-> 🇺🇸 Read this page in English → [[💻 Ambiente Local (Dev) (EN)]]
-
 Como compilar e instalar o plugin no GitExtensions local para desenvolver e testar.
 
 ## ⚡ TL;DR — o comando único

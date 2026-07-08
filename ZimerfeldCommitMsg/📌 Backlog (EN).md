@@ -7,8 +7,6 @@ atualizado: 2026-07-07
 
 # 📌 Backlog
 
-> 🇧🇷 Leia esta página em português → [[📌 Backlog]]
-
 > [!tip] Start here
 > Project resumption point. When coming back in another session, read the [[🏠 Home (EN)|Home]] and this backlog.
 

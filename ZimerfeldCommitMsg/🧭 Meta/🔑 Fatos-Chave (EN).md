@@ -8,8 +8,6 @@ tags: [fatos-chave, referencia, meta]
 
 # 🔑 Key Facts
 
-> 🇧🇷 Leia esta página em português → [[🔑 Fatos-Chave]]
-
 > [!tip] Read first
 > Stable, always-useful truths. Update when something changes.
 

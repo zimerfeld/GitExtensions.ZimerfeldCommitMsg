@@ -7,8 +7,6 @@ atualizado: 2026-07-05
 
 # 🏠 GitExtensions.ZimerfeldCommitMsg — Cofre de Neurônios
 
-> 🇺🇸 Read this page in English → [[🏠 Home (EN)]]
-
 > [!abstract] 🧠 O que é este cofre
 > Memória persistente do Claude para o projeto **GitExtensions.ZimerfeldCommitMsg** — um plugin MEF para o GitExtensions que gera mensagens de commit automaticamente a partir do diff em stage. Este cofre é mantido a cada sessão: notas com par bilíngue (PT/EN), frontmatter padronizado e ordenação por prioridade.
 
