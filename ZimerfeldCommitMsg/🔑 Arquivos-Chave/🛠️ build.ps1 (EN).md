@@ -9,7 +9,7 @@ arquivo: build.ps1
 
 # 🛠️ build.ps1
 
-> 🇧🇷 Leia esta página em português → [[🛠️ build.ps1]]
+> 🇧🇷 Português → [[🛠️ build.ps1]] · 🇪🇸 Español → [[🛠️ build.ps1 (ES)]]
 
 The plugin's **build + versioning + deploy + packaging** script.
 

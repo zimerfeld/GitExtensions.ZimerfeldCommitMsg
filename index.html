@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GitExtensions.ZimerfeldCommitMsg — GitExtensions plugin</title>
-<meta name="description" content="Auto-generate a Conventional Commits message from your staged changes — in English or Brazilian Portuguese, one click in the commit dialog.">
+<meta name="description" content="Auto-generate a Conventional Commits message from your staged changes — in English, Brazilian Portuguese or Spanish, one click in the commit dialog.">
 <style>
   :root{
     --accent:#1F9E5A;
@@ -107,8 +107,8 @@
   <div class="wrap">
     <img class="hero-icon" src="https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/src/GitExtensions.ZimerfeldCommitMsg/Resources/icon-128.png" alt="GitExtensions.ZimerfeldCommitMsg">
     <h1>GitExtensions.ZimerfeldCommitMsg</h1>
-    <p class="tagline lang-en">Auto-generate a Conventional Commits message from your staged changes — in English or Brazilian Portuguese, one click in the commit dialog.</p>
-    <p class="tagline lang-pt">Gere automaticamente uma mensagem no padrão Conventional Commits a partir das mudanças em stage — em inglês ou português, num clique no diálogo de commit.</p>
+    <p class="tagline lang-en">Auto-generate a Conventional Commits message from your staged changes — in English, Brazilian Portuguese or Spanish, one click in the commit dialog.</p>
+    <p class="tagline lang-pt">Gere automaticamente uma mensagem no padrão Conventional Commits a partir das mudanças em stage — em inglês, português ou espanhol, num clique no diálogo de commit.</p>
     <div class="badges">
       <a href="https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/"><img alt="NuGet version" src="https://img.shields.io/nuget/v/GitExtensions.ZimerfeldCommitMsg?logo=nuget&label=NuGet"></a>
       <a href="https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/"><img alt="NuGet downloads" src="https://img.shields.io/nuget/dt/GitExtensions.ZimerfeldCommitMsg?logo=nuget&label=Downloads"></a>
@@ -130,7 +130,7 @@
     <p class="sub lang-en">What GitExtensions.ZimerfeldCommitMsg brings to your GitExtensions.</p>
     <p class="sub lang-pt">O que o GitExtensions.ZimerfeldCommitMsg traz para o seu GitExtensions.</p>
     <div class="grid">
-      <div class="card"><span class="ic">🔍</span><h3 class="lang-en">Reads the real diff</h3><h3 class="lang-pt">Lê o diff de verdade</h3><p class="lang-en">Summarizes what actually changed from the staged <em>content</em>, not just filenames.</p><p class="lang-pt">Resume o que realmente mudou a partir do <em>conteúdo</em> em stage, não só dos nomes de arquivo.</p></div><div class="card"><span class="ic">🏷️</span><h3 class="lang-en">Conventional Commits</h3><h3 class="lang-pt">Conventional Commits</h3><p class="lang-en">Classifies changes (feat / fix / docs / test / chore / build / refactor) to choose the right verb.</p><p class="lang-pt">Classifica as mudanças (feat / fix / docs / test / chore / build / refactor) para escolher o verbo certo.</p></div><div class="card"><span class="ic">✍️</span><h3 class="lang-en">Verb-first sentence + bullets</h3><h3 class="lang-pt">Frase com verbo + bullets</h3><p class="lang-en">Produces a clean, verb-first message with a bulleted body — without the <code>type:</code> prefix.</p><p class="lang-pt">Produz uma mensagem limpa iniciada por verbo com corpo em bullets — sem o prefixo <code>type:</code>.</p></div><div class="card"><span class="ic">🌐</span><h3 class="lang-en">Bilingual output</h3><h3 class="lang-pt">Saída bilíngue</h3><p class="lang-en">Brazilian Portuguese or English, following the OS with a manual override.</p><p class="lang-pt">Português do Brasil ou inglês, seguindo o SO com override manual.</p></div><div class="card"><span class="ic">🖱️</span><h3 class="lang-en">One click where you commit</h3><h3 class="lang-pt">Um clique onde você commita</h3><p class="lang-en">Generates the message right inside the GitExtensions commit dialog.</p><p class="lang-pt">Gera a mensagem dentro do próprio diálogo de commit do GitExtensions.</p></div><div class="card"><span class="ic">✅</span><h3 class="lang-en">Tested &amp; reliable</h3><h3 class="lang-pt">Testado e confiável</h3><p class="lang-en">Deterministic, offline classification — no external API calls, no data leaves your machine.</p><p class="lang-pt">Classificação determinística e offline — sem chamadas a APIs externas, nada sai da sua máquina.</p></div>
+      <div class="card"><span class="ic">🔍</span><h3 class="lang-en">Reads the real diff</h3><h3 class="lang-pt">Lê o diff de verdade</h3><p class="lang-en">Summarizes what actually changed from the staged <em>content</em>, not just filenames.</p><p class="lang-pt">Resume o que realmente mudou a partir do <em>conteúdo</em> em stage, não só dos nomes de arquivo.</p></div><div class="card"><span class="ic">🏷️</span><h3 class="lang-en">Conventional Commits</h3><h3 class="lang-pt">Conventional Commits</h3><p class="lang-en">Classifies changes (feat / fix / docs / test / chore / build / refactor) to choose the right verb.</p><p class="lang-pt">Classifica as mudanças (feat / fix / docs / test / chore / build / refactor) para escolher o verbo certo.</p></div><div class="card"><span class="ic">✍️</span><h3 class="lang-en">Verb-first sentence + bullets</h3><h3 class="lang-pt">Frase com verbo + bullets</h3><p class="lang-en">Produces a clean, verb-first message with a bulleted body — without the <code>type:</code> prefix.</p><p class="lang-pt">Produz uma mensagem limpa iniciada por verbo com corpo em bullets — sem o prefixo <code>type:</code>.</p></div><div class="card"><span class="ic">🌐</span><h3 class="lang-en">Multilingual output</h3><h3 class="lang-pt">Saída multilíngue</h3><p class="lang-en">Brazilian Portuguese, English or Spanish, following the OS with a manual override.</p><p class="lang-pt">Português do Brasil, inglês ou espanhol, seguindo o SO com override manual.</p></div><div class="card"><span class="ic">🖱️</span><h3 class="lang-en">One click where you commit</h3><h3 class="lang-pt">Um clique onde você commita</h3><p class="lang-en">Generates the message right inside the GitExtensions commit dialog.</p><p class="lang-pt">Gera a mensagem dentro do próprio diálogo de commit do GitExtensions.</p></div><div class="card"><span class="ic">✅</span><h3 class="lang-en">Tested &amp; reliable</h3><h3 class="lang-pt">Testado e confiável</h3><p class="lang-en">Deterministic, offline classification — no external API calls, no data leaves your machine.</p><p class="lang-pt">Classificação determinística e offline — sem chamadas a APIs externas, nada sai da sua máquina.</p></div>
     </div>
   </div>
 </section>
@@ -184,6 +184,7 @@
     <div class="langlinks">
       <a href="https://github.com/zimerfeld/GitExtensions.ZimerfeldCommitMsg/blob/main/README.en-US.md">&#127482;&#127480; English (United States)</a>
       <a href="https://github.com/zimerfeld/GitExtensions.ZimerfeldCommitMsg/blob/main/README.pt-BR.md">&#127463;&#127479; Português (Brasil)</a>
+      <a href="https://github.com/zimerfeld/GitExtensions.ZimerfeldCommitMsg/blob/main/README.es-ES.md">&#127466;&#127480; Español (España)</a>
     </div>
   </div>
 </section>

@@ -8,7 +8,7 @@ tags: [ferramenta, cli, rtk, meta]
 
 # 🦀 RTK — Rust Token Killer
 
-> 🇺🇸 Read this page in English → [[🦀 RTK (EN)]]
+> 🇺🇸 English → [[🦀 RTK (EN)]] · 🇪🇸 Español → [[🦀 RTK (ES)]]
 
 ## 📝 Resumo
 Proxy CLI que economiza **60–90% de tokens** em operações de desenvolvimento. Reescreve comandos automaticamente via hook do Claude Code (ex.: `git status` → `rtk git status`, transparente, 0 tokens de overhead).

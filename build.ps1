@@ -111,7 +111,8 @@ $today = (Get-Date).ToString("yyyy-MM-dd")
 $readmeDocs = @(
     "$PSScriptRoot\README.md",
     "$PSScriptRoot\README.pt-BR.md",
-    "$PSScriptRoot\README.en-US.md"
+    "$PSScriptRoot\README.en-US.md",
+    "$PSScriptRoot\README.es-ES.md"
 )
 foreach ($readmeDoc in $readmeDocs) {
     if (Test-Path $readmeDoc) {
@@ -127,8 +128,8 @@ foreach ($readmeDoc in $readmeDocs) {
     }
 }
 
-# 2b. Cofre Obsidian -- somente as 12 notas que carimbam a versao ATUAL do projeto
-# (PT + variantes EN): Projeto, README espelho, Visao Geral, Versionamento, Home e
+# 2b. Cofre Obsidian -- somente as 18 notas que carimbam a versao ATUAL do projeto
+# (PT + variantes EN/ES): Projeto, README espelho, Visao Geral, Versionamento, Home e
 # Backlog. Notas de sessao/historico mencionam versoes antigas e NAO entram de proposito.
 $vault = "$PSScriptRoot\ZimerfeldCommitMsg"
 $obsidianDocs = @(
@@ -143,7 +144,13 @@ $obsidianDocs = @(
     "$vault\🏠 Home.md",
     "$vault\🏠 Home (EN).md",
     "$vault\📌 Backlog.md",
-    "$vault\📌 Backlog (EN).md"
+    "$vault\📌 Backlog (EN).md",
+    "$vault\💼 Negócio\📦 GitExtensions.ZimerfeldCommitMsg (ES).md",
+    "$vault\📚 Conhecimento\📖 README — Instalação, Uso e Build (ES).md",
+    "$vault\🧩 Sistemas\🔭 Visão Geral (ES).md",
+    "$vault\🧩 Sistemas\🏷️ Versionamento (ES).md",
+    "$vault\🏠 Home (ES).md",
+    "$vault\📌 Backlog (ES).md"
 )
 $verBold = '**' + $newVersion + '**'
 foreach ($obsDoc in $obsidianDocs) {

@@ -17,10 +17,18 @@ internal static class Strings
     private static readonly ResourceManager PtRm =
         new("GitExtensions.ZimerfeldCommitMsg.Resources.StringsPtBr", typeof(Strings).Assembly);
 
+    private static readonly ResourceManager EsRm =
+        new("GitExtensions.ZimerfeldCommitMsg.Resources.StringsEsEs", typeof(Strings).Assembly);
+
     /// <summary>Lê a string pela chave no idioma indicado; cai para inglês e, por fim, para a chave.</summary>
     private static string Get(string key, MessageLanguage lang)
     {
-        var rm = lang == MessageLanguage.PtBr ? PtRm : EnRm;
+        var rm = lang switch
+        {
+            MessageLanguage.PtBr => PtRm,
+            MessageLanguage.EsEs => EsRm,
+            _                    => EnRm,
+        };
         // InvariantCulture evita probing de satellite assemblies — os recursos são neutros.
         return rm.GetString(key, CultureInfo.InvariantCulture)
             ?? EnRm.GetString(key, CultureInfo.InvariantCulture)

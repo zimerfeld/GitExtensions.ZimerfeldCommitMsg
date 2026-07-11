@@ -41,6 +41,9 @@
     <EmbeddedResource Update="Resources\StringsPtBr.resx">
       <LogicalName>GitExtensions.ZimerfeldCommitMsg.Resources.StringsPtBr.resources</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\StringsEsEs.resx">
+      <LogicalName>GitExtensions.ZimerfeldCommitMsg.Resources.StringsEsEs.resources</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

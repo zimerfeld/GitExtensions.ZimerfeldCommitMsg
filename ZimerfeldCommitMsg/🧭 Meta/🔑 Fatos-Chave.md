@@ -8,7 +8,7 @@ tags: [fatos-chave, referencia, meta]
 
 # 🔑 Fatos-Chave
 
-> 🇺🇸 Read this page in English → [[🔑 Fatos-Chave (EN)]]
+> 🇺🇸 English → [[🔑 Fatos-Chave (EN)]] · 🇪🇸 Español → [[🔑 Fatos-Chave (ES)]]
 
 > [!tip] Leia primeiro
 > Verdades estáveis e sempre úteis. Atualize quando algo mudar.

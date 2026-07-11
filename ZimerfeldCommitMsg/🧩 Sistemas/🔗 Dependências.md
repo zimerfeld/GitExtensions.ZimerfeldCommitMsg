@@ -8,7 +8,7 @@ tags: [dependências, assemblies, gitextensions, nuget]
 
 # 🔗 Dependências
 
-> 🇺🇸 Read this page in English → [[🔗 Dependências (EN)]]
+> 🇺🇸 English → [[🔗 Dependências (EN)]] · 🇪🇸 Español → [[🔗 Dependências (ES)]]
 
 ## 🧩 Assemblies do GitExtensions (referências de compilação)
 

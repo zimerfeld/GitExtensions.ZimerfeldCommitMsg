@@ -9,7 +9,7 @@ status: aceita
 
 # ✍️ ADR — Verb-first subject, without the literal "type:" prefix
 
-> 🇧🇷 Leia esta página em português → [[✍️ Subject iniciado por verbo sem prefixo de tipo]]
+> 🇧🇷 Português → [[✍️ Subject iniciado por verbo sem prefixo de tipo]] · 🇪🇸 Español → [[✍️ Subject iniciado por verbo sem prefixo de tipo (ES)]]
 
 ## 🎯 Context
 The **Conventional Commits** standard defines types (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) usually written as a literal prefix: `feat: add authentication`. The plugin classifies changes by these types, but must decide **how** that appears in the message.
