@@ -20,6 +20,16 @@ Diretrizes persistentes para o Claude neste repositório.
 - Manter também a **paridade estrutural**: mesmos títulos, seções, tabelas, blocos
   de código, links e banners de troca de idioma entre as três versões.
 
+## Seletor de idioma (combo)
+
+- **O seletor/combo de idioma deve sempre exibir as quatro opções, nesta ordem:
+  `AUTO / PT / EN / ES`, com `AUTO` pré-selecionado (valor padrão).** Vale para o
+  `ChoiceSetting` nas configurações do plugin e para o dropdown de templates do
+  diálogo de commit (onde `AUTO` é o primeiro item).
+- `AUTO` (Automático) detecta o idioma pelo sistema operacional: `pt-*` → PT,
+  `es-*` → ES, qualquer outro → EN. Ao evoluir os idiomas, preservar essa ordem e
+  manter `AUTO` como padrão.
+
 ## Publicação e Pull Requests
 
 - **Não pedir para criar nem aprovar Pull Requests.** Não sugerir abrir PR, não
