@@ -2,6 +2,12 @@
 
 Diretrizes persistentes para o Claude neste repositório.
 
+## Idioma
+
+- **Responder sempre no chat em português do Brasil (pt-BR).** Vale para todas
+  as respostas, resumos e perguntas ao usuário, independentemente do idioma do
+  código, dos arquivos ou da mensagem recebida.
+
 ## Publicação e Pull Requests
 
 - **Não pedir para criar nem aprovar Pull Requests.** Não sugerir abrir PR, não
