@@ -24,3 +24,6 @@ gitextensions.shared/
 # OS
 Thumbs.db
 .DS_Store
+
+# Diretrizes locais do Claude (não versionadas)
+CLAUDE.local.md
