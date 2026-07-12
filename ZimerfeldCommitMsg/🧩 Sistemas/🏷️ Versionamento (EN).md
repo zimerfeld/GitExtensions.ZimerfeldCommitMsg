@@ -8,7 +8,7 @@ tags: [build, versão, nupkg, deploy]
 
 # 🏷️ Versioning and Build
 
-> 🇧🇷 Leia esta página em português → [[🏷️ Versionamento]]
+> 🇧🇷 Português → [[🏷️ Versionamento]] · 🇪🇸 Español → [[🏷️ Versionamento (ES)]]
 
 ## 🔢 Version scheme
 

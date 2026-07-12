@@ -8,7 +8,7 @@ tags: [meta, protocolo]
 
 # 🧭 Como usar este cofre (protocolo do Claude)
 
-> 🇺🇸 Read this page in English → [[🧭 Como usar este cofre (EN)]]
+> 🇺🇸 English → [[🧭 Como usar este cofre (EN)]] · 🇪🇸 Español → [[🧭 Como usar este cofre (ES)]]
 
 > [!important] Protocolo de memória
 > No **início** de cada sessão, leia: [[🏠 Home]], [[🔑 Fatos-Chave]] e o [[📌 Backlog]] (ponto de retomada).

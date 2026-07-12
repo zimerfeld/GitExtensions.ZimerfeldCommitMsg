@@ -10,7 +10,7 @@ versao: 1.0.97
 
 # 📖 README — Instalação, Uso e Build
 
-> 🇺🇸 Read this page in English → [[📖 README — Instalação, Uso e Build (EN)]]
+> 🇺🇸 English → [[📖 README — Instalação, Uso e Build (EN)]] · 🇪🇸 Español → [[📖 README — Instalação, Uso e Build (ES)]]
 
 > Espelho do `README.md` da raiz do repositório (bilíngue EN/PT), reconciliado com o código em 2026-07-04.
 > Nota de projeto: [[📦 GitExtensions.ZimerfeldCommitMsg]]. Conceitos em [[📜 Conventional Commits - Conceitos]].

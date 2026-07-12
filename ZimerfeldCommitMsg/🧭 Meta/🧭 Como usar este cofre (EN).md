@@ -8,7 +8,7 @@ tags: [meta, protocolo]
 
 # 🧭 How to use this vault (Claude's protocol)
 
-> 🇧🇷 Leia esta página em português → [[🧭 Como usar este cofre]]
+> 🇧🇷 Português → [[🧭 Como usar este cofre]] · 🇪🇸 Español → [[🧭 Como usar este cofre (ES)]]
 
 > [!important] Memory protocol
 > At the **start** of each session, read: [[🏠 Home (EN)|Home]], [[🔑 Fatos-Chave (EN)|Key Facts]] and the [[📌 Backlog (EN)|Backlog]] (resumption point).

@@ -23,13 +23,14 @@ public sealed class ZimerfeldCommitMsgPlugin : GitPluginBase
         ($"{TemplatePrefix} — {LanguageOption.Auto}",      null),
         ($"{TemplatePrefix} — {LanguageOption.Portugues}", MessageLanguage.PtBr),
         ($"{TemplatePrefix} — {LanguageOption.English}",   MessageLanguage.En),
+        ($"{TemplatePrefix} — {LanguageOption.Espanol}",   MessageLanguage.EsEs),
     ];
 
     // Idioma da mensagem: Automático (detecta pelo SO) ou forçado pelo usuário.
     private static readonly ChoiceSetting _languageSetting = new(
         "ZimerfeldCommitMsg_Language",
         "Idioma da mensagem / Message language",
-        new[] { LanguageOption.Auto, LanguageOption.Portugues, LanguageOption.English },
+        new[] { LanguageOption.Auto, LanguageOption.Portugues, LanguageOption.English, LanguageOption.Espanol },
         LanguageOption.Auto);
 
     // Capturado no Register() (roda na UI thread) para marshalling seguro

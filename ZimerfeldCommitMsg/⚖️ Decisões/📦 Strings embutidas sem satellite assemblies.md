@@ -9,7 +9,7 @@ status: aceita
 
 # 📦 ADR — Strings de UI embutidas (sem satellite assemblies)
 
-> 🇺🇸 Read this page in English → [[📦 Strings embutidas sem satellite assemblies (EN)]]
+> 🇺🇸 English → [[📦 Strings embutidas sem satellite assemblies (EN)]] · 🇪🇸 Español → [[📦 Strings embutidas sem satellite assemblies (ES)]]
 
 ## 🎯 Contexto
 O plugin é distribuído como uma **DLL única** (empacotada em `lib\` raiz do nupkg). As strings de UI precisam ser localizadas (pt-BR / inglês). O mecanismo padrão do .NET para `.resx` localizados gera **satellite assemblies** (`pt-BR\*.resources.dll`), o que quebraria o deploy de arquivo único.

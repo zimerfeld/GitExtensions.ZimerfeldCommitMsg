@@ -9,7 +9,7 @@ arquivo: src/GitExtensions.ZimerfeldCommitMsg/RepoVocabularyConfig.cs
 
 # 📓 RepoVocabularyConfig.cs
 
-> 🇺🇸 Read this page in English → [[📓 RepoVocabularyConfig (EN)]]
+> 🇺🇸 English → [[📓 RepoVocabularyConfig (EN)]] · 🇪🇸 Español → [[📓 RepoVocabularyConfig (ES)]]
 
 Vocabulário **adicional por repositório**, permitindo estender a extração de conceitos **sem recompilar** o plugin. ~77 linhas.
 

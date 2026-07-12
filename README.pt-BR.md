@@ -11,11 +11,11 @@ Este plugin é construído e mantido no meu tempo livre. Se ele te poupa tempo a
 **Versão:** 1.0.97
 **Atualizado em:** 2026-07-04
 
-Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR ou inglês**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
+Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera automaticamente mensagens de commit analisando o conteúdo real das alterações staged. As mudanças são classificadas pelos tipos do **Conventional Commits** (`feat`/`fix`/`docs`/`test`/`chore`/`build`/`refactor`) para escolher o **verbo** adequado, e a mensagem resultante é uma **frase iniciada por verbo** seguida de um corpo em bullets — **sem** o prefixo `tipo:`. **Multilíngue**: gera em **português-BR, inglês ou espanhol**, detectado automaticamente pelo idioma do sistema operacional, com **override manual** nas configurações do plugin.
 
 ![Screenshot](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotUsage.png)
 
-[English](README.en-US.md) | [Português-BR](README.pt-BR.md)
+[English](README.en-US.md) | [Português-BR](README.pt-BR.md) | [Español](README.es-ES.md)
 
 [...Mais informações](https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg "Mais informações sobre GitExtensions.ZimerfeldTree package")
 
@@ -25,7 +25,7 @@ Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera autom
 
 - **Geração automática** da mensagem de commit a partir do conteúdo real do diff staged (não apenas dos nomes de arquivo).
 - **Verbo guiado por Conventional Commits** — classifica as mudanças nos tipos (`feat`, `fix`, `docs`, `test`, `chore`, `build`, `refactor`) e prefixa o **verbo** correspondente (3ª pessoa do presente em pt-BR / imperativo em inglês). O tipo em si **não** aparece na mensagem.
-- **Multilíngue (Português/Inglês)** — idioma escolhido automaticamente pelo SO, com seletor manual de override.
+- **Multilíngue (Português / Inglês / Espanhol)** — idioma escolhido automaticamente pelo SO, com seletor manual de override.
 - **Duas estratégias de conteúdo**: baseada em comentários do diff (principal) e baseada em nomes de arquivo (fallback). A extração reconhece várias sintaxes de comentário — `//`, `///`, blocos C-style `/* */` `/** */`, JSDoc `* `, HTML `<!-- -->`, SQL/Lua `--`, VB `'` e `#`.
 - **Vocabulário por repositório** — um arquivo opcional `.zimerfeldcommitmsg.json` estende o vocabulário conhecido/rejeitado e as frases de conceito sem recompilar.
 - **Corpo em bullets** — até 5 frases de uma linha, cada uma resumindo a mudança mais significativa de um arquivo; **sempre ao menos um bullet**, mesmo com um único arquivo alterado.
@@ -37,7 +37,7 @@ Plugin para **[GitExtensions](https://gitextensions.github.io/)** que gera autom
 
 ---
 
-## Multilíngue (Português / Inglês)
+## Multilíngue (Português / Inglês / Espanhol)
 
 O plugin gera toda a mensagem (descrição, corpo e verbos) **no idioma escolhido**, e localiza também as mensagens de UI (diálogos de aviso).
 
@@ -45,23 +45,25 @@ O plugin gera toda a mensagem (descrição, corpo e verbos) **no idioma escolhid
 
 Há **duas formas** de escolher o idioma, com os mesmos rótulos bilíngues (claros independentemente do idioma do sistema):
 
-**1. No dropdown de templates da tela de commit** — três itens, um por idioma (escolha rápida por commit):
+**1. No dropdown de templates da tela de commit** — quatro itens, um por idioma (escolha rápida por commit):
 
 ```text
 Zimerfeld Commit Msg — Automático/Automatic
 Zimerfeld Commit Msg — Português/Portuguese
 Zimerfeld Commit Msg — Inglês/English
+Zimerfeld Commit Msg — Espanhol/Español
 ```
 
-![Dropdown de templates de commit com os três itens de idioma](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotUsage.png)
+![Dropdown de templates de commit com os itens de idioma](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotUsage.png)
 
 **2. Em Configurações → Plugins → ZimerfeldCommitMsg** — o seletor **"Idioma da mensagem / Message language"** define o **padrão** usado pelo menu Plugins e pelo auto-refresh.
 
 | Opção                  | Comportamento                                                                                                       |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `Automático/Automatic` | **Padrão.** Detecta pelo idioma do sistema operacional/GitExtensions (`pt-*` → português; qualquer outro → inglês). |
+| `Automático/Automatic` | **Padrão.** Detecta pelo idioma do sistema operacional/GitExtensions (`pt-*` → português; `es-*` → espanhol; qualquer outro → inglês). |
 | `Português/Portuguese` | Força a saída em português-BR.                                                                                      |
 | `Inglês/English`       | Força a saída em inglês.                                                                                            |
+| `Espanhol/Español`     | Força a saída em espanhol (Espanha).                                                                                |
 
 > Escolher um item no **dropdown** fixa aquele idioma para o **auto-refresh** enquanto o diálogo estiver aberto (tem prioridade sobre o setting/SO). O seletor em Configurações define o padrão usado quando nenhum item do dropdown foi escolhido (e pelo menu Plugins). A detecção automática usa `CultureInfo.CurrentUICulture`.
 >
@@ -69,12 +71,12 @@ Zimerfeld Commit Msg — Inglês/English
 
 ### Exemplo lado a lado
 
-| Português-BR                            | English                    |
-| --------------------------------------- | -------------------------- |
-| `Implementa autenticação`               | `Implement authentication` |
-| `- Adiciona autenticação`               | `- Add authentication`     |
-| `- Adiciona processamento de pagamento` | `- Add payment processing` |
-| `- Adiciona gerenciamento de token`     | `- Add token management`   |
+| Português-BR                            | English                    | Español                          |
+| --------------------------------------- | -------------------------- | -------------------------------- |
+| `Implementa autenticação`               | `Implement authentication` | `Implementa autenticación`       |
+| `- Adiciona autenticação`               | `- Add authentication`     | `- Añade autenticación`          |
+| `- Adiciona processamento de pagamento` | `- Add payment processing` | `- Añade procesamiento de pagos` |
+| `- Adiciona gerenciamento de token`     | `- Add token management`   | `- Añade gestión de tokens`      |
 
 ---
 
@@ -82,9 +84,9 @@ Zimerfeld Commit Msg — Inglês/English
 
 ### Template no diálogo de commit
 
-No dropdown de templates da janela de commit há um item por idioma — **"Zimerfeld Commit Msg — Automático/Automatic"**, **"— Português/Portuguese"** e **"— Inglês/English"**. Selecione um e a mensagem é gerada nesse idioma e preenchida automaticamente no campo de texto.
+No dropdown de templates da janela de commit há um item por idioma — **"Zimerfeld Commit Msg — Automático/Automatic"**, **"— Português/Portuguese"**, **"— Inglês/English"** e **"— Espanhol/Español"**. Selecione um e a mensagem é gerada nesse idioma e preenchida automaticamente no campo de texto.
 
-> Ao **abrir** o dropdown, os três idiomas são gerados na hora (mensagens frescas a partir do stage atual); **clicar** em um item **substitui** o conteúdo do campo pela mensagem daquele idioma — inclusive texto digitado manualmente. (Isso difere do auto-refresh, que preserva o texto do usuário.)
+> Ao **abrir** o dropdown, os quatro idiomas são gerados na hora (mensagens frescas a partir do stage atual); **clicar** em um item **substitui** o conteúdo do campo pela mensagem daquele idioma — inclusive texto digitado manualmente. (Isso difere do auto-refresh, que preserva o texto do usuário.)
 
 ### Menu Plugins
 
@@ -271,14 +273,14 @@ O corpo lista até **5 bullets** — **ao menos um, mesmo com um único arquivo*
 
 ## Exemplos de mensagens geradas
 
-| Arquivos staged                                                                     | Mensagem gerada (pt-BR)                                                                                                 | Mensagem gerada (en)                                                               |
-| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `AuthService.cs` adicionado                                                         | `Implementa autenticação`                                                                                               | `Implement authentication`                                                         |
-| `PaymentService.cs` adicionado                                                      | `Implementa processamento de pagamento`                                                                                 | `Implement payment processing`                                                     |
-| `UserService.cs` modificado                                                         | `Corrige gerenciamento de usuários`                                                                                     | `Fix user management`                                                              |
-| `README.md` modificado                                                              | `Atualiza documentação`                                                                                                 | `Update documentation`                                                             |
-| `UserService.cs` + `TokenService.cs` adicionados                                    | `Implementa gerenciamento de usuários`<br>`- Adiciona gerenciamento de usuários`<br>`- Adiciona gerenciamento de token` | `Implement user management`<br>`- Add user management`<br>`- Add token management` |
-| `.cs` modificado com comentário `// Valida o token antes de processar a requisição` | `Valida o token antes de processar a requisição`                                                                        | _(comentário em pt passa intacto)_                                                 |
+| Arquivos staged                                                                     | Mensagem gerada (pt-BR)                                                                                                 | Mensagem gerada (en)                                                               | Mensagem gerada (es-ES)                                                               |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `AuthService.cs` adicionado                                                         | `Implementa autenticação`                                                                                               | `Implement authentication`                                                         | `Implementa autenticación`                                                            |
+| `PaymentService.cs` adicionado                                                      | `Implementa processamento de pagamento`                                                                                 | `Implement payment processing`                                                     | `Implementa procesamiento de pagos`                                                   |
+| `UserService.cs` modificado                                                         | `Corrige gerenciamento de usuários`                                                                                     | `Fix user management`                                                              | `Corrige gestión de usuarios`                                                         |
+| `README.md` modificado                                                              | `Atualiza documentação`                                                                                                 | `Update documentation`                                                             | `Actualiza documentación`                                                             |
+| `UserService.cs` + `TokenService.cs` adicionados                                    | `Implementa gerenciamento de usuários`<br>`- Adiciona gerenciamento de usuários`<br>`- Adiciona gerenciamento de token` | `Implement user management`<br>`- Add user management`<br>`- Add token management` | `Implementa gestión de usuarios`<br>`- Añade gestión de usuarios`<br>`- Añade gestión de tokens` |
+| `.cs` modificado com comentário `// Valida o token antes de processar a requisição` | `Valida o token antes de processar a requisição`                                                                        | _(comentário em pt passa intacto)_                                                 | _(comentário em pt passa intacto)_                                                   |
 
 ---
 

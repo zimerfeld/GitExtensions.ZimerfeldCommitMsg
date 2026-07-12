@@ -16,9 +16,9 @@
 ![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotBR.png) **Versão:** 1.0.97
 **Atualizado em:** 2026-07-04
 
-![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotGB.png) GitExtensions plugin that automatically generates commit messages from staged changes, with output in Brazilian Portuguese or English.
+![EN](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotGB.png) GitExtensions plugin that automatically generates commit messages from staged changes, with output in Brazilian Portuguese, English or Spanish.
 
-![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotBR.png) Plugin para GitExtensions que gera mensagens de commit automaticamente a partir das alterações em stage, com saída em português do Brasil ou inglês.
+![PT](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotBR.png) Plugin para GitExtensions que gera mensagens de commit automaticamente a partir das alterações em stage, com saída em português do Brasil, inglês ou espanhol.
 
 ![Generated commit message in the GitExtensions commit dialog](https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotREADME.png)
 
@@ -30,6 +30,7 @@
 
 - [English (United States)](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.en-US.md)
 - [Português (Brasil)](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.pt-BR.md)
+- [Español (España)](https://github.com/zimerfeld/ZimerfeldCommitMsg/blob/main/README.es-ES.md)
 
 ## Package / Pacote
 
