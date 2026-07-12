@@ -9,6 +9,8 @@ arquivo: src/GitExtensions.ZimerfeldCommitMsg/Localization/
 
 # 🌐 Localization/ (MessageLanguage, LanguagePack, Strings)
 
+> 🇧🇷 Português → [[🌐 Localization]] · 🇪🇸 Español → [[🌐 Localization (ES)]]
+
 Localization folder — two axes: **language of the generated message** and **UI strings**.
 
 **Path:** `src/GitExtensions.ZimerfeldCommitMsg/Localization/`

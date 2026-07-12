@@ -8,6 +8,8 @@ tags: [meta, protocolo]
 
 # 🧭 Como usar este cofre (protocolo do Claude)
 
+> 🇺🇸 English → [[🧭 Como usar este cofre (EN)]] · 🇪🇸 Español → [[🧭 Como usar este cofre (ES)]]
+
 > [!important] Protocolo de memória
 > No **início** de cada sessão, leia: [[🏠 Home]], [[🔑 Fatos-Chave]] e o [[📌 Backlog]] (ponto de retomada).
 > No **fim** de cada sessão, atualize as notas afetadas e o [[📌 Backlog]].

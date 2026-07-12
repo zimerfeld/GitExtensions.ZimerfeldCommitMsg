@@ -9,9 +9,14 @@ internal abstract class LanguagePack
 {
     public static readonly LanguagePack PtBr = new PtBrLanguagePack();
     public static readonly LanguagePack En   = new EnLanguagePack();
+    public static readonly LanguagePack EsEs = new EsEsLanguagePack();
 
-    public static LanguagePack For(MessageLanguage lang) =>
-        lang == MessageLanguage.PtBr ? PtBr : En;
+    public static LanguagePack For(MessageLanguage lang) => lang switch
+    {
+        MessageLanguage.PtBr => PtBr,
+        MessageLanguage.EsEs => EsEs,
+        _                    => En,
+    };
 
     // ── Conceitos de domínio ────────────────────────────────────────────────
     // As CHAVES são idênticas entre idiomas (identificadores em inglês: Auth, Payment…);
@@ -414,5 +419,179 @@ internal sealed class EnLanguagePack : LanguagePack
         ["throws"] = "Throw", ["throw"] = "Throw",
         ["moves"] = "Move", ["move"] = "Move",
         ["renames"] = "Rename", ["rename"] = "Rename",
+    };
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  Espanhol (Espanha)
+// ══════════════════════════════════════════════════════════════════════════
+internal sealed class EsEsLanguagePack : LanguagePack
+{
+    protected override IReadOnlyDictionary<string, string> ConceptPhrases => _concepts;
+
+    private static readonly Dictionary<string, string> _concepts = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Identidad / acceso
+        ["Auth"] = "autenticación", ["Authentication"] = "autenticación",
+        ["Login"] = "inicio de sesión", ["Logout"] = "cierre de sesión",
+        ["SignIn"] = "inicio de sesión", ["SignUp"] = "registro",
+        ["Register"] = "registro", ["Registration"] = "registro",
+        ["Password"] = "gestión de contraseñas", ["Token"] = "gestión de tokens",
+        ["Jwt"] = "autenticación JWT", ["Bearer"] = "autenticación por token",
+        ["Session"] = "gestión de sesiones", ["Permission"] = "permisos",
+        ["Permissions"] = "permisos", ["Role"] = "control de acceso por roles",
+        ["Roles"] = "control de acceso por roles", ["Claim"] = "claims",
+        ["OAuth"] = "integración OAuth",
+        // Usuario / cuenta
+        ["User"] = "gestión de usuarios", ["Users"] = "gestión de usuarios",
+        ["Account"] = "gestión de cuentas", ["Profile"] = "perfil de usuario",
+        ["Member"] = "membresía", ["Customer"] = "gestión de clientes",
+        ["Tenant"] = "multi-tenancy",
+        // Comercio
+        ["Order"] = "procesamiento de pedidos", ["Cart"] = "carrito de compras",
+        ["Checkout"] = "flujo de pago", ["Payment"] = "procesamiento de pagos",
+        ["Invoice"] = "gestión de facturas", ["Product"] = "gestión de productos",
+        ["Catalog"] = "catálogo de productos", ["Inventory"] = "inventario",
+        ["Shipping"] = "envío", ["Discount"] = "gestión de descuentos",
+        ["Coupon"] = "gestión de cupones", ["Subscription"] = "suscripciones",
+        // Comunicación
+        ["Email"] = "servicio de correo electrónico", ["Mail"] = "servicio de correo electrónico",
+        ["Sms"] = "notificaciones SMS", ["Notification"] = "notificaciones",
+        ["Push"] = "notificaciones push", ["Webhook"] = "webhooks",
+        ["Message"] = "mensajería", ["Chat"] = "chat",
+        // Infraestructura
+        ["Cache"] = "caché", ["Log"] = "registro de logs",
+        ["Logger"] = "registro de logs", ["Logging"] = "registro de logs",
+        ["Audit"] = "registro de auditoría", ["Health"] = "verificación de estado",
+        ["Metric"] = "métricas", ["Monitor"] = "monitoreo",
+        ["Queue"] = "cola de mensajes", ["Job"] = "tareas en segundo plano",
+        ["Scheduler"] = "programación de tareas", ["Worker"] = "procesos en segundo plano",
+        ["Event"] = "gestión de eventos",
+        // Datos
+        ["Migration"] = "migración de base de datos", ["Seed"] = "carga de datos iniciales",
+        ["Database"] = "acceso a base de datos", ["Db"] = "base de datos",
+        ["Storage"] = "almacenamiento", ["File"] = "gestión de archivos",
+        ["Upload"] = "subida de archivos", ["Download"] = "descarga de archivos",
+        ["Blob"] = "almacenamiento de blobs",
+        // Informes
+        ["Report"] = "informes", ["Dashboard"] = "panel",
+        ["Analytics"] = "análisis", ["Export"] = "exportación de datos",
+        ["Import"] = "importación de datos", ["Pdf"] = "generación de PDF",
+        ["Excel"] = "exportación a Excel",
+        // Búsqueda
+        ["Search"] = "búsqueda", ["Filter"] = "filtrado",
+        // Configuración
+        ["Settings"] = "configuración", ["Config"] = "configuración",
+        ["AppSettings"] = "configuración de la aplicación",
+        // API
+        ["Api"] = "API", ["Rest"] = "API REST",
+        ["Grpc"] = "servicio gRPC", ["GraphQL"] = "GraphQL",
+        ["Swagger"] = "documentación de la API", ["Cors"] = "política CORS",
+        // Pruebas
+        ["Test"] = "pruebas unitarias", ["Tests"] = "pruebas unitarias",
+        ["Integration"] = "pruebas de integración", ["E2E"] = "pruebas end-to-end",
+        // Docs
+        ["Readme"] = "documentación", ["Changelog"] = "registro de cambios", ["Docs"] = "documentación",
+        // Plugin / commit
+        ["CommitMessage"] = "mensaje de commit", ["CommitMsg"] = "mensaje de commit",
+        ["Plugin"] = "plugin", ["GitExtension"] = "extensión de Git",
+    };
+
+    public override string TypeVerb(string type, bool onlyAdditions, bool hasAdditions, bool hasDeletions) =>
+        type switch
+        {
+            "feat"     => onlyAdditions ? "Implementa" : "Añade",
+            "fix"      => "Corrige",
+            "refactor" => "Refactoriza",
+            "docs"     => hasAdditions  ? "Documenta"  : "Actualiza",
+            "build"    => "Configura",
+            "chore"    => hasDeletions  ? "Elimina"    : "Configura",
+            "test"     => "Añade",
+            "perf"     => "Optimiza",
+            "ci"       => "Configura",
+            "style"    => "Estandariza",
+            _          => "Actualiza",
+        };
+
+    public override string StatusVerb(char status) => status switch
+    {
+        'A' or 'C' => "Añade",
+        'D'        => "Elimina",
+        'R'        => "Renombra",
+        _          => "Actualiza",
+    };
+
+    public override string StatusNoun(char status) => status switch
+    {
+        'A' or 'C' => "Adición",
+        'D'        => "Eliminación",
+        'R'        => "Renombramiento",
+        _          => "Actualización",
+    };
+
+    public override (string? Verb, string Remainder) LeadingVerb(string desc)
+    {
+        var firstSpace = desc.IndexOf(' ');
+        if (firstSpace <= 0) return (null, desc);
+
+        var firstWord = desc[..firstSpace].ToLowerInvariant();
+        var rest      = desc[(firstSpace + 1)..];
+
+        if (_verbs3rd.Contains(firstWord))
+            return (char.ToUpperInvariant(firstWord[0]) + firstWord[1..], rest);
+
+        if (_infinitiveTo3rd.TryGetValue(firstWord, out var conjugated))
+            return (conjugated, rest);
+
+        return (null, desc);
+    }
+
+    public override IReadOnlySet<string> DanglingTrailingWords { get; } =
+        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "de", "del", "la", "el", "las", "los", "un", "una", "unos", "unas",
+            "para", "por", "con", "sin", "en", "y", "o", "u", "que", "a", "al",
+            "e", "entre", "sobre", "bajo", "ante", "tras", "hasta", "desde",
+            "durante", "como", "cuando", "si", "pero", "sino", "aunque", "según",
+        };
+
+    public override string FilesWord(int count) => count == 1 ? "archivo" : "archivos";
+
+    // Presente de indicativo, 3ª pessoa singular — detecta descrição que já começa com verbo.
+    private static readonly HashSet<string> _verbs3rd = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "añade", "agrega", "elimina", "corrige", "ajusta", "refactoriza", "implementa",
+        "actualiza", "mejora", "estandariza", "reorganiza", "simplifica", "documenta",
+        "valida", "optimiza", "configura", "filtra", "genera", "calcula",
+        "extrae", "transforma", "resuelve", "expone", "renderiza", "envía",
+        "recibe", "mapea", "agrupa", "ordena", "une", "divide",
+        "busca", "retorna", "devuelve", "convierte", "crea", "obtiene", "define",
+        "lee", "escribe", "procesa", "gestiona", "maneja", "carga", "guarda",
+        "verifica", "coincide", "encapsula", "extiende", "representa", "contiene",
+        "proporciona", "inicializa", "delega", "lanza", "construye", "mueve", "renombra",
+    };
+
+    // Infinitivo → 3ª pessoa singular presente (capitalizado).
+    private static readonly Dictionary<string, string> _infinitiveTo3rd = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["añadir"] = "Añade", ["agregar"] = "Agrega", ["eliminar"] = "Elimina",
+        ["corregir"] = "Corrige", ["ajustar"] = "Ajusta", ["refactorizar"] = "Refactoriza",
+        ["implementar"] = "Implementa", ["actualizar"] = "Actualiza", ["mejorar"] = "Mejora",
+        ["estandarizar"] = "Estandariza", ["reorganizar"] = "Reorganiza", ["simplificar"] = "Simplifica",
+        ["documentar"] = "Documenta", ["validar"] = "Valida", ["optimizar"] = "Optimiza",
+        ["configurar"] = "Configura", ["filtrar"] = "Filtra", ["generar"] = "Genera",
+        ["calcular"] = "Calcula", ["extraer"] = "Extrae", ["transformar"] = "Transforma",
+        ["resolver"] = "Resuelve", ["exponer"] = "Expone", ["renderizar"] = "Renderiza",
+        ["enviar"] = "Envía", ["recibir"] = "Recibe", ["mapear"] = "Mapea",
+        ["agrupar"] = "Agrupa", ["ordenar"] = "Ordena", ["unir"] = "Une",
+        ["dividir"] = "Divide", ["buscar"] = "Busca", ["retornar"] = "Retorna",
+        ["devolver"] = "Devuelve", ["convertir"] = "Convierte", ["crear"] = "Crea",
+        ["construir"] = "Construye", ["obtener"] = "Obtiene", ["definir"] = "Define",
+        ["leer"] = "Lee", ["escribir"] = "Escribe", ["procesar"] = "Procesa",
+        ["gestionar"] = "Gestiona", ["manejar"] = "Maneja", ["cargar"] = "Carga",
+        ["guardar"] = "Guarda", ["verificar"] = "Verifica", ["encapsular"] = "Encapsula",
+        ["extender"] = "Extiende", ["representar"] = "Representa", ["contener"] = "Contiene",
+        ["proporcionar"] = "Proporciona", ["inicializar"] = "Inicializa", ["delegar"] = "Delega",
+        ["lanzar"] = "Lanza", ["mover"] = "Mueve", ["renombrar"] = "Renombra",
     };
 }

@@ -9,6 +9,8 @@ status: aceita
 
 # 🔌 ADR — Integração via template dropdown + Application.Idle
 
+> 🇺🇸 English → [[🔌 Integração via template dropdown e Application.Idle (EN)]] · 🇪🇸 Español → [[🔌 Integração via template dropdown e Application.Idle (ES)]]
+
 ## 🎯 Contexto
 O plugin precisa **preencher a caixa de mensagem** do diálogo de commit do GitExtensions e **manter a mensagem atualizada** enquanto o usuário mexe no stage. Porém a extensibilidade do host **não expõe** um evento de "diálogo de commit aberto" nem um callback de "item de template clicado".
 

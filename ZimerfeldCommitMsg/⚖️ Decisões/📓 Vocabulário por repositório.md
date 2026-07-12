@@ -9,6 +9,8 @@ status: aceita
 
 # 📓 ADR — Vocabulário por repositório (.zimerfeldcommitmsg.json)
 
+> 🇺🇸 English → [[📓 Vocabulário por repositório (EN)]] · 🇪🇸 Español → [[📓 Vocabulário por repositório (ES)]]
+
 ## 🎯 Contexto
 Cada projeto tem seu próprio jargão: nomes de domínio ("widget", "overlay") que deveriam virar conceitos, e nomes próprios/namespaces ("Acme", "Contoso") que **não** deveriam. Embutir todo esse vocabulário no plugin exigiria recompilar a cada projeto.
 

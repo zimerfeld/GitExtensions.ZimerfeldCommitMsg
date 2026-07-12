@@ -9,11 +9,13 @@ internal enum MessageLanguage
     PtBr,
     /// <summary>Inglês.</summary>
     En,
+    /// <summary>Espanhol (Espanha).</summary>
+    EsEs,
 }
 
 /// <summary>
 /// Rótulos bilíngues do <c>ChoiceSetting</c> de idioma exibidos nas opções do plugin.
-/// O rótulo mostra os dois idiomas (ex.: "Português/Portuguese") para ser claro
+/// O rótulo mostra os idiomas (ex.: "Português/Portuguese") para ser claro
 /// independentemente do idioma do sistema. Compartilhados entre o plugin (registro do
 /// setting) e o resolvedor (leitura). A correspondência no resolvedor é por subtrecho,
 /// então o formato exato do rótulo pode mudar sem quebrar a leitura.
@@ -23,6 +25,7 @@ internal static class LanguageOption
     public const string Auto       = "Automático/Automatic";
     public const string Portugues  = "Português/Portuguese";
     public const string English    = "Inglês/English";
+    public const string Espanol    = "Espanhol/Español";
 }
 
 /// <summary>
@@ -38,6 +41,8 @@ internal static class MessageLanguageResolver
 
         // "Português" / "Portuguese"
         if (v.Contains("portug")) return MessageLanguage.PtBr;
+        // "Espanhol" / "Español" / "Spanish"
+        if (v.Contains("espa") || v.Contains("spanish")) return MessageLanguage.EsEs;
         // "Inglês" / "English"
         if (v.Contains("ingl") || v.Contains("english")) return MessageLanguage.En;
 
@@ -45,9 +50,12 @@ internal static class MessageLanguageResolver
         return FromCulture(CultureInfo.CurrentUICulture);
     }
 
-    /// <summary>pt-* → português; qualquer outro → inglês.</summary>
-    public static MessageLanguage FromCulture(CultureInfo culture) =>
-        culture.TwoLetterISOLanguageName.Equals("pt", StringComparison.OrdinalIgnoreCase)
-            ? MessageLanguage.PtBr
-            : MessageLanguage.En;
+    /// <summary>pt-* → português; es-* → espanhol; qualquer outro → inglês.</summary>
+    public static MessageLanguage FromCulture(CultureInfo culture)
+    {
+        var iso = culture.TwoLetterISOLanguageName;
+        if (iso.Equals("pt", StringComparison.OrdinalIgnoreCase)) return MessageLanguage.PtBr;
+        if (iso.Equals("es", StringComparison.OrdinalIgnoreCase)) return MessageLanguage.EsEs;
+        return MessageLanguage.En;
+    }
 }

@@ -8,6 +8,8 @@ tags: [arquitetura, classes, design, i18n, application-idle]
 
 # 🏗️ Arquitetura
 
+> 🇺🇸 English → [[🏗️ Arquitetura (EN)]] · 🇪🇸 Español → [[🏗️ Arquitetura (ES)]]
+
 ## 🗺️ Diagrama de classes
 
 ```

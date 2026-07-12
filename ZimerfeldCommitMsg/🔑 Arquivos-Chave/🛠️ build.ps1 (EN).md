@@ -9,6 +9,8 @@ arquivo: build.ps1
 
 # 🛠️ build.ps1
 
+> 🇧🇷 Português → [[🛠️ build.ps1]] · 🇪🇸 Español → [[🛠️ build.ps1 (ES)]]
+
 The plugin's **build + versioning + deploy + packaging** script.
 
 **Path:** `build.ps1` (repo root)

@@ -9,6 +9,8 @@ arquivo: src/GitExtensions.ZimerfeldCommitMsg/ZimerfeldCommitMsgPlugin.cs
 
 # 🔌 ZimerfeldCommitMsgPlugin.cs
 
+> 🇺🇸 English → [[🔌 ZimerfeldCommitMsgPlugin (EN)]] · 🇪🇸 Español → [[🔌 ZimerfeldCommitMsgPlugin (ES)]]
+
 Ponto de entrada do plugin e **integração com o diálogo de commit** do GitExtensions. Exportado via MEF. ~626 linhas.
 
 **Caminho:** `src/GitExtensions.ZimerfeldCommitMsg/ZimerfeldCommitMsgPlugin.cs`

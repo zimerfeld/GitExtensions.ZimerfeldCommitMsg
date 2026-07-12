@@ -8,6 +8,8 @@ tags: [sistema, overview, plugin, gitextensions, commit-message, conventional-co
 
 # 🔭 Visão Geral
 
+> 🇺🇸 English → [[🔭 Visão Geral (EN)]] · 🇪🇸 Español → [[🔭 Visão Geral (ES)]]
+
 ## 🎯 O que é
 
 Plugin para **GitExtensions** (Windows) que **gera a mensagem de commit automaticamente** a partir do conteúdo real das alterações em stage. Ele se integra ao **diálogo de commit** do host: ao abrir o diálogo (e sempre que arquivos entram/saem do stage), o plugin lê o `git diff --cached`, classifica as mudanças por **Conventional Commits** e materializa um **subject iniciado por verbo** + **corpo em bullets**, no idioma escolhido. Ver [[📜 Conventional Commits - Conceitos]] e [[✍️ Subject iniciado por verbo sem prefixo de tipo]].

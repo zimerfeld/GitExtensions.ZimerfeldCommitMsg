@@ -8,6 +8,8 @@ tags: [dependências, assemblies, gitextensions, nuget]
 
 # 🔗 Dependências
 
+> 🇺🇸 English → [[🔗 Dependências (EN)]] · 🇪🇸 Español → [[🔗 Dependências (ES)]]
+
 ## 🧩 Assemblies do GitExtensions (referências de compilação)
 
 Ambas referenciadas com `<Private>false</Private>` — **não** copiadas para o output (o host já as fornece em runtime).

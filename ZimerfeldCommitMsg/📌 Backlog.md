@@ -7,6 +7,8 @@ atualizado: 2026-07-07
 
 # 📌 Backlog
 
+> 🇺🇸 English → [[📌 Backlog (EN)]] · 🇪🇸 Español → [[📌 Backlog (ES)]]
+
 > [!tip] Comece por aqui
 > Ponto de retomada do projeto. Ao voltar em outra sessão, leia a [[🏠 Home]] e este backlog.
 

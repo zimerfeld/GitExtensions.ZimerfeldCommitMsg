@@ -8,6 +8,8 @@ tags: [fluxo, geração, diff, conventional-commits, etapa2]
 
 # ⚙️ Fluxo: Geração da mensagem
 
+> 🇺🇸 English → [[⚙️ 2 - Geração da mensagem (EN)]] · 🇪🇸 Español → [[⚙️ 2 - Geração da mensagem (ES)]]
+
 O que o `CommitMessageGenerator.Generate()` faz para transformar o diff staged numa mensagem.
 
 ## 🪜 Passos

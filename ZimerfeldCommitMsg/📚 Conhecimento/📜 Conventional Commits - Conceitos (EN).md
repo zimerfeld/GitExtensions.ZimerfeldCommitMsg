@@ -8,6 +8,8 @@ tags: [conhecimento, git, conventional-commits, mensagem-de-commit]
 
 # 📜 Conventional Commits — Concepts
 
+> 🇧🇷 Português → [[📜 Conventional Commits - Conceitos]] · 🇪🇸 Español → [[📜 Conventional Commits - Conceitos (ES)]]
+
 ## 📝 Summary
 **Conventional Commits** is a convention for commit messages that classifies each change by a semantic **type**. The canonical format is `<type>[optional scope]: <description>`, with optional body and footer. See https://www.conventionalcommits.org/en/v1.0.0/.
 

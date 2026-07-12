@@ -368,6 +368,264 @@ internal sealed class CommitMessageGenerator
         ["user"]="usuário", ["admin"]="administrador",
     };
 
+    // ══════════════════════════════════════════════════════════════════════════
+    //  Espanhol (es-ES) — dicionários paralelos aos de pt-BR
+    // ══════════════════════════════════════════════════════════════════════════
+
+    // ── Tradução inglês → es-ES: frases compostas (mais longas primeiro) ────────
+    private static readonly (string En, string Es)[] PhraseTranslationsEs =
+    [
+        // Negaciones compuestas (más específicas antes de las genéricas)
+        ("the node and all its descendants don't match the filter",
+            "el nodo y todos sus descendientes no coinciden con el filtro"),
+        ("the node and all its descendants", "el nodo y todos sus descendientes"),
+        ("all its descendants",              "todos sus descendientes"),
+        ("don't match the filter",           "no coinciden con el filtro"),
+        ("doesn't match the filter",         "no coincide con el filtro"),
+        ("don't match",                      "no coinciden"),
+        ("doesn't match",                    "no coincide"),
+        ("do not match",                     "no coinciden"),
+        ("does not match",                   "no coincide"),
+        ("returns null when",                "retorna null cuando"),
+        // Contexto git
+        ("git-history hierarchy",            "jerarquía del historial git"),
+        ("this was created from",            "de dónde se creó"),
+        ("then git-history hierarchy within each group",
+            "luego jerarquía del historial git dentro de cada grupo"),
+        ("within each group",                "dentro de cada grupo"),
+        ("grouped by remote",                "agrupados por remoto"),
+        // Patrones relacionales
+        ("split by",                         "separado por"),
+        ("grouped by",                       "agrupado por"),
+        ("sorted by",                        "ordenado por"),
+        ("filtered by",                      "filtrado por"),
+        ("ordered by",                       "ordenado por"),
+        ("based on",                         "basado en"),
+        ("mapped to",                        "mapeado a"),
+        ("converted to",                     "convertido a"),
+        ("converted into",                   "convertido en"),
+        ("created from",                     "creado a partir de"),
+        ("derived from",                     "derivado de"),
+    ];
+
+    // ── Tradução inglês → es-ES: palavras individuais ──────────────────────────
+    private static readonly Dictionary<string, string> WordTranslationsEs =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Verbos (3ª pessoa / infinitivo)
+        ["returns"]       = "retorna",      ["return"]        = "retornar",
+        ["converts"]      = "convierte",    ["convert"]       = "convertir",
+        ["creates"]       = "crea",         ["create"]        = "crear",
+        ["removes"]       = "elimina",      ["remove"]        = "eliminar",
+        ["adds"]          = "añade",        ["add"]           = "añadir",
+        ["updates"]       = "actualiza",    ["update"]        = "actualizar",
+        ["builds"]        = "construye",    ["build"]         = "construir",
+        ["gets"]          = "obtiene",      ["get"]           = "obtener",
+        ["sets"]          = "define",       ["set"]           = "definir",
+        ["takes"]         = "recibe",       ["take"]          = "recibir",
+        ["makes"]         = "crea",         ["make"]          = "crear",
+        ["uses"]          = "usa",          ["use"]           = "usar",
+        ["reads"]         = "lee",          ["read"]          = "leer",
+        ["writes"]        = "escribe",      ["write"]         = "escribir",
+        ["parses"]        = "procesa",      ["parse"]         = "procesar",
+        ["filters"]       = "filtra",       ["handles"]       = "gestiona",
+        ["handle"]        = "gestionar",    ["validates"]     = "valida",
+        ["validate"]      = "validar",      ["loads"]         = "carga",
+        ["load"]          = "cargar",       ["saves"]         = "guarda",
+        ["save"]          = "guardar",      ["checks"]        = "verifica",
+        ["check"]         = "verificar",    ["matches"]       = "coincide",
+        ["match"]         = "coincidir",    ["wraps"]         = "encapsula",
+        ["wrap"]          = "encapsular",   ["extends"]       = "extiende",
+        ["extend"]        = "extender",     ["represents"]    = "representa",
+        ["contains"]      = "contiene",     ["contain"]       = "contener",
+        ["provides"]      = "proporciona",  ["provide"]       = "proporcionar",
+        ["processes"]     = "procesa",      ["initializes"]   = "inicializa",
+        ["initialize"]    = "inicializar",  ["initialises"]   = "inicializa",
+        ["generates"]     = "genera",       ["generate"]      = "generar",
+        ["calculates"]    = "calcula",      ["calculate"]     = "calcular",
+        ["extracts"]      = "extrae",       ["extract"]       = "extraer",
+        ["transforms"]    = "transforma",   ["transform"]     = "transformar",
+        ["resolves"]      = "resuelve",     ["resolve"]       = "resolver",
+        ["throws"]        = "lanza",        ["throw"]         = "lanzar",
+        ["delegates"]     = "delega",       ["delegate"]      = "delegar",
+        ["exposes"]       = "expone",       ["expose"]        = "exponer",
+        ["renders"]       = "renderiza",    ["render"]        = "renderizar",
+        ["sends"]         = "envía",        ["send"]          = "enviar",
+        ["receives"]      = "recibe",       ["receive"]       = "recibir",
+        ["maps"]          = "mapea",        ["map"]           = "mapear",
+        ["groups"]        = "agrupa",       ["sorts"]         = "ordena",
+        ["joins"]         = "une",          ["splits"]        = "divide",
+        ["searches"]      = "busca",        ["search"]        = "buscar",
+        // Advérbios
+        ["recursively"]   = "recursivamente",
+        ["automatically"] = "automáticamente",
+        ["manually"]      = "manualmente",
+        ["directly"]      = "directamente",
+        ["lazily"]        = "de forma diferida",
+        ["asynchronously"]= "de forma asíncrona",
+        ["synchronously"] = "de forma síncrona",
+        // Preposições / conjunções / artigos
+        ["the"]           = "",          // artículo omitido (género variable)
+        ["from"]          = "de",        ["into"]    = "en",
+        ["within"]        = "dentro de", ["without"] = "sin",
+        ["between"]       = "entre",     ["through"] = "a través de",
+        ["onto"]          = "sobre",     ["when"]    = "cuando",
+        ["where"]         = "donde",     ["and"]     = "y",
+        ["or"]            = "o",         ["not"]     = "no",
+        ["all"]           = "todos",     ["each"]    = "cada",
+        ["its"]           = "sus",       ["their"]   = "sus",
+        ["that"]          = "que",       ["which"]   = "que",
+        ["this"]          = "este",      ["then"]    = "luego",
+        ["with"]          = "con",       ["for"]     = "para",
+        ["by"]            = "por",       ["of"]      = "de",
+        ["in"]            = "en",        ["at"]      = "en",
+        ["on"]            = "en",        ["as"]      = "como",
+        ["an"]            = "",          ["a"]       = "",
+        // Substantivos técnicos
+        ["node"]          = "nodo",      ["nodes"]        = "nodos",
+        ["tree"]          = "árbol",     ["hierarchy"]    = "jerarquía",
+        ["history"]       = "historial", ["ancestor"]     = "ancestro",
+        ["descendant"]    = "descendiente",["descendants"]= "descendientes",
+        ["parent"]        = "padre",     ["child"]        = "hijo",
+        ["children"]      = "hijos",     ["prefix"]       = "prefijo",
+        ["suffix"]        = "sufijo",    ["remote"]       = "remoto",
+        ["remotes"]       = "remotos",   ["list"]         = "lista",
+        ["grouping"]      = "agrupación",["filter"]       = "filtro",
+        ["entry"]         = "entrada",   ["entries"]      = "entradas",
+        ["key"]           = "clave",     ["value"]        = "valor",
+        ["values"]        = "valores",   ["index"]        = "índice",
+        ["path"]          = "ruta",      ["root"]         = "raíz",
+        ["leaf"]          = "hoja",      ["depth"]        = "profundidad",
+        ["level"]         = "nivel",     ["order"]        = "orden",
+        ["result"]        = "resultado", ["output"]       = "salida",
+        ["input"]         = "entrada",   ["type"]         = "tipo",
+        ["name"]          = "nombre",    ["label"]        = "etiqueta",
+        ["message"]       = "mensaje",   ["error"]        = "error",
+        ["event"]         = "evento",    ["item"]         = "elemento",
+        ["items"]         = "elementos", ["element"]      = "elemento",
+        ["elements"]      = "elementos", ["property"]     = "propiedad",
+        ["properties"]    = "propiedades",["collection"]  = "colección",
+        ["separator"]     = "separador", ["scope"]        = "ámbito",
+        ["context"]       = "contexto",  ["source"]       = "origen",
+        ["target"]        = "destino",   ["state"]        = "estado",
+        ["status"]        = "estado",    ["mode"]         = "modo",
+        ["format"]        = "formato",   ["pattern"]      = "patrón",
+        ["rule"]          = "regla",     ["rules"]        = "reglas",
+        ["option"]        = "opción",    ["options"]      = "opciones",
+        ["flag"]          = "indicador", ["flags"]        = "indicadores",
+        ["limit"]         = "límite",    ["size"]         = "tamaño",
+        ["count"]         = "conteo",    ["total"]        = "total",
+        ["range"]         = "rango",     ["step"]         = "paso",
+        ["folder"]        = "carpeta",   ["file"]         = "archivo",
+        ["task"]          = "tarea",     ["tasks"]        = "tareas",
+        // Adjetivos
+        ["based"]         = "basado",    ["grouped"]      = "agrupado",
+        ["sorted"]        = "ordenado",  ["filtered"]     = "filtrado",
+        ["mapped"]        = "mapeado",   ["enabled"]      = "habilitado",
+        ["disabled"]      = "deshabilitado",["visible"]   = "visible",
+        ["hidden"]        = "oculto",    ["selected"]     = "seleccionado",
+        ["required"]      = "obligatorio",["optional"]    = "opcional",
+        ["created"]       = "creado",    ["nested"]       = "anidado",
+        ["merged"]        = "fusionado", ["loaded"]       = "cargado",
+        // Verbos adicionais (3ª pessoa / infinitivo)
+        ["ensures"]       = "garantiza", ["ensure"]       = "garantizar",
+        ["prevents"]      = "previene",  ["prevent"]      = "prevenir",
+        ["allows"]        = "permite",   ["allow"]        = "permitir",
+        ["supports"]      = "admite",    ["support"]      = "admitir",
+        ["requires"]      = "requiere",  ["require"]      = "requerir",
+        ["computes"]      = "computa",   ["compute"]      = "computar",
+        ["stores"]        = "almacena",  ["store"]        = "almacenar",
+        ["fetches"]       = "obtiene",   ["fetch"]        = "obtener",
+        ["applies"]       = "aplica",    ["apply"]        = "aplicar",
+        ["toggles"]       = "alterna",   ["toggle"]       = "alternar",
+        ["enables"]       = "habilita",  ["enable"]       = "habilitar",
+        ["disables"]      = "deshabilita",["disable"]     = "deshabilitar",
+        ["registers"]     = "registra",  ["register"]     = "registrar",
+        ["invokes"]       = "invoca",    ["invoke"]       = "invocar",
+        ["clears"]        = "limpia",    ["clear"]        = "limpiar",
+        ["resets"]        = "reinicia",  ["reset"]        = "reiniciar",
+        ["tracks"]        = "rastrea",   ["track"]        = "rastrear",
+        ["detects"]       = "detecta",   ["detect"]       = "detectar",
+        ["ignores"]       = "ignora",    ["ignore"]       = "ignorar",
+        ["skips"]         = "omite",     ["skip"]         = "omitir",
+        ["keeps"]         = "mantiene",  ["keep"]         = "mantener",
+        ["avoids"]        = "evita",     ["avoid"]        = "evitar",
+        ["replaces"]      = "reemplaza", ["replace"]      = "reemplazar",
+        ["merges"]        = "fusiona",   ["merge"]        = "fusionar",
+        ["appends"]       = "agrega",    ["append"]       = "agregar",
+        ["inserts"]       = "inserta",   ["insert"]       = "insertar",
+        ["deletes"]       = "elimina",   ["delete"]       = "eliminar",
+        ["copies"]        = "copia",     ["copy"]         = "copiar",
+        ["renames"]       = "renombra",  ["rename"]       = "renombrar",
+        ["moves"]         = "mueve",     ["move"]         = "mover",
+        ["disposes"]      = "libera",    ["dispose"]      = "liberar",
+        ["overrides"]     = "sobrescribe",["override"]    = "sobrescribir",
+        ["implements"]    = "implementa",["implement"]    = "implementar",
+        ["compares"]      = "compara",   ["compare"]      = "comparar",
+        ["selects"]       = "selecciona",["select"]       = "seleccionar",
+        ["serializes"]    = "serializa", ["serialize"]    = "serializar",
+        ["deserializes"]  = "deserializa",["deserialize"] = "deserializar",
+        ["encodes"]       = "codifica",  ["encode"]       = "codificar",
+        ["decodes"]       = "decodifica",["decode"]       = "decodificar",
+        ["formats"]       = "formatea",  ["counts"]       = "cuenta",
+        // Conectores / advérbios adicionais
+        ["before"]        = "antes de",  ["after"]        = "después de",
+        ["during"]        = "durante",   ["instead"]      = "en su lugar",
+        ["otherwise"]     = "de lo contrario",["because"] = "porque",
+        ["if"]            = "si",        ["else"]         = "si no",
+        ["while"]         = "mientras",  ["until"]        = "hasta",
+        ["also"]          = "también",   ["only"]         = "solo",
+        ["using"]         = "usando",    ["once"]         = "una vez",
+        ["always"]        = "siempre",   ["never"]        = "nunca",
+        ["still"]         = "aún",
+        // Substantivos técnicos adicionais. Mesma cautela do pt-BR: NÃO incluir loanwords
+        // ambíguos (token, cache, buffer, array, via, data, config) que também aparecem
+        // verbatim em comentários — inflariam a detecção de inglês.
+        ["request"]       = "solicitud", ["requests"]     = "solicitudes",
+        ["response"]      = "respuesta", ["responses"]    = "respuestas",
+        ["queue"]         = "cola",      ["stack"]        = "pila",
+        ["object"]        = "objeto",    ["class"]        = "clase",
+        ["method"]        = "método",    ["function"]     = "función",
+        ["variable"]      = "variable",  ["parameter"]    = "parámetro",
+        ["parameters"]    = "parámetros",["argument"]     = "argumento",
+        ["arguments"]     = "argumentos",["line"]         = "línea",
+        ["lines"]         = "líneas",    ["field"]        = "campo",
+        ["fields"]        = "campos",    ["record"]       = "registro",
+        ["records"]       = "registros", ["service"]      = "servicio",
+        ["services"]      = "servicios", ["module"]       = "módulo",
+        ["component"]     = "componente",["components"]   = "componentes",
+        ["user"]          = "usuario",   ["users"]        = "usuarios",
+    };
+
+    // Tradução EN→ES de palavras de conceito (substantivos), usada no prefixo nominal
+    // do título em es-ES. Espelha ConceptWordPt com o vocabulário espanhol.
+    private static readonly Dictionary<string, string> ConceptWordEs =
+        new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["text"]="texto", ["document"]="documento", ["documents"]="documentos",
+        ["file"]="archivo", ["files"]="archivos", ["folder"]="carpeta", ["folders"]="carpetas",
+        ["page"]="página", ["pages"]="páginas", ["image"]="imagen", ["images"]="imágenes",
+        ["icon"]="icono", ["icons"]="iconos", ["note"]="nota", ["notes"]="notas",
+        ["summary"]="resumen", ["detail"]="detalle", ["details"]="detalles",
+        ["overview"]="visión general", ["guide"]="guía", ["manual"]="manual",
+        ["spec"]="especificación", ["specs"]="especificaciones",
+        ["version"]="versión", ["release"]="versión",
+        ["change"]="cambio", ["changes"]="cambios",
+        ["view"]="vista", ["views"]="vistas", ["model"]="modelo", ["models"]="modelos",
+        ["layout"]="diseño", ["style"]="estilo", ["styles"]="estilos",
+        ["script"]="script", ["scripts"]="scripts",
+        ["table"]="tabla", ["tables"]="tablas", ["row"]="fila", ["rows"]="filas",
+        ["column"]="columna", ["columns"]="columnas", ["field"]="campo", ["fields"]="campos",
+        ["button"]="botón", ["buttons"]="botones", ["menu"]="menú",
+        ["header"]="encabezado", ["footer"]="pie de página", ["title"]="título", ["label"]="etiqueta",
+        ["content"]="contenido", ["section"]="sección", ["block"]="bloque", ["group"]="grupo",
+        ["tab"]="pestaña", ["panel"]="panel", ["dialog"]="diálogo", ["window"]="ventana",
+        ["form"]="formulario", ["forms"]="formularios", ["list"]="lista",
+        ["item"]="elemento", ["items"]="elementos", ["data"]="datos", ["info"]="información",
+        ["report"]="informe", ["sample"]="ejemplo", ["example"]="ejemplo",
+        ["user"]="usuario", ["admin"]="administrador",
+    };
+
     // ── Tokens preservados na tradução (não traduzir) ─────────────────────────
     // Nomes de branch no padrão gitflow (feature/…, release/…, etc.) e os tipos
     // Conventional Commits. Sem esta proteção, a tradução palavra-a-palavra
@@ -457,12 +715,14 @@ internal sealed class CommitMessageGenerator
             var raw = ExtractRawConcept(Path.GetFileNameWithoutExtension(c.Path));
             if (raw is null) continue;
 
-            // pt-BR: prefixo nominal de ação ("Remoção de documento de texto").
+            // pt-BR / es-ES: prefixo nominal de ação ("Remoção de documento de texto" /
+            // "Eliminación de documento de texto"). Ambos os idiomas latinos usam a mesma
+            // estrutura (substantivo + " de " + conceito); só o vocabulário muda.
             // en: mantém o conceito humanizado, sem ação (comportamento anterior).
             string phrase;
-            if (_language == MessageLanguage.PtBr)
+            if (_language is MessageLanguage.PtBr or MessageLanguage.EsEs)
             {
-                var concept = ConceptToPt(raw);
+                var concept = ConceptToNominal(raw);
                 if (concept.Length == 0) continue;
                 phrase = $"{_lang.StatusNoun(c.Status)} de {concept}";
             }
@@ -487,11 +747,13 @@ internal sealed class CommitMessageGenerator
     }
 
     /// <summary>
-    /// Frase do conceito em pt-BR para o prefixo do título: conceito conhecido usa a frase do
-    /// dicionário; nome de vocabulário tem as palavras traduzidas, qualificadores (new/old/…)
-    /// descartados e a ordem invertida unida por " de " ("text document" → "documento de texto").
+    /// Frase do conceito (pt-BR/es-ES) para o prefixo do título: conceito conhecido usa a frase
+    /// do dicionário do idioma; nome de vocabulário tem as palavras traduzidas, qualificadores
+    /// (new/old/…) descartados e a ordem invertida unida por " de " ("text document" →
+    /// "documento de texto"). A estrutura é idêntica nos dois idiomas latinos; só o vocabulário
+    /// (selecionado por <see cref="TranslateConceptWord"/>) muda.
     /// </summary>
-    private string ConceptToPt(string raw)
+    private string ConceptToNominal(string raw)
     {
         if (_lang.HasConcept(raw)) return _lang.MapConcept(raw, HumanizeName);
 
@@ -504,11 +766,23 @@ internal sealed class CommitMessageGenerator
         return string.Join(" de ", words.Select(TranslateConceptWord));
     }
 
-    private string TranslateConceptWord(string word) =>
-        _vocab.ConceptPt.TryGetValue(word, out var extra)                  ? extra
-        : ConceptWordPt.TryGetValue(word, out var pt)                       ? pt
-        : WordTranslations.TryGetValue(word, out var pt2) && pt2.Length > 0 ? pt2
-        : word;
+    /// <summary>
+    /// Traduz uma palavra de conceito para o idioma ativo (pt-BR/es-ES), consultando primeiro o
+    /// override do repositório, depois o dicionário nominal do idioma e, por fim, o dicionário
+    /// geral de tradução. Sem correspondência, devolve a palavra original.
+    /// </summary>
+    private string TranslateConceptWord(string word)
+    {
+        if (_vocab.ConceptPt.TryGetValue(word, out var extra)) return extra;
+
+        var (conceptNouns, generalWords) = _language == MessageLanguage.EsEs
+            ? (ConceptWordEs, WordTranslationsEs)
+            : (ConceptWordPt, WordTranslations);
+
+        return conceptNouns.TryGetValue(word, out var noun)              ? noun
+            : generalWords.TryGetValue(word, out var w) && w.Length > 0 ? w
+            : word;
+    }
 
     /// <summary>
     /// Lê o título (primeira linha com #) do README.md staged, se houver.
@@ -590,9 +864,12 @@ internal sealed class CommitMessageGenerator
     private string? BestComment(string path, Dictionary<string, List<string>> byFile, string? readmeTitle)
     {
         var raw = byFile.TryGetValue(path, out var list) ? list : [];
-        var usable = _language == MessageLanguage.PtBr
-            ? raw.Select(TranslateToPortuguese).OfType<string>()
-            : raw;
+        var usable = _language switch
+        {
+            MessageLanguage.PtBr => raw.Select(TranslateToPortuguese).OfType<string>(),
+            MessageLanguage.EsEs => raw.Select(TranslateToSpanish).OfType<string>(),
+            _                    => raw,
+        };
 
         // Mantém só frases "fechadas" e escolhe a de maior score (não a mais longa).
         var best = usable.Where(IsCleanSentence)
@@ -892,6 +1169,66 @@ internal sealed class CommitMessageGenerator
         // Avalia qualidade ANTES de restaurar: tokens preservados (branches/tipos CC)
         // não devem contar como "inglês não traduzido".
         if (IsEnglishText(result)) return null;  // descarta — fallback pt-BR será usado
+
+        // Restaura nomes de branch e tipos CC, intactos
+        if (preserved.Count > 0)
+            result = Regex.Replace(result, "\u0001(\\d+)\u0001",
+                m => preserved[int.Parse(m.Groups[1].Value)]);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Traduz um comentário do inglês para es-ES usando frases e palavras mapeadas.
+    /// Espelha <see cref="TranslateToPortuguese"/>: preserva identificadores PascalCase/
+    /// MAIÚSCULAS (código), nomes de branch (feature/…, release/…, etc.) e os tipos
+    /// Conventional Commits. Retorna null quando a tradução é insuficiente (fallback es-ES).
+    /// </summary>
+    internal static string? TranslateToSpanish(string text)
+    {
+        if (!IsEnglishText(text)) return text;  // já em outro idioma
+
+        // Mascara nomes de branch e tipos CC com placeholders \u0001N\u0001
+        // (sem letras → as fases de tradução os ignoram). Restaurados no fim.
+        var preserved = new List<string>();
+        var result = Regex.Replace(text, PreservePattern,
+            m => { preserved.Add(m.Value); return $"\u0001{preserved.Count - 1}\u0001"; },
+            RegexOptions.IgnoreCase);
+
+        // Fase 1 — frases compostas (mais longas primeiro para evitar fragmentação)
+        foreach (var (en, es) in PhraseTranslationsEs)
+            result = Regex.Replace(result, $@"(?i){Regex.Escape(en)}", es);
+
+        // Fase 2 — padrões estruturais
+        // "X-based" → "basado en X"
+        result = Regex.Replace(result, @"\b(\w+)-based\b",
+            m => $"basado en {m.Groups[1].Value.ToLowerInvariant()}", RegexOptions.IgnoreCase);
+        // "recursively VERBO" → "VERBO recursivamente"
+        result = Regex.Replace(result, @"\brecursively\s+(\w+)",
+            m =>
+            {
+                var verb = m.Groups[1].Value;
+                var es   = WordTranslationsEs.TryGetValue(verb, out var v) ? v : verb;
+                return $"{es} recursivamente";
+            }, RegexOptions.IgnoreCase);
+
+        // Fase 3 — palavras individuais (preserva PascalCase = identificadores de código)
+        result = Regex.Replace(result, @"\b[A-Za-z][a-z]*\b",
+            m =>
+            {
+                var word = m.Value;
+                // Preserva PascalCase: primeira maiúscula + tem minúsculas = identificador
+                if (char.IsUpper(word[0]) && word.Length > 1 && word.Any(char.IsLower))
+                    return word;
+                return WordTranslationsEs.TryGetValue(word, out var es) ? es : word;
+            });
+
+        // Limpeza: remove espaços duplos gerados pela remoção de artigos ("the" → "")
+        result = Regex.Replace(result, @"\s{2,}", " ").Trim().TrimStart(',', ';');
+
+        // Avalia qualidade ANTES de restaurar: tokens preservados (branches/tipos CC)
+        // não devem contar como "inglês não traduzido".
+        if (IsEnglishText(result)) return null;  // descarta — fallback es-ES será usado
 
         // Restaura nomes de branch e tipos CC, intactos
         if (preserved.Count > 0)

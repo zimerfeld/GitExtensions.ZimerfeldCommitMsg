@@ -8,6 +8,8 @@ tags: [operação, dev, build, install, powershell]
 
 # 💻 Local Environment (Dev)
 
+> 🇧🇷 Português → [[💻 Ambiente Local (Dev)]] · 🇪🇸 Español → [[💻 Ambiente Local (Dev) (ES)]]
+
 How to build and install the plugin into the local GitExtensions to develop and test.
 
 ## ⚡ TL;DR — the single command

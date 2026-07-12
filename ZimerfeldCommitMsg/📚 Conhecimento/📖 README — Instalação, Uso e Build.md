@@ -10,6 +10,8 @@ versao: 1.0.97
 
 # 📖 README — Instalação, Uso e Build
 
+> 🇺🇸 English → [[📖 README — Instalação, Uso e Build (EN)]] · 🇪🇸 Español → [[📖 README — Instalação, Uso e Build (ES)]]
+
 > Espelho do `README.md` da raiz do repositório (bilíngue EN/PT), reconciliado com o código em 2026-07-04.
 > Nota de projeto: [[📦 GitExtensions.ZimerfeldCommitMsg]]. Conceitos em [[📜 Conventional Commits - Conceitos]].
 > O `build.ps1` carimba versão + data nos READMEs **e** nas notas do cofre que espelham a versão atual — ver [[🏷️ Versionamento]].

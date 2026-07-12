@@ -8,6 +8,8 @@ tags: [build, versão, nupkg, deploy]
 
 # 🏷️ Versioning and Build
 
+> 🇧🇷 Português → [[🏷️ Versionamento]] · 🇪🇸 Español → [[🏷️ Versionamento (ES)]]
+
 ## 🔢 Version scheme
 
 `major.minor.build` — only `build` is incremented automatically by `build.ps1`. Major and minor are changed manually.
