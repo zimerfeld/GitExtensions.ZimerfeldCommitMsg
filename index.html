@@ -21,12 +21,16 @@
   a{color:var(--accent);text-decoration:none}
   a:hover{text-decoration:underline}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
-  .lang-pt{display:none}
-  html[data-lang="pt"] .lang-en{display:none}
+  .lang-pt,.lang-es{display:none}
+  html[data-lang="pt"] .lang-en,html[data-lang="pt"] .lang-es{display:none}
   html[data-lang="pt"] .lang-pt{display:inline}
+  html[data-lang="es"] .lang-en,html[data-lang="es"] .lang-pt{display:none}
+  html[data-lang="es"] .lang-es{display:inline}
+  .block.lang-pt,.block.lang-es{display:none}
   html[data-lang="pt"] .block.lang-pt{display:block}
-  .block.lang-pt{display:none}
+  html[data-lang="es"] .block.lang-es{display:block}
   html[data-lang="pt"] h2.lang-pt,html[data-lang="pt"] h3.lang-pt{display:block}
+  html[data-lang="es"] h2.lang-es,html[data-lang="es"] h3.lang-es{display:block}
   /* top nav */
   nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);
     background:rgba(13,17,23,.72);border-bottom:1px solid var(--line)}
@@ -94,11 +98,15 @@
     <span class="spacer"></span>
     <a href="#features" class="lang-en" style="color:var(--muted);font-size:14px">Features</a>
     <a href="#features" class="lang-pt" style="color:var(--muted);font-size:14px">Funcionalidades</a>
+    <a href="#features" class="lang-es" style="color:var(--muted);font-size:14px">Funcionalidades</a>
     <a href="#install" class="lang-en" style="color:var(--muted);font-size:14px">Install</a>
     <a href="#install" class="lang-pt" style="color:var(--muted);font-size:14px">Instalação</a>
+    <a href="#install" class="lang-es" style="color:var(--muted);font-size:14px">Instalación</a>
     <div class="toggle" role="group" aria-label="Language">
-      <button data-set="en">EN</button>
+      <button data-set="auto">AUTO</button>
       <button data-set="pt">PT</button>
+      <button data-set="en">EN</button>
+      <button data-set="es">ES</button>
     </div>
   </div>
 </nav>
@@ -109,6 +117,7 @@
     <h1>GitExtensions.ZimerfeldCommitMsg</h1>
     <p class="tagline lang-en">Auto-generate a Conventional Commits message from your staged changes — in English, Brazilian Portuguese or Spanish, one click in the commit dialog.</p>
     <p class="tagline lang-pt">Gere automaticamente uma mensagem no padrão Conventional Commits a partir das mudanças em stage — em inglês, português ou espanhol, num clique no diálogo de commit.</p>
+    <p class="tagline lang-es">Genera automáticamente un mensaje con el formato Conventional Commits a partir de tus cambios en stage — en inglés, portugués o español, con un clic en el diálogo de commit.</p>
     <div class="badges">
       <a href="https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/"><img alt="NuGet version" src="https://img.shields.io/nuget/v/GitExtensions.ZimerfeldCommitMsg?logo=nuget&label=NuGet"></a>
       <a href="https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/"><img alt="NuGet downloads" src="https://img.shields.io/nuget/dt/GitExtensions.ZimerfeldCommitMsg?logo=nuget&label=Downloads"></a>
@@ -116,21 +125,22 @@
     </div>
     <div class="cta">
       <a class="btn primary" href="https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/">
-        <span class="lang-en">Get it on NuGet</span><span class="lang-pt">Baixar no NuGet</span></a>
+        <span class="lang-en">Get it on NuGet</span><span class="lang-pt">Baixar no NuGet</span><span class="lang-es">Descargar en NuGet</span></a>
       <a class="btn" href="https://github.com/zimerfeld/GitExtensions.ZimerfeldCommitMsg">GitHub</a>
       <a class="btn" href="https://github.com/sponsors/zimerfeld"><span class="heart">&#10084;</span>
-        <span class="lang-en">Sponsor</span><span class="lang-pt">Patrocinar</span></a>
+        <span class="lang-en">Sponsor</span><span class="lang-pt">Patrocinar</span><span class="lang-es">Patrocinar</span></a>
     </div>
   </div>
 </header>
 
 <section id="features">
   <div class="wrap">
-    <h2 class="lang-en">Features</h2><h2 class="lang-pt">Funcionalidades</h2>
+    <h2 class="lang-en">Features</h2><h2 class="lang-pt">Funcionalidades</h2><h2 class="lang-es">Funcionalidades</h2>
     <p class="sub lang-en">What GitExtensions.ZimerfeldCommitMsg brings to your GitExtensions.</p>
     <p class="sub lang-pt">O que o GitExtensions.ZimerfeldCommitMsg traz para o seu GitExtensions.</p>
+    <p class="sub lang-es">Lo que GitExtensions.ZimerfeldCommitMsg aporta a tu GitExtensions.</p>
     <div class="grid">
-      <div class="card"><span class="ic">🔍</span><h3 class="lang-en">Reads the real diff</h3><h3 class="lang-pt">Lê o diff de verdade</h3><p class="lang-en">Summarizes what actually changed from the staged <em>content</em>, not just filenames.</p><p class="lang-pt">Resume o que realmente mudou a partir do <em>conteúdo</em> em stage, não só dos nomes de arquivo.</p></div><div class="card"><span class="ic">🏷️</span><h3 class="lang-en">Conventional Commits</h3><h3 class="lang-pt">Conventional Commits</h3><p class="lang-en">Classifies changes (feat / fix / docs / test / chore / build / refactor) to choose the right verb.</p><p class="lang-pt">Classifica as mudanças (feat / fix / docs / test / chore / build / refactor) para escolher o verbo certo.</p></div><div class="card"><span class="ic">✍️</span><h3 class="lang-en">Verb-first sentence + bullets</h3><h3 class="lang-pt">Frase com verbo + bullets</h3><p class="lang-en">Produces a clean, verb-first message with a bulleted body — without the <code>type:</code> prefix.</p><p class="lang-pt">Produz uma mensagem limpa iniciada por verbo com corpo em bullets — sem o prefixo <code>type:</code>.</p></div><div class="card"><span class="ic">🌐</span><h3 class="lang-en">Multilingual output</h3><h3 class="lang-pt">Saída multilíngue</h3><p class="lang-en">Brazilian Portuguese, English or Spanish, following the OS with a manual override.</p><p class="lang-pt">Português do Brasil, inglês ou espanhol, seguindo o SO com override manual.</p></div><div class="card"><span class="ic">🖱️</span><h3 class="lang-en">One click where you commit</h3><h3 class="lang-pt">Um clique onde você commita</h3><p class="lang-en">Generates the message right inside the GitExtensions commit dialog.</p><p class="lang-pt">Gera a mensagem dentro do próprio diálogo de commit do GitExtensions.</p></div><div class="card"><span class="ic">✅</span><h3 class="lang-en">Tested &amp; reliable</h3><h3 class="lang-pt">Testado e confiável</h3><p class="lang-en">Deterministic, offline classification — no external API calls, no data leaves your machine.</p><p class="lang-pt">Classificação determinística e offline — sem chamadas a APIs externas, nada sai da sua máquina.</p></div>
+      <div class="card"><span class="ic">🔍</span><h3 class="lang-en">Reads the real diff</h3><h3 class="lang-pt">Lê o diff de verdade</h3><h3 class="lang-es">Lee el diff real</h3><p class="lang-en">Summarizes what actually changed from the staged <em>content</em>, not just filenames.</p><p class="lang-pt">Resume o que realmente mudou a partir do <em>conteúdo</em> em stage, não só dos nomes de arquivo.</p><p class="lang-es">Resume lo que realmente cambió a partir del <em>contenido</em> en stage, no solo de los nombres de archivo.</p></div><div class="card"><span class="ic">🏷️</span><h3 class="lang-en">Conventional Commits</h3><h3 class="lang-pt">Conventional Commits</h3><h3 class="lang-es">Conventional Commits</h3><p class="lang-en">Classifies changes (feat / fix / docs / test / chore / build / refactor) to choose the right verb.</p><p class="lang-pt">Classifica as mudanças (feat / fix / docs / test / chore / build / refactor) para escolher o verbo certo.</p><p class="lang-es">Clasifica los cambios (feat / fix / docs / test / chore / build / refactor) para elegir el verbo adecuado.</p></div><div class="card"><span class="ic">✍️</span><h3 class="lang-en">Verb-first sentence + bullets</h3><h3 class="lang-pt">Frase com verbo + bullets</h3><h3 class="lang-es">Frase con verbo + viñetas</h3><p class="lang-en">Produces a clean, verb-first message with a bulleted body — without the <code>type:</code> prefix.</p><p class="lang-pt">Produz uma mensagem limpa iniciada por verbo com corpo em bullets — sem o prefixo <code>type:</code>.</p><p class="lang-es">Produce un mensaje limpio que empieza por verbo con un cuerpo en viñetas — sin el prefijo <code>type:</code>.</p></div><div class="card"><span class="ic">🌐</span><h3 class="lang-en">Multilingual output</h3><h3 class="lang-pt">Saída multilíngue</h3><h3 class="lang-es">Salida multilingüe</h3><p class="lang-en">Brazilian Portuguese, English or Spanish, following the OS with a manual override.</p><p class="lang-pt">Português do Brasil, inglês ou espanhol, seguindo o SO com override manual.</p><p class="lang-es">Portugués de Brasil, inglés o español, siguiendo el sistema operativo con anulación manual.</p></div><div class="card"><span class="ic">🖱️</span><h3 class="lang-en">One click where you commit</h3><h3 class="lang-pt">Um clique onde você commita</h3><h3 class="lang-es">Un clic donde haces commit</h3><p class="lang-en">Generates the message right inside the GitExtensions commit dialog.</p><p class="lang-pt">Gera a mensagem dentro do próprio diálogo de commit do GitExtensions.</p><p class="lang-es">Genera el mensaje dentro del propio diálogo de commit de GitExtensions.</p></div><div class="card"><span class="ic">✅</span><h3 class="lang-en">Tested &amp; reliable</h3><h3 class="lang-pt">Testado e confiável</h3><h3 class="lang-es">Probado y fiable</h3><p class="lang-en">Deterministic, offline classification — no external API calls, no data leaves your machine.</p><p class="lang-pt">Classificação determinística e offline — sem chamadas a APIs externas, nada sai da sua máquina.</p><p class="lang-es">Clasificación determinista y sin conexión — sin llamadas a APIs externas, ningún dato sale de tu máquina.</p></div>
     </div>
   </div>
 </section>
@@ -139,11 +149,12 @@
 
 <section id="screens">
   <div class="wrap">
-    <h2 class="lang-en">Screenshots</h2><h2 class="lang-pt">Printscreens</h2>
+    <h2 class="lang-en">Screenshots</h2><h2 class="lang-pt">Printscreens</h2><h2 class="lang-es">Capturas de pantalla</h2>
     <p class="sub lang-en">A look at the plugin in action.</p>
     <p class="sub lang-pt">Uma olhada no plugin em ação.</p>
+    <p class="sub lang-es">Un vistazo al plugin en acción.</p>
     <div class="shots">
-      <figure><img loading="lazy" src="https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotREADME.png" alt="Generated message in the commit dialog"><figcaption><span class="lang-en">Generated message in the commit dialog</span><span class="lang-pt">Mensagem gerada no diálogo de commit</span></figcaption></figure>
+      <figure><img loading="lazy" src="https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/screenshots/screenshotREADME.png" alt="Generated message in the commit dialog"><figcaption><span class="lang-en">Generated message in the commit dialog</span><span class="lang-pt">Mensagem gerada no diálogo de commit</span><span class="lang-es">Mensaje generado en el diálogo de commit</span></figcaption></figure>
     </div>
   </div>
 </section>
@@ -152,24 +163,28 @@
 
 <section id="install">
   <div class="wrap">
-    <h2 class="lang-en">Installation</h2><h2 class="lang-pt">Instalação</h2>
+    <h2 class="lang-en">Installation</h2><h2 class="lang-pt">Instalação</h2><h2 class="lang-es">Instalación</h2>
     <p class="sub lang-en">Two ways to get up and running.</p>
     <p class="sub lang-pt">Duas formas de começar.</p>
+    <p class="sub lang-es">Dos formas de empezar.</p>
     <div class="steps">
       <div class="step"><div>
-        <strong class="lang-en">Plugin Manager (recommended)</strong><strong class="lang-pt">Gerenciador de Plugins (recomendado)</strong><br>
+        <strong class="lang-en">Plugin Manager (recommended)</strong><strong class="lang-pt">Gerenciador de Plugins (recomendado)</strong><strong class="lang-es">Gestor de Plugins (recomendado)</strong><br>
         <span class="lang-en">In GitExtensions, open <code>Plugins &rarr; Plugin Manager</code>, search for <code>ZimerfeldCommitMsg</code> and install. Restart, then open <code>Plugins &rarr; ZimerfeldCommitMsg</code>.</span>
         <span class="lang-pt">No GitExtensions, abra <code>Plugins &rarr; Plugin Manager</code>, procure por <code>ZimerfeldCommitMsg</code> e instale. Reinicie e abra <code>Plugins &rarr; ZimerfeldCommitMsg</code>.</span>
+        <span class="lang-es">En GitExtensions, abre <code>Plugins &rarr; Plugin Manager</code>, busca <code>ZimerfeldCommitMsg</code> e instálalo. Reinicia y abre <code>Plugins &rarr; ZimerfeldCommitMsg</code>.</span>
       </div></div>
       <div class="step"><div>
-        <strong class="lang-en">Manual</strong><strong class="lang-pt">Manual</strong><br>
+        <strong class="lang-en">Manual</strong><strong class="lang-pt">Manual</strong><strong class="lang-es">Manual</strong><br>
         <span class="lang-en">Install the <a href="https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/">NuGet package</a> or drop the plugin DLL into <code>C:\Program Files\GitExtensions\Plugins\</code>.</span>
         <span class="lang-pt">Instale o <a href="https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/">pacote NuGet</a> ou copie a DLL do plugin para <code>C:\Program Files\GitExtensions\Plugins\</code>.</span>
+        <span class="lang-es">Instala el <a href="https://www.nuget.org/packages/GitExtensions.ZimerfeldCommitMsg/">paquete NuGet</a> o copia la DLL del plugin en <code>C:\Program Files\GitExtensions\Plugins\</code>.</span>
       </div></div>
     </div>
     <p class="sub" style="margin-top:16px">
       <span class="lang-en">Requires <a href="https://gitextensions.github.io/">GitExtensions</a> 6.x (.NET 9) on Windows.</span>
       <span class="lang-pt">Requer o <a href="https://gitextensions.github.io/">GitExtensions</a> 6.x (.NET 9) no Windows.</span>
+      <span class="lang-es">Requiere <a href="https://gitextensions.github.io/">GitExtensions</a> 6.x (.NET 9) en Windows.</span>
     </p>
   </div>
 </section>
@@ -178,9 +193,10 @@
 
 <section id="docs">
   <div class="wrap">
-    <h2 class="lang-en">Full documentation</h2><h2 class="lang-pt">Documentação completa</h2>
+    <h2 class="lang-en">Full documentation</h2><h2 class="lang-pt">Documentação completa</h2><h2 class="lang-es">Documentación completa</h2>
     <p class="sub lang-en"><strong>Technical details, features, screenshots and installation</strong> are available per language. Click here:</p>
     <p class="sub lang-pt"><strong>Detalhes técnicos, funcionalidades, printscreens e instalação</strong> estão disponíveis por idioma. Clique aqui:</p>
+    <p class="sub lang-es"><strong>Detalles técnicos, funcionalidades, capturas de pantalla e instalación</strong> están disponibles por idioma. Haz clic aquí:</p>
     <div class="langlinks">
       <a href="https://github.com/zimerfeld/GitExtensions.ZimerfeldCommitMsg/blob/main/README.en-US.md">&#127482;&#127480; English (United States)</a>
       <a href="https://github.com/zimerfeld/GitExtensions.ZimerfeldCommitMsg/blob/main/README.pt-BR.md">&#127463;&#127479; Português (Brasil)</a>
@@ -194,6 +210,7 @@
     <div>
       <span class="lang-en">Copyright &copy; 2026 Renato Zimerfeld &mdash; <strong>CC BY-NC-ND 4.0</strong>.</span>
       <span class="lang-pt">Copyright &copy; 2026 Renato Zimerfeld &mdash; <strong>CC BY-NC-ND 4.0</strong>.</span>
+      <span class="lang-es">Copyright &copy; 2026 Renato Zimerfeld &mdash; <strong>CC BY-NC-ND 4.0</strong>.</span>
     </div>
     <div>
       <a href="https://zimerfeld.com">zimerfeld.com</a> &nbsp;&middot;&nbsp;
@@ -206,19 +223,27 @@
 <script>
   (function(){
     var html=document.documentElement;
-    function set(l){
-      html.setAttribute('data-lang',l);
-      html.setAttribute('lang', l==='pt'?'pt-BR':'en');
+    function detect(){
+      var n=(navigator.language||'en').toLowerCase();
+      if(n.indexOf('pt')===0) return 'pt';
+      if(n.indexOf('es')===0) return 'es';
+      return 'en';
+    }
+    // mode = escolha do seletor (auto/pt/en/es); lang = idioma exibido (pt/en/es).
+    // AUTO resolve o idioma pelo do navegador; PT/EN/ES forçam.
+    function apply(mode){
+      var lang = mode==='auto' ? detect() : mode;
+      html.setAttribute('data-lang', lang);
+      html.setAttribute('lang', lang==='pt'?'pt-BR':(lang==='es'?'es-ES':'en'));
       document.querySelectorAll('.toggle button').forEach(function(b){
-        b.classList.toggle('active', b.dataset.set===l);
+        b.classList.toggle('active', b.dataset.set===mode);
       });
-      try{localStorage.setItem('zf-lang',l);}catch(e){}
+      try{localStorage.setItem('zf-lang',mode);}catch(e){}
     }
     var saved=null; try{saved=localStorage.getItem('zf-lang');}catch(e){}
-    var initial = saved || ((navigator.language||'en').toLowerCase().indexOf('pt')===0?'pt':'en');
-    set(initial);
+    apply(saved || 'auto');   // AUTO pré-selecionado por padrão
     document.querySelectorAll('.toggle button').forEach(function(b){
-      b.addEventListener('click',function(){set(b.dataset.set);});
+      b.addEventListener('click',function(){apply(b.dataset.set);});
     });
   })();
 </script>
