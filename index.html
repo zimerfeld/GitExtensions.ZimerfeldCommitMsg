@@ -36,7 +36,7 @@
     background:rgba(13,17,23,.72);border-bottom:1px solid var(--line)}
   nav .wrap{display:flex;align-items:center;gap:14px;height:60px}
   nav img{width:30px;height:30px;border-radius:7px}
-  nav .brand{font-weight:700;letter-spacing:.2px}
+  nav .brand{font-weight:700;letter-spacing:.2px;font-size:clamp(10px,3.2vw,16px);white-space:nowrap}
   nav .spacer{flex:1}
   .toggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
   .toggle button{background:transparent;color:var(--muted);border:0;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600}
@@ -51,6 +51,9 @@
     nav .brand{order:2;margin-right:auto}
     nav .toggle{order:3}
     nav .navlinks{order:4;flex-basis:100%}
+  }
+  @media (max-width:420px){
+    nav .wrap{padding:10px 12px}
   }
   /* hero */
   header.hero{position:relative;overflow:hidden;padding:72px 0 56px;text-align:center;
