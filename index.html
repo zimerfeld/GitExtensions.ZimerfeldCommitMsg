@@ -41,19 +41,9 @@
   .toggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
   .toggle button{background:transparent;color:var(--muted);border:0;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600}
   .toggle button.active{background:var(--accent);color:#fff}
-  .navlinks{display:flex;align-items:center;gap:14px}
-  /* Nav compacto: em telas <= 860px, os links (Funcionalidades/Instalação)
-     vão para a linha de baixo, sob o nome do programa; marca + seletor no topo. */
-  @media (max-width:860px){
-    nav .wrap{flex-wrap:wrap;height:auto;row-gap:10px;padding:10px 0}
-    nav .spacer{display:none}
-    nav img{order:1}
-    nav .brand{order:2;margin-right:auto}
-    nav .toggle{order:3}
-    nav .navlinks{order:4;flex-basis:100%}
-  }
-  @media (max-width:420px){
-    nav .wrap{padding:10px 12px}
+  /* Nav compacto: em telas estreitas o seletor pode quebrar para a linha de baixo. */
+  @media (max-width:560px){
+    nav .wrap{flex-wrap:wrap;height:auto;row-gap:8px;padding:10px 12px}
   }
   /* hero */
   header.hero{position:relative;overflow:hidden;padding:72px 0 56px;text-align:center;
@@ -110,14 +100,6 @@
     <img src="https://raw.githubusercontent.com/zimerfeld/ZimerfeldCommitMsg/main/src/GitExtensions.ZimerfeldCommitMsg/Resources/icon-128.png" alt="GitExtensions.ZimerfeldCommitMsg icon">
     <span class="brand">GitExtensions.ZimerfeldCommitMsg</span>
     <span class="spacer"></span>
-    <div class="navlinks">
-      <a href="#features" class="lang-en" style="color:var(--muted);font-size:14px">Features</a>
-      <a href="#features" class="lang-pt" style="color:var(--muted);font-size:14px">Funcionalidades</a>
-      <a href="#features" class="lang-es" style="color:var(--muted);font-size:14px">Funcionalidades</a>
-      <a href="#install" class="lang-en" style="color:var(--muted);font-size:14px">Install</a>
-      <a href="#install" class="lang-pt" style="color:var(--muted);font-size:14px">Instalação</a>
-      <a href="#install" class="lang-es" style="color:var(--muted);font-size:14px">Instalación</a>
-    </div>
     <div class="toggle" role="group" aria-label="Language">
       <button data-set="auto">AUTO</button>
       <button data-set="pt">PT</button>
